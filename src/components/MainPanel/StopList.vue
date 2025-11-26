@@ -51,7 +51,6 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   padding-right: 2cqw;
 }
 
-/* La ligne infinie en arrière-plan */
 .stops-list::before {
   content: "";
   position: absolute;
@@ -93,7 +92,7 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   left: 1.2cqw;
   top: 0.7cqw;
   position: relative;
-  z-index: 2; /* Important : au-dessus du masque ::after */
+  z-index: 2; 
   flex-shrink: 0;
 }
 
