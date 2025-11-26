@@ -1,0 +1,55 @@
+{
+    "direction": "Noisy-le-Grand - Mont d'Est RER",
+    "stops": [
+        {
+            "stop": {
+                "id": "stop_point:IDFM:35857",
+                "name": "Pasteur",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "timeOfArrival": "2025-11-26T06:23:00+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:25861",
+                "name": "Mairie de Noisy-le-Grand - Jean Vaquier",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "timeOfArrival": "2025-11-26T06:25:00+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:36242",
+                "name": "Espace Michel Simon",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "timeOfArrival": "2025-11-26T06:27:00+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:36226",
+                "name": "R\u00e9publique",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "timeOfArrival": "2025-11-26T06:28:00+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:36234",
+                "name": "Noisy-le-Grand - Mont d'Est RER",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": true,
+            "timeOfArrival": "2025-11-26T06:30:00+00:00"
+        }
+    ]
+}

@@ -1,0 +1,85 @@
+@font-face {
+  font-family: "ParisineBold";
+  src: url("./assets/fonts/Parisine-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "ParisineRegular";
+  src: url("./assets/fonts/Parisine-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "AchemineBold";
+  src: url("./assets/fonts/achemine_bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "AchemineRegular";
+  src: url("./assets/fonts/achemine_regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "AchemineItalic";
+  src: url("./assets/fonts/achemine_italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IDFMBold";
+  src: url("./assets/fonts/IDFVoyageur-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "IDFMRegular";
+  src: url("./assets/fonts/IDFVoyageur-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "IDFMMedium";
+  src: url("./assets/fonts/IDFVoyageur-Medium.ttf") format("truetype");
+}
+
+:root {
+  --wg-green: #00aa83;
+  --wg-blue: #e6f6f3;
+  font-family: "ParisineRegular", "AchemineRegular", "sans-serif";
+
+  --ratp-blue: #0a0086;
+  --ratp-red: #ff1400;
+--ratp-beige: #e6e4dd;
+  --ratp-red-rgb: 255, 20, 0;
+
+  --ratp-bg: #bec5df;
+  --ratp-yellow: #fec107;
+  --ratp-orange: #ff8c00;
+
+  --ratp-orange-rgb: 255, 140, 0;
+--ratp-brown: #8D5E2A;
+  --ratp-green: #01aa01;
+  --ratp-bg2: #dee2ee;
+
+  --ratp-purple: #544dad;
+
+  --idfm-blue: rgb(100, 181, 229);
+  --idfm-black: #221f21;
+  --idfm-white: rgb(255, 255, 255);
+  --idfm-grey: rgb(217, 217, 214);
+  --idfm-brown: rgb(72, 45, 10);
+}
+img {
+  /*  no drag */
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+html,
+body,
+#app, .content {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-color: black;
+  font-family: "ParisineRegular", "AchemineRegular", "sans-serif";
+}
+
