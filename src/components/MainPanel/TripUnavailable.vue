@@ -17,6 +17,10 @@ defineProps<{
     </div>
     <aside class="aside">
       Informations<br />sur le parcours <br />du bus<br />indisponibles
+      <img
+        src="../../assets/img/screw-driver.svg"
+        class="tool-icon"
+      />
     </aside>
   </main>
 </template>
@@ -35,6 +39,7 @@ aside {
   padding: 2cqw;
   font-size: 2.5cqw;
   box-shadow: -5px 0 5px -5px black;
+  position: relative;
 }
 .welcome-text {
   font-size: 6cqw;
@@ -50,5 +55,11 @@ aside {
 }
 .line-logo {
   height: 5cqw;
+}
+.tool-icon {
+position: absolute;
+  width: 20cqw;
+  bottom: -5cqw;
+  right: -5cqw;
 }
 </style>

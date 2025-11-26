@@ -1,29 +1,35 @@
 <template>
   <main class="data-unavailable">
     <div>
-    <h1>Bienvenue <br />à bord</h1>
+      <h1>Bienvenue <br />à bord</h1>
     </div>
     <aside class="aside">
-        Informations<br />sur le parcours <br />du bus<br />indisponibles
+      Informations<br />sur le parcours <br />du bus<br />indisponibles
+      <img src="../../assets/img/screw-driver.svg" class="tool-icon" />
     </aside>
   </main>
 </template>
 <style lang="css" scoped>
 .data-unavailable {
-
-    display: grid;
+  display: grid;
   grid-template-columns: 65% 35%;
 
-  color:white;
+  color: white;
   padding-left: 2cqw;
-    background-color: rgb(36, 36, 36);
-    font-size: 3cqw;
-    box-shadow: 0 -5px 5px -5px black;
+  background-color: rgb(36, 36, 36);
+  font-size: 3cqw;
+  box-shadow: 0 -5px 5px -5px black;
 }
-aside{
+aside {
   padding: 2cqw;
-    font-size: 2.5cqw;
-    box-shadow: -5px 0 5px -5px black;
-
+  font-size: 2.5cqw;
+  box-shadow: -5px 0 5px -5px black;
+  position: relative;
+}
+.tool-icon {
+  position: absolute;
+  width: 20cqw;
+  bottom: -5cqw;
+  right: -5cqw;
 }
 </style>
