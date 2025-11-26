@@ -2,14 +2,16 @@
   <div
     class="screen"
     :class="{
-      'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(state),
+      'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(
+        state
+      ),
     }"
   >
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
       :line="line"
     />
-    <main>
+    <main :class="{ 'split-view': isSplit  && ['AT_STOP', 'NOT_AT_STOP'].includes(state)}">
       <Transition name="fade" mode="out-in">
         <Direction
           v-if="state === 'FIRST_STOP'"
@@ -32,6 +34,10 @@
           :line="line"
         />
       </Transition>
+      <ArrivingToIn
+        v-if="['AT_STOP', 'NOT_AT_STOP'].includes(state)"
+        :stops-list="desserte.stops"
+      />
     </main>
   </div>
 </template>
@@ -39,7 +45,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import ScreenHeader from "./ScreenHeader.vue";
-// import ArrivingToIn from "./SidePanel/ArrivingToIn.vue";
 import StopList from "./MainPanel/StopList.vue";
 // import NextDepartures from "./SidePanel/NextDepartures.vue";
 import DataUnavailable from "./MainPanel/DataUnavailable.vue";
@@ -52,10 +57,11 @@ import NotInService from "./MainPanel/NotInService.vue";
 import { useRoute } from "vue-router";
 import TripUnavailable from "./MainPanel/TripUnavailable.vue";
 import { Desserte, Line } from "../types";
+import { useIntervalFn } from "@vueuse/core";
+import ArrivingToIn from "./SidePanel/ArrivingToIn.vue";
 const desserteIntact = ref<Desserte>(json as Desserte);
 const line = ref<Line | null>(null);
 const route = useRoute();
-
 const fetchLineData = async () => {
   try {
     const lineData = await Api.getLine(route.query.lineRef as string);
@@ -160,10 +166,16 @@ const updateState = () => {
     desserte.value.stops.shift();
   }
 };
-
+const isSplit = ref(true);
 onMounted(() => {
   fetchLineData();
   updateIntervalId = setInterval(updateState, 1_000);
+  useIntervalFn(() => {
+    const oldValue = isSplit.value;
+    isSplit.value = !oldValue;
+    isSplit.value = true;
+    
+  }, 30_000);
 });
 
 onUnmounted(() => {
@@ -185,9 +197,14 @@ onUnmounted(() => {
 main {
   display: grid;
   /* grid-template-columns: 65% 35%; */
+  grid-template-columns: 100% 35%;
+  transition: grid-template-columns 2s cubic-bezier(0.25, 0.8, 0.25, 1);
   grid-template-rows: 100%;
   overflow: hidden;
   background-color: var(--ratp-beige);
+}
+main.split-view {
+  grid-template-columns: 65% 35%;
 }
 /* Animation de transition avec glissement */
 .fade-enter-active,

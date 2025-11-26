@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { getSecondesFromDate } from "../../utils";
+import { StopWithTime } from "../../types";
 
-defineProps<{ stop: StopWithTime; index: number }>();
+const props = defineProps<{ stop: StopWithTime; index: number }>();
 
 const nowTrigger = ref(Date.now());
 let timer: ReturnType<typeof setInterval>;
+
+const stopNameClass = computed(() => {
+  return {
+    'stop-name-long': props.stop.stop.name.length >= 22
+  }
+});
 
 onMounted(() => {
   timer = setInterval(() => {
@@ -34,7 +41,7 @@ onUnmounted(() => {
     :data-time="getSecondesFromDate(stop.timeOfArrival, true)"
   >
     <div class="stop-indicator"></div>
-    <span class="stop-name">{{ stop.stop.name }}</span>
+    <span class="stop-name" :class="stopNameClass">{{ stop.stop.name }}</span>
     <div>
       <img class="non-accessible-stop" src="../../assets/img/non-accessible-stop.png" alt="non accessible stop" v-if="!stop.stop.isAccessible" />
     </div>
@@ -42,7 +49,6 @@ onUnmounted(() => {
 </template>
 <style lang="css" scoped>
 .stop {
-  font-size: 5cqw;
   display: flex;
   gap: 3cqw;
   position: relative;
@@ -80,7 +86,12 @@ onUnmounted(() => {
 
 .stop-name {
   color: var(--ratp-blue);
+  font-size: 5cqw;
 }
+.stop-name-long{
+  font-size: 4cqw;
+}
+
 
 /* Animations pour les transitions */
 .stop-transition-enter-active,

@@ -1,5 +1,39 @@
 {
     "direction": "Marne-la-Vall\u00e9e Chessy",
     "stops": [
+ 
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:58874",
+                "name": "Bussy-Saint-Georges",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T09:58:51+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:43213",
+                "name": "Val d'Europe",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T10:03:06+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:43239",
+                "name": "Marne-la-Vall\u00e9e Chessy",
+                "isAccessible": true
+            },
+            "isStopSkipped": false,
+            "isTerminus": true,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T10:06:50+00:00"
+        }
     ]
 }

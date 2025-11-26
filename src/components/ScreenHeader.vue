@@ -2,7 +2,7 @@
   <header>
     <div class="line-and-mode">
       <BusPicto class="picto" />
-      <LineLogo v-if="line" :line="line" className="picto smaller" size="70%" />
+      <LineLogo v-if="line" :line="line" className="picto smaller" size="100%" />
     </div>
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>

@@ -1,10 +1,10 @@
-interface Stop {
+export interface Stop {
   id: string;
   name: string;
   landmarkName?: string;
   isAccessible: boolean;
 }
-interface StopWithTime {
+export interface StopWithTime {
   stop: Stop;
   timeOfArrival: string;
   isTerminus: boolean;

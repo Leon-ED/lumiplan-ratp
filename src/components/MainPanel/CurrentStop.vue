@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Stop } from '../../types';
+
 defineProps<{stop: Stop}>();
 
 </script>
@@ -29,7 +31,7 @@ defineProps<{stop: Stop}>();
 }
 
 .current-stop-name {
-    font-size: 7cqw;
+    font-size: 9cqw;
     text-align: center;
 }
 .current-stop-landmark-name{
