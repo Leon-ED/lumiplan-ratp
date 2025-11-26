@@ -20,6 +20,7 @@ onMounted(() => {
   }, 1000);
 });
 const isStopCurrent = (stop: StopWithTime, index: number) => {
+  // @ts-ignore
   const _ = nowTrigger.value;
   return !stop.isStopSkipped  && getSecondesFromDate(stop.timeOfArrival, true) <= 0 && index === 0 && getSecondesFromDate(stop.timeOfArrival, true) > -20;
 };

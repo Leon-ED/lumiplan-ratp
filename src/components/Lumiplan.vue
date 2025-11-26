@@ -9,19 +9,23 @@
   >
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
-      :line="line"
+      :line="line!"
     />
-    <main :class="{ 'split-view': isSplit  && ['AT_STOP', 'NOT_AT_STOP'].includes(state)}">
+    <main
+      :class="{
+        'split-view': isSplit && ['AT_STOP', 'NOT_AT_STOP'].includes(state),
+      }"
+    >
       <Transition name="fade" mode="out-in">
         <Direction
           v-if="state === 'FIRST_STOP'"
           :direction="desserte.direction"
-          :departure-date="currentStop?.timeOfArrival"
+          :departure-date="currentStop!.timeOfArrival"
         />
         <NotInService v-else-if="state === 'NOT_IN_SERVICE'" />
         <CurrentStop
           v-else-if="state === 'AT_STOP'"
-          :stop="currentStop?.stop"
+          :stop="currentStop!.stop"
         />
         <StopList
           v-else-if="state === 'NOT_AT_STOP'"
@@ -31,7 +35,7 @@
         <DataUnavailable v-else-if="state === 'NO_DATA'" />
         <TripUnavailable
           v-else-if="state === 'NO_TRIP_DATA_AVAILABLE'"
-          :line="line"
+          :line="line!"
         />
       </Transition>
       <ArrivingToIn
@@ -46,7 +50,6 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import ScreenHeader from "./ScreenHeader.vue";
 import StopList from "./MainPanel/StopList.vue";
-// import NextDepartures from "./SidePanel/NextDepartures.vue";
 import DataUnavailable from "./MainPanel/DataUnavailable.vue";
 import json from "../mock/treated303.json";
 import Direction from "./MainPanel/Direction.vue";
@@ -87,11 +90,11 @@ const currentStop = computed(() =>
 const state = ref<ScreenState>("NO_DATA");
 
 const computeState = () => {
+  if (!line.value) {
+    state.value = "NO_DATA";
+    return;
+  }
   if (desserte.value.stops.length === 0) {
-    if (!line.value) {
-      state.value = "NO_DATA";
-      return;
-    }
     state.value = "NO_TRIP_DATA_AVAILABLE";
   } else if (
     currentStop.value &&
@@ -153,29 +156,24 @@ const updateState = () => {
   computeState();
   if (
     currentStop.value &&
-    currentStop.value.isTerminus &&
-    getSecondesFromDate(currentStop.value.timeOfArrival, true) < -20
-  ) {
-    desserte.value.stops.shift();
-    console.log(desserte.value);
-  } else if (
-    currentStop.value &&
-    !currentStop.value.isTerminus &&
-    getSecondesFromDate(currentStop.value.timeOfArrival, true) < -6
+    // Si c'est un terminus on attend un peu plus longtemps avant de supprimer l'arrêt
+    ((currentStop.value.isTerminus &&
+      getSecondesFromDate(currentStop.value.timeOfArrival, true) < -20) ||
+      // Sinon on supprime dès que le bus est parti depuis plus de 6 secondes
+      (!currentStop.value.isTerminus &&
+        getSecondesFromDate(currentStop.value.timeOfArrival, true) < -6))
   ) {
     desserte.value.stops.shift();
   }
 };
-const isSplit = ref(true);
+const isSplit = ref(false);
 onMounted(() => {
   fetchLineData();
   updateIntervalId = setInterval(updateState, 1_000);
   useIntervalFn(() => {
     const oldValue = isSplit.value;
     isSplit.value = !oldValue;
-    isSplit.value = true;
-    
-  }, 30_000);
+  }, 15_000);
 });
 
 onUnmounted(() => {

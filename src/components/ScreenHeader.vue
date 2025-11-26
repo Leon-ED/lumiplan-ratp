@@ -11,9 +11,10 @@
   </header>
 </template>
 <script setup lang="ts">
+import { Line } from "../types";
 import BusPicto from "./BusPicto.vue";
 import LineLogo from "./Other/LineLogo.vue";
-const props = defineProps<{
+defineProps<{
   direction: string;
   line:Line;
 }>();

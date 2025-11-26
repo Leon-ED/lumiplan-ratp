@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { getSecondesFromDate } from "../../utils";
 import { computed } from "vue";
 import Stop from "./Stop.vue";
+import { StopWithTime } from "../../types";
 
 const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 

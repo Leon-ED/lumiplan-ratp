@@ -20,19 +20,6 @@
   </aside>
 </template>
 <script setup lang="ts">
-// interface Props {
-//   stopsList: {
-//     stop: Stop;
-//     timeOfArrival: Date;
-//   }[];
-// }
-// defineProps<Props>();
-
-const getMinutesFromDate = (date: Date): number => {
-  const now = new Date();
-  const diffInMs = date.getTime() - now.getTime();
-  return Math.max(0, Math.floor(diffInMs / (1000 * 60)));
-};
 </script>
 <style lang="css" scoped>
 .line-and-mode {
