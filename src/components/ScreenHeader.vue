@@ -5,13 +5,16 @@
       <img src="../assets/303.png" alt="303" class="picto smaller" />
     </div>
     <div class="direction">
-      <span class="direction-name"> Noisy-le-Grand–Mont d'Est RER </span>
+      <span class="direction-name"> {{direction}}</span>
     </div>
     <div class="clock">00:00</div>
   </header>
 </template>
 <script setup lang="ts">
 import BusPicto from "./BusPicto.vue";
+const props = defineProps<{
+  direction: string;
+}>();
 </script>
 <style lang="scss" scoped>
 .no-data-available header {

@@ -6,11 +6,30 @@ interface Stop {
 }
 interface StopWithTime {
   stop: Stop;
-  timeOfArrival: Date;
+  timeOfArrival: string;
   isTerminus: boolean;
+  isFirstStop: boolean;
 }
 
 interface Desserte {
   direction: string;
   stops: StopWithTime[];
+}
+
+enum Mode{
+  BUS = "BUS",
+  NOCTILIEN = "NOCTILIEN",
+  TRAMWAY = "TRAMWAY",
+  METRO = "METRO",
+  RER = "RER",
+  TRANSILIEN = "TRANSILIEN",
+  CABLE = "CABLE"
+}
+
+interface Line{
+  id: string;
+  name: string;
+  color: string;
+  textColor: string;
+  mode: Mode;
 }

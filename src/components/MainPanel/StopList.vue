@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
+import { getSecondesFromDate } from '../../utils';
+
+const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 </script>
 
 <template>
@@ -14,7 +16,7 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
           v-for="stop in stops.slice(0, 2)"
           :key="stop.stop.name"
           class="stop blinkable"
-          :class="{ 'is-last-stop': stop.isTerminus }"
+          :class="{ 'is-last-stop': stop.isTerminus, 'is-current': getSecondesFromDate(stop.timeOfArrival, true) <= -5}"
         >
           <div class="stop-indicator"></div>
           <span class="stop-name">{{ stop.stop.name }}</span>
@@ -54,7 +56,7 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 .stops-list::before {
   content: "";
   position: absolute;
-  left: 2cqw;
+  left: 2.05cqw;
   top: -1000px;
   bottom: 0;
   width: 2.2cqw;
@@ -177,6 +179,12 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   z-index: 10;
 }
 
+.stop.is-current .stop-name {
+  background-color: var(--ratp-blue);
+  color: white;
+  padding: 0.6cqw;
+
+}
 .stop.is-last-stop .stop-name {
   background-color: black;
   color: white;
