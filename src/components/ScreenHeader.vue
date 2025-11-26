@@ -28,15 +28,16 @@ header {
   container-type: inline-size;
   background-color: white;
   display: grid;
-  grid-template-columns: 15% 70% 15%;
+  grid-template-columns: 12% 75% 13%;
   grid-template-rows: 100%;
   font-family: "ParisineBold", sans-serif;
 }
 .line-and-mode {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 0.2em;
+  padding-left: 1cqw;
   gap: 0.5em;
 }
 .line-and-mode .picto {
@@ -50,8 +51,9 @@ header {
 
 .clock {
   color: var(--ratp-yellow);
+  font-family: 'ParisineRegular';
   background-color: black;
-  font-size: 4cqw;
+  font-size: 3cqw;
   display: flex;
   justify-content: center;
   align-items: center;

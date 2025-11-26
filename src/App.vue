@@ -5,7 +5,7 @@ import FitBox from './components/FitBox.vue';
 </script>
 <template>
 <div class="content">
-  <FitBox :ratio="'30/10'">
+  <FitBox :ratio="'32/9'">
     <Lumiplan />
   </FitBox>
 

@@ -57,14 +57,14 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   left: 2cqw;
   top: -1000px;
   bottom: 0;
-  width: 2.5cqw;
+  width: 2.2cqw;
   height: 100000px;
   background-color: v-bind(primaryColor);
   z-index: 1;
 }
 
 .stop {
-  font-size: 4cqw;
+  font-size: 5cqw;
   display: flex;
   gap: 3cqw;
   padding: 2cqw 0;
@@ -84,13 +84,13 @@ defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 }
 
 .stop-indicator {
-  width: 3cqw;
-  height: 3cqw;
+  width: 2.5cqw;
+  height: 2.5cqw;
   background-color: white;
   border: .5cqw solid black;
   border-radius: 50%;
-  left: 1.2cqw;
-  top: 0.7cqw;
+  left: 1.4cqw;
+  top: 1.5cqw;
   position: relative;
   z-index: 2; 
   flex-shrink: 0;

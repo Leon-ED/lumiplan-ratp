@@ -35,7 +35,7 @@ if(event.key === "ArrowRight"){
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-rows: 25% 75%;
+  grid-template-rows: 22% 78%;
   font-size: 3cqmin;
   container-type: inline-size;
 
