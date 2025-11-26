@@ -1,5 +1,10 @@
 <template>
-  <div class="screen" :class="{ 'no-data-available': ['NO_DATA','TRIP_UNAVAILABLE'].includes(state) }">
+  <div
+    class="screen"
+    :class="{
+      'no-data-available': ['NO_DATA', 'TRIP_UNAVAILABLE'].includes(state),
+    }"
+  >
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
       :line="line"
@@ -19,10 +24,13 @@
         <StopList
           v-else-if="state === 'NOT_AT_STOP'"
           :stops="desserte.stops"
-          :primary-color="line.color"
+          :primary-color="line?.color || '#000000'"
         />
         <DataUnavailable v-else-if="state === 'NO_DATA'" />
-        <TripUnavailable v-else-if="state === 'TRIP_UNAVAILABLE'" :line="line" />
+        <TripUnavailable
+          v-else-if="state === 'TRIP_UNAVAILABLE'"
+          :line="line"
+        />
       </Transition>
     </main>
   </div>
@@ -73,17 +81,11 @@ const currentStop = computed(() =>
 const state = ref<ScreenState>("NO_DATA");
 
 const computeState = () => {
-  if (
-    desserte.value.stops.length === 0 &&
-    !line.value === null &&
-    !line.value === undefined
-  ) {
-    state.value = "NO_DATA";
-  }else if (
-    desserte.value.stops.length === 0 &&
-    line.value !== null &&
-    line.value !== undefined
-  ) {
+  if (desserte.value.stops.length === 0) {
+    if (!line.value) {
+      state.value = "NO_DATA";
+      return;
+    }
     state.value = "TRIP_UNAVAILABLE";
   } else if (
     currentStop.value &&
@@ -121,7 +123,6 @@ const desserte = ref<Desserte>({
 watch(
   () => desserte.value,
   () => {
-    
     computeState();
   },
   { deep: true }
@@ -129,7 +130,6 @@ watch(
 watch(
   () => state.value,
   () => {
-
     console.log(state);
   },
   { deep: true }
