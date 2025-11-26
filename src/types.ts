@@ -9,6 +9,7 @@ interface StopWithTime {
   timeOfArrival: string;
   isTerminus: boolean;
   isFirstStop: boolean;
+  isStopSkipped: boolean;
 }
 
 interface Desserte {

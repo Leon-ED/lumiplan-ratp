@@ -5,7 +5,7 @@
       <img src="../assets/303.png" alt="303" class="picto smaller" />
     </div>
     <div class="direction">
-      <span class="direction-name"> {{direction}}</span>
+      <span class="direction-name"> {{ direction }}</span>
     </div>
     <div class="clock">00:00</div>
   </header>

@@ -1,26 +1,60 @@
 <script setup lang="ts">
-import { getSecondesFromDate } from '../../utils';
+import { getSecondesFromDate } from "../../utils";
+import { computed } from "vue";
+import Stop from "./Stop.vue";
 
 const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
+
+const text = computed(() => {
+  return props.stops[props.stops.length - 1].isTerminus &&
+    props.stops.length === 1
+    ? "Prochain arrêt : terminus"
+    : "Prochains arrêts";
+});
+const getIndexForStop = (i: number) => {
+  const stop0 = props.stops[0];
+  const stop1 = props.stops[1];
+
+  // Cas 1 : stop 0 n'est pas skip → il est le seul index 0
+  if (!stop0.isStopSkipped) {
+    return i === 0 ? 0 : 1;
+  }
+
+  // Cas 2 : stop 0 est skip → stop 1 prend 0 s'il peut
+  if (stop1 && !stop1.isStopSkipped) {
+    return i === 1 ? 0 : 1;
+  }
+
+  // Cas 3 : les deux sont skip → aucun index 0
+  return 1;
+};
+
 </script>
 
 <template>
   <div class="stops-list-container">
     <ol class="stops-list">
+      <li class="next-stop-container" key="next-stop">
+        <div class="next-stop-arrow-indicator">
+          <img
+            src="../../assets/img/down-arrow.png"
+            alt="arrow"
+            class="arrow-icon"
+          />
+        </div>
+        <span class="next-stop-description">{{ text }}</span>
+      </li>
       <TransitionGroup
         name="stop-transition"
         tag="div"
         class="stops-transition-wrapper"
       >
-        <li
-          v-for="stop in stops.slice(0, 2)"
-          :key="stop.stop.name"
-          class="stop blinkable"
-          :class="{ 'is-last-stop': stop.isTerminus, 'is-current': getSecondesFromDate(stop.timeOfArrival, true) <= -5}"
-        >
-          <div class="stop-indicator"></div>
-          <span class="stop-name">{{ stop.stop.name }}</span>
-        </li>
+        <Stop
+          v-for="(stopWithTime, index) in stops.slice(0, 2)"
+          :index="getIndexForStop(index)"
+          :key="stopWithTime.stop.id"
+          :stop="stopWithTime"
+        />
       </TransitionGroup>
     </ol>
   </div>
@@ -52,7 +86,10 @@ const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   justify-content: space-around;
   padding-right: 2cqw;
 }
-
+.stop-transition-move {
+  transition: transform 1s ease-in-out;
+  z-index: 10;
+}
 .stops-list::before {
   content: "";
   position: absolute;
@@ -65,39 +102,30 @@ const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   z-index: 1;
 }
 
-.stop {
-  font-size: 5cqw;
-  display: flex;
-  gap: 3cqw;
-  padding: 2cqw 0;
-  position: relative;
-}
-
-.stop.is-last-stop::after {
-  content: "";
+.arrow-icon {
   position: absolute;
-  left: 2cqw;
-  width: 2.5cqw;
-  top: 5cqw;
-  height: 2000px;
-  background-color: var(--ratp-beige);
-  z-index: 1;
-  pointer-events: none;
+  z-index: 2;
+  left: 2.5cqw;
+  top: 1.45cqw;
+  width: 1.3cqw;
+  fill: white;
+}
+.next-stop-description {
+  font-family: "ParisineRegular";
+  position: absolute;
+  left: 5.5cqw;
+  top: 1cqw;
+  font-size: 2cqw;
+  color: #212121;
 }
 
-.stop-indicator {
-  width: 2.5cqw;
-  height: 2.5cqw;
-  background-color: white;
-  border: .5cqw solid black;
-  border-radius: 50%;
-  left: 1.4cqw;
-  top: 1.5cqw;
-  position: relative;
-  z-index: 2; 
-  flex-shrink: 0;
+.next-stop {
+  font-family: "ParisineRegular";
+  font-size: 2.1cqw;
+  color: gray;
+  padding: 0;
+  padding-left: 2cqw;
 }
-
 .next-stop .stop-indicator {
   border-radius: 0;
   background-color: transparent;
@@ -111,83 +139,17 @@ const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
   justify-content: center;
 }
 
-.arrow-icon {
-  width: 100%;
-  height: 100%;
-  fill: white;
-}
-
-.stop-name {
-  color: var(--ratp-blue);
-}
-
-.next-stop {
-  font-family: "ParisineRegular";
-  font-size: 2.1cqw;
-  color: gray;
-  padding: 0;
-  padding-left: 2cqw;
-}
-
-.blinkable:first-of-type .stop-indicator {
-  animation: blink 1.2s infinite steps(1);
-}
-
-@keyframes blink {
-  0%,
-  49% {
-    background-color: var(--ratp-yellow);
-  }
-  50%,
-  100% {
-    background-color: white;
-  }
-}
-
 .stops-transition-wrapper {
   display: contents;
 }
 
-/* Animations pour les transitions */
-.stop-transition-enter-active,
-.stop-transition-leave-active {
-  transition: transform 1s ease-in-out;
-  z-index: 10;
+.next-stop-container {
+  transition: opacity 0.5s ease;
 }
 
-.stop-transition-enter-active .stop-indicator,
-.stop-transition-leave-active .stop-indicator {
-  z-index: 10;
-}
-.stop-transition-leave-active {
-  transition: transform 1s ease-in-out;
-  z-index: 10;
-
-  position: absolute;
-  width: 100%;
-}
-.stop-transition-enter-from {
-  transform: translateY(100%);
-}
-
-.stop-transition-leave-to {
-  transform: translateY(-200%);
-}
-
-.stop-transition-move {
-  transition: transform 1s ease-in-out;
-  z-index: 10;
-}
-
-.stop.is-current .stop-name {
-  background-color: var(--ratp-blue);
-  color: white;
-  padding: 0.6cqw;
-
-}
-.stop.is-last-stop .stop-name {
-  background-color: black;
-  color: white;
-  padding: 0.6cqw;
+.stops-list:has(.stop-transition-enter-active) .next-stop-container,
+.stops-list:has(.stop-transition-leave-active) .next-stop-container {
+  opacity: 0;
+  pointer-events: none; /* Empêche les clics pendant l'animation */
 }
 </style>

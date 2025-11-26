@@ -1,357 +1,181 @@
 {
-    "direction": "Nogent-sur-Marne RER",
+    "direction": "Marne-la-Vall\u00e9e Chessy",
     "stops": [
         {
             "stop": {
-                "id": "stop_point:IDFM:36233",
-                "name": "Noisy-le-Grand - Mont d'Est RER",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": true,
-            "timeOfArrival": "2025-11-26T08:02:30+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:36318",
-                "name": "Le Th\u00e9\u00e2tre",
+                "id": "stop_point:IDFM:monomodalStopPlace:45873",
+                "name": "Auber",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:03:00+00:00"
+            "timeOfArrival": "2025-11-26T09:21:35+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:460394",
-                "name": "Lyc\u00e9e International",
+                "id": "stop_point:IDFM:monomodalStopPlace:45102",
+                "name": "Ch\u00e2telet les Halles",
+                "isAccessible": false
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T09:24:10+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:470195",
+                "name": "Gare de Lyon",
+                "isAccessible": true
+            },
+            "isStopSkipped": true,
+            "isTerminus": false,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T09:27:25+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:473875",
+                "name": "Nation",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T07:01:30+00:00"
+            "timeOfArrival": "2025-11-26T09:30:06+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36317",
-                "name": "H\u00f4pital Priv\u00e9 de Marne-la-Vall\u00e9e",
+                "id": "stop_point:IDFM:monomodalStopPlace:43224",
+                "name": "Vincennes",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:04:00+00:00"
+            "timeOfArrival": "2025-11-26T09:33:19+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36260",
-                "name": "La Fontaine",
+                "id": "stop_point:IDFM:monomodalStopPlace:47900",
+                "name": "Val de Fontenay",
+                "isAccessible": false
+            },
+            "isStopSkipped": false,
+            "isTerminus": false,
+            "isFirstStop": false,
+            "timeOfArrival": "2025-11-26T09:37:35+00:00"
+        },
+        {
+            "stop": {
+                "id": "stop_point:IDFM:monomodalStopPlace:43172",
+                "name": "Neuilly-Plaisance",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:08:00+00:00"
+            "timeOfArrival": "2025-11-26T09:40:19+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36258",
-                "name": "Moli\u00e8re",
+                "id": "stop_point:IDFM:monomodalStopPlace:43101",
+                "name": "Bry-sur-Marne",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:09:30+00:00"
+            "timeOfArrival": "2025-11-26T09:42:19+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36257",
-                "name": "Europe",
+                "id": "stop_point:IDFM:monomodalStopPlace:474082",
+                "name": "Noisy-le-Grand - Mont d'Est",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:12:00+00:00"
+            "timeOfArrival": "2025-11-26T09:44:47+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:26017",
-                "name": "Georges M\u00e9li\u00e8s",
+                "id": "stop_point:IDFM:monomodalStopPlace:58937",
+                "name": "Noisy - Champs",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:14:00+00:00"
+            "timeOfArrival": "2025-11-26T09:47:37+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:26016",
-                "name": "H\u00f4pital Saint-Camille",
+                "id": "stop_point:IDFM:monomodalStopPlace:44199",
+                "name": "Noisiel",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:15:00+00:00"
+            "timeOfArrival": "2025-11-26T09:50:33+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:22595",
-                "name": "2 d\u00e9cembre 1870",
+                "id": "stop_point:IDFM:monomodalStopPlace:43152",
+                "name": "Lognes",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:16:00+00:00"
+            "timeOfArrival": "2025-11-26T09:52:33+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36321",
-                "name": "Docteur Armand Brillard",
+                "id": "stop_point:IDFM:monomodalStopPlace:43207",
+                "name": "Torcy",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:18:00+00:00"
+            "timeOfArrival": "2025-11-26T09:54:43+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:26015",
-                "name": "Chemin des Moines",
+                "id": "stop_point:IDFM:monomodalStopPlace:58874",
+                "name": "Bussy-Saint-Georges",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:19:00+00:00"
+            "timeOfArrival": "2025-11-26T09:58:51+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:36320",
-                "name": "Cimeti\u00e8re - Fun\u00e9rarium de Bry",
+                "id": "stop_point:IDFM:monomodalStopPlace:43213",
+                "name": "Val d'Europe",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": false,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:20:00+00:00"
+            "timeOfArrival": "2025-11-26T10:03:06+00:00"
         },
         {
             "stop": {
-                "id": "stop_point:IDFM:9541",
-                "name": "Bry-sur-Marne RER",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:21:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:7818",
-                "name": "Place Carnot",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:23:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:26014",
-                "name": "Ch\u00e2teau",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:25:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:26021",
-                "name": "Rue de la Marne",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:26:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:26020",
-                "name": "Avenue de Rigny",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:27:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:37612",
-                "name": "Mairie",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:29:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:36326",
-                "name": "Mar\u00e9chal Joffre - Pont de Bry",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:31:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:36325",
-                "name": "Les Ormes",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:32:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:485191",
-                "name": "Doumer - Brossolette",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:35:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:36327",
-                "name": "Alma",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:37:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:27633",
-                "name": "Les Parclairs",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:39:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:22591",
-                "name": "Nogent-le-Perreux RER",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:42:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:26412",
-                "name": "Mairie",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:44:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:9142",
-                "name": "H\u00f4tel des Coignard",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:45:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:9542",
-                "name": "Marche de Nogent-sur-Marne",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:47:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:22589",
-                "name": "Sous-Pr\u00e9fecture - Jules Ferry",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:48:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:26025",
-                "name": "Rue de Beaut\u00e9",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:50:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:7799",
-                "name": "Place du G\u00e9n\u00e9ral Leclerc",
-                "isAccessible": true
-            },
-            "isStopSkipped": false,
-            "isTerminus": false,
-            "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:53:00+00:00"
-        },
-        {
-            "stop": {
-                "id": "stop_point:IDFM:493533",
-                "name": "Nogent-sur-Marne RER",
+                "id": "stop_point:IDFM:monomodalStopPlace:43239",
+                "name": "Marne-la-Vall\u00e9e Chessy",
                 "isAccessible": true
             },
             "isStopSkipped": false,
             "isTerminus": true,
             "isFirstStop": false,
-            "timeOfArrival": "2025-11-26T08:55:00+00:00"
+            "timeOfArrival": "2025-11-26T10:06:50+00:00"
         }
     ]
 }

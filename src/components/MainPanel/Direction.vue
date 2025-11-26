@@ -1,9 +1,23 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { getMinutesFromDate } from "../../utils";
+import { useIntervalFn } from "@vueuse/core";
+
 interface Props {
   direction: string;
-  departureInMinutes: number;
+  departureDate: string;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const minutes = ref<number>(getMinutesFromDate(props.departureDate));
+
+useIntervalFn(
+  () => {
+    minutes.value = getMinutesFromDate(props.departureDate);
+  },
+  30_000,
+  { immediate: true }
+);
 </script>
 <template>
   <main class="direction">
@@ -13,7 +27,11 @@ defineProps<Props>();
     </div>
     <aside class="aside">
       <div class="text">Départ dans</div>
-      <div class="time">{{ departureInMinutes }}</div>
+      <div class="time">
+        <span :class="{ 'blink-text': minutes === 0 }">
+          {{ minutes }}
+        </span>
+      </div>
       <div class="unit">min</div>
     </aside>
   </main>
