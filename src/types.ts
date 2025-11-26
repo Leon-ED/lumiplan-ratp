@@ -12,12 +12,12 @@ interface StopWithTime {
   isStopSkipped: boolean;
 }
 
-interface Desserte {
+export interface Desserte {
   direction: string;
   stops: StopWithTime[];
 }
 
-enum Mode{
+export enum Mode{
   BUS = "BUS",
   NOCTILIEN = "NOCTILIEN",
   TRAMWAY = "TRAMWAY",
@@ -27,7 +27,7 @@ enum Mode{
   CABLE = "CABLE"
 }
 
-interface Line{
+export interface Line{
   id: string;
   name: string;
   color: string;

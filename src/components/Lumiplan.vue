@@ -1,7 +1,8 @@
 <template>
-  <div class="screen" :class="{ 'no-data-available': state === 'NO_DATA' }">
+  <div class="screen" :class="{ 'no-data-available': ['NO_DATA','TRIP_UNAVAILABLE'].includes(state) }">
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
+      :line="line"
     />
     <main>
       <Transition name="fade" mode="out-in">
@@ -18,9 +19,10 @@
         <StopList
           v-else-if="state === 'NOT_AT_STOP'"
           :stops="desserte.stops"
-          primary-color="#6E6E00"
+          :primary-color="line.color"
         />
         <DataUnavailable v-else-if="state === 'NO_DATA'" />
+        <TripUnavailable v-else-if="state === 'TRIP_UNAVAILABLE'" :line="line" />
       </Transition>
     </main>
   </div>
@@ -36,15 +38,19 @@ import DataUnavailable from "./MainPanel/DataUnavailable.vue";
 import json from "../mock/treated303.json";
 import Direction from "./MainPanel/Direction.vue";
 import CurrentStop from "./MainPanel/CurrentStop.vue";
-import { getMinutesFromDate, getSecondesFromDate } from "../utils";
+import { getSecondesFromDate } from "../utils";
 import { Api } from "../api";
 import NotInService from "./MainPanel/NotInService.vue";
+import { useRoute } from "vue-router";
+import TripUnavailable from "./MainPanel/TripUnavailable.vue";
+import { Desserte, Line } from "../types";
 const desserteIntact = ref<Desserte>(json as Desserte);
 const line = ref<Line | null>(null);
+const route = useRoute();
 
-const fetchLineData = async (lineId: string) => {
+const fetchLineData = async () => {
   try {
-    const lineData = await Api.getLine(lineId);
+    const lineData = await Api.getLine(route.query.lineRef as string);
     line.value = lineData;
   } catch (error) {
     console.error("Error fetching line data:", error);
@@ -54,6 +60,7 @@ const fetchLineData = async (lineId: string) => {
 // create an enums of possible states of the screen
 type ScreenState =
   | "NO_DATA"
+  | "TRIP_UNAVAILABLE"
   | "FIRST_STOP"
   | "AT_STOP"
   | "NOT_AT_STOP"
@@ -66,9 +73,18 @@ const currentStop = computed(() =>
 const state = ref<ScreenState>("NO_DATA");
 
 const computeState = () => {
-    if (desserte.value.stops.length === 0) {
+  if (
+    desserte.value.stops.length === 0 &&
+    !line.value === null &&
+    !line.value === undefined
+  ) {
     state.value = "NO_DATA";
-    return "NO_DATA";
+  }else if (
+    desserte.value.stops.length === 0 &&
+    line.value !== null &&
+    line.value !== undefined
+  ) {
+    state.value = "TRIP_UNAVAILABLE";
   } else if (
     currentStop.value &&
     currentStop.value.stop &&
@@ -78,7 +94,7 @@ const computeState = () => {
     state.value = "FIRST_STOP";
   } else if (
     currentStop.value &&
-    !currentStop.value.isStopSkipped&&
+    !currentStop.value.isStopSkipped &&
     getSecondesFromDate(currentStop.value.timeOfArrival) <= 5 &&
     getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -5
   ) {
@@ -99,19 +115,23 @@ const desserte = ref<Desserte>({
   ...desserteIntact.value,
   stops: desserteIntact.value.stops.map((stop, i) => ({
     ...stop,
-    timeOfArrival: new Date(Date.now() + (i + 1) * 15 * 1000).toISOString()
-  }))
+    timeOfArrival: new Date(Date.now() + (i + 1) * 15 * 1000).toISOString(),
+  })),
 });
 watch(
   () => desserte.value,
   () => {
+    
     computeState();
   },
   { deep: true }
 );
 watch(
   () => state.value,
-  () => {},
+  () => {
+
+    console.log(state);
+  },
   { deep: true }
 );
 
@@ -142,6 +162,7 @@ const updateState = () => {
 };
 
 onMounted(() => {
+  fetchLineData();
   updateIntervalId = setInterval(updateState, 1_000);
 });
 

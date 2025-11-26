@@ -2,7 +2,7 @@
   <header>
     <div class="line-and-mode">
       <BusPicto class="picto" />
-      <img src="../assets/303.png" alt="303" class="picto smaller" />
+      <LineLogo v-if="line" :line="line" className="picto smaller" size="70%" />
     </div>
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
@@ -12,8 +12,10 @@
 </template>
 <script setup lang="ts">
 import BusPicto from "./BusPicto.vue";
+import LineLogo from "./Other/LineLogo.vue";
 const props = defineProps<{
   direction: string;
+  line:Line;
 }>();
 </script>
 <style lang="scss" scoped>

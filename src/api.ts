@@ -1,3 +1,6 @@
+import { Mode } from "fs";
+import { Line } from "./types";
+
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
 
@@ -14,8 +17,8 @@ export class Api {
       const line = linesData.lines[0];
       const realLine: Line = {
         id: line.id,
-        name: line.name,
-        color: line.color,
+        name: line.name.startsWith("TER ") ? 'TER'  : line.name,
+        color: line.backgroundColor,
         textColor: line.textColor,
         mode: line.mode.toUpperCase() as Mode,
       };

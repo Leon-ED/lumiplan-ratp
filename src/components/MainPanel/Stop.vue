@@ -63,7 +63,7 @@ onUnmounted(() => {
   position: relative;
 }
 .non-accessible-stop {
-  height: auto;
+  height: 5cqw;
 }
 .stop-indicator {
   width: 2.5cqw;
