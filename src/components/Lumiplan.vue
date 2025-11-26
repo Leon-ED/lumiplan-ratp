@@ -2,7 +2,7 @@
   <div
     class="screen"
     :class="{
-      'no-data-available': ['NO_DATA', 'TRIP_UNAVAILABLE'].includes(state),
+      'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(state),
     }"
   >
     <ScreenHeader
@@ -28,7 +28,7 @@
         />
         <DataUnavailable v-else-if="state === 'NO_DATA'" />
         <TripUnavailable
-          v-else-if="state === 'TRIP_UNAVAILABLE'"
+          v-else-if="state === 'NO_TRIP_DATA_AVAILABLE'"
           :line="line"
         />
       </Transition>
@@ -68,7 +68,7 @@ const fetchLineData = async () => {
 // create an enums of possible states of the screen
 type ScreenState =
   | "NO_DATA"
-  | "TRIP_UNAVAILABLE"
+  | "NO_TRIP_DATA_AVAILABLE"
   | "FIRST_STOP"
   | "AT_STOP"
   | "NOT_AT_STOP"
@@ -86,7 +86,7 @@ const computeState = () => {
       state.value = "NO_DATA";
       return;
     }
-    state.value = "TRIP_UNAVAILABLE";
+    state.value = "NO_TRIP_DATA_AVAILABLE";
   } else if (
     currentStop.value &&
     currentStop.value.stop &&
