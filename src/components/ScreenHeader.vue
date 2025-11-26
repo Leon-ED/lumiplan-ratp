@@ -20,7 +20,7 @@ import BusPicto from "./BusPicto.vue";
     color: rgb(36, 36, 36) !important;
     font-size: 0px !important;
   }
-  .picto{
+  .picto {
     display: none !important;
   }
 }
@@ -31,6 +31,9 @@ header {
   grid-template-columns: 12% 75% 13%;
   grid-template-rows: 100%;
   font-family: "ParisineBold", sans-serif;
+  box-shadow: 0 5px 5px -5px black;
+  position: relative;
+  z-index: 1;
 }
 .line-and-mode {
   display: flex;
@@ -51,7 +54,7 @@ header {
 
 .clock {
   color: var(--ratp-yellow);
-  font-family: 'ParisineRegular';
+  font-family: "ParisineRegular";
   background-color: black;
   font-size: 3cqw;
   display: flex;
