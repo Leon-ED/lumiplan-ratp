@@ -24,7 +24,7 @@ const style = computed(() => {
   };
 });
 const isLineSpecial = computed(() => {
-  const specialModes = [Mode.TRAMWAY, Mode.RER, Mode.METRO,Mode.CABLE,Mode.TRANSILIEN];
+  const specialModes = [Mode.TRAM, Mode.RER, Mode.METRO,Mode.CABLE,Mode.TRANSILIEN];
      const specialNames = [
       "AUDONIE",
       "TUVIM",

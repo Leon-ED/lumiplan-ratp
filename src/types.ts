@@ -20,7 +20,7 @@ export interface Desserte {
 export enum Mode{
   BUS = "BUS",
   NOCTILIEN = "NOCTILIEN",
-  TRAMWAY = "TRAMWAY",
+  TRAM = "TRAM",
   METRO = "METRO",
   RER = "RER",
   TRANSILIEN = "TRANSILIEN",
