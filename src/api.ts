@@ -20,6 +20,7 @@ export class Api {
         name: line.name.startsWith("TER ") ? 'TER'  : line.name,
         color: line.backgroundColor,
         textColor: line.textColor,
+        //@ts-expect-error
         mode: line.mode.toUpperCase() as Mode,
       };
       return realLine;
