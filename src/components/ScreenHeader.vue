@@ -1,8 +1,8 @@
 <template>
   <header>
     <div class="line-and-mode">
-      <BusPicto class="picto" />
-      <LineLogo v-if="line" :line="line" className="picto smaller" size="100%" />
+      <BusPicto class="mode-picto picto" />
+      <LineLogo v-if="line" :line="line" className="picto" size="100%" />
     </div>
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
@@ -50,13 +50,12 @@ header {
   gap: 0.5em;
 }
 .line-and-mode .picto {
-  height: 70%;
-  width: fit-content;
+  height: 80%;
 }
-.line-and-mode .smaller {
-  height: 60%;
-  width: fit-content;
+.mode-picto {
+  width: auto;
 }
+
 
 .clock {
   color: var(--ratp-yellow);
