@@ -1,7 +1,7 @@
 <template>
   <header>
-      <BusPicto class="mode-picto picto" />
-      <LineLogo v-if="line" :line="line" className="picto" size="100%" />
+    <BusPicto class="mode-picto picto" />
+    <LineLogo v-if="line" :line="line" className="picto" size="100%" />
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
     </div>
@@ -14,25 +14,25 @@ import BusPicto from "./BusPicto.vue";
 import LineLogo from "./Other/LineLogo.vue";
 defineProps<{
   direction: string;
-  line:Line;
+  line: Line;
 }>();
 </script>
 <style lang="scss" scoped>
-.no-data-available header {
-  * {
-    background-color: rgb(36, 36, 36);
-    color: rgb(36, 36, 36) !important;
-    font-size: 0px !important;
-  }
-  .picto {
-    display: none !important;
-  }
+.no-data-available header,
+.no-data-available header * {
+  background-color: rgb(36, 36, 36);
+  color: rgb(36, 36, 36) !important;
+  font-size: 0 !important;
 }
-.clock{
+
+.no-data-available header .picto {
+  display: none !important;
+}
+.clock {
   position: absolute;
   right: 0cqw;
-  width:13%;
-  height:100%
+  width: 13%;
+  height: 100%;
 }
 header {
   container-type: inline-size;
@@ -61,7 +61,6 @@ header {
 .mode-picto {
   width: auto;
 }
-
 
 .clock {
   color: var(--ratp-yellow);
