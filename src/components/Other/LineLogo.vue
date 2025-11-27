@@ -57,7 +57,7 @@ const isLineSpecial = computed(() => {
   <!-- Logo Tram -->
   <img
     v-if="isLineSpecial"
-    :src="'/lines/'+props.line.name.toLowerCase()+'.svg'"
+    :src="'/lines/'+props.line.name.toLowerCase().replace(/\s/g, '_')+'.svg'"
     :class="'line-logo' + ' specialLogo ' + props.className + ' '"
     :style="style"
   />
