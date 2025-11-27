@@ -106,7 +106,7 @@ onUnmounted(() => {
   z-index: 10;
 }
 .stop-transition-leave-active {
-  transition: transform 1s ease-in-out;
+  transition: transform 1.5s ease-in-out;
   z-index: 10;
 
   position: absolute;
@@ -117,7 +117,7 @@ onUnmounted(() => {
 }
 
 .stop-transition-leave-to {
-  transform: translateY(-400%);
+  transform: translateY(-200%);
 }
 
 .blinkable:not(
