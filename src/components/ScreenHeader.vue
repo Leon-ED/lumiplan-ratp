@@ -1,9 +1,7 @@
 <template>
   <header>
-    <div class="line-and-mode">
       <BusPicto class="mode-picto picto" />
       <LineLogo v-if="line" :line="line" className="picto" size="100%" />
-    </div>
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
     </div>
@@ -30,12 +28,20 @@ defineProps<{
     display: none !important;
   }
 }
+.clock{
+  position: absolute;
+  right: 0cqw;
+  width:13%;
+  height:100%
+}
 header {
   container-type: inline-size;
   background-color: white;
   display: grid;
-  grid-template-columns: 12% 75% 13%;
-  grid-template-rows: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1.5cqw;
+  padding-left: 1cqw;
   font-family: "ParisineBold", sans-serif;
   box-shadow: 0 5px 5px -5px black;
   position: relative;
@@ -49,8 +55,8 @@ header {
   padding-left: 1cqw;
   gap: 0.5em;
 }
-.line-and-mode .picto {
-  height: 80%;
+.picto {
+  height: 70%;
 }
 .mode-picto {
   width: auto;
