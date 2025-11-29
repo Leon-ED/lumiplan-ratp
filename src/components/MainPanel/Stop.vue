@@ -92,7 +92,7 @@ onUnmounted(() => {
   border: 0.5cqw solid black;
   border-radius: 50%;
   left: 1.4cqw;
-  top: 1.5cqw;
+  top: 1.25cqw;
   position: relative;
   z-index: 2;
   flex-shrink: 0;
