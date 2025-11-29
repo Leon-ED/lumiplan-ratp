@@ -1,4 +1,3 @@
-import { Mode } from "fs";
 import { Desserte, Line } from "./types";
 import { Converter } from "./converter";
 
