@@ -4,11 +4,11 @@
     <label for="search-input">Rechercher une ligne</label>
     <input name="search-input" class="search-input" type="text" v-model="_search" placeholder="RER A, Metro 5, T5, 393" />
     </section>
-    <ol class="line-list">
+    <ul class="line-list">
       <li v-for="line in lines" :key="line.id" @click="selectedLine = line" class="line" :class="{'selected':selectedLine?.id === line.id}">
         <LineLogo :line="line" class-name="line-logo" size="3em" />
       </li>
-    </ol>
+    </ul>
     <section class="desserte-list" v-if="dessertes.length > 0">
       <h2>Services disponibles pour la ligne {{ selectedLine?.name }}</h2>
       <ul class="service-list">
@@ -43,6 +43,9 @@ const lines = ref<Line[]>([]);
 watchDebounced(
   _search,
   async () => {
+    selectedDesserte.value = null;
+    dessertes.value = [];
+    selectedLine.value = null;
     try {
       const apiLines = await Api.searchLines(_search.value);
       if (!apiLines || apiLines.length === 0) {
@@ -78,35 +81,28 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3em;
-  width: min(30em, 90%);
+  padding: 1em;
+  box-sizing: border-box;
+  width: min(35em, 90%);
   margin: auto;
 }
 input[type="text"] {
-  font-size: 1.5em;
+  font-size: 1.3em;
   border-radius: 0.2em;
   box-shadow: unset;
   width: 100%;
   margin-bottom: 1em;
   box-sizing: border-box;
-  padding: .3em 0.1em;
+  padding: .5em 0.3em;
   margin-top: 0.5em;
-  border: gray 1px solid;
+  border: gray .5px solid;
 }
 input,
 input::placeholder {
-  font-size: .8em;
+  font-size: .6em;
 }
 input[type="text"]:focus {
   outline: none;
-}
-ol {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1em;
 }
 a{
   text-decoration: none;
@@ -118,6 +114,14 @@ li {
 li:hover {
   cursor: pointer;
   background-color: #f0f0f0;
+}
+.line-list{
+    list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1em;
 }
 /* target .line-list child if line-lisdt has only one child with .selected class */
 .line-list:has(.selected) .line:not(.selected) {

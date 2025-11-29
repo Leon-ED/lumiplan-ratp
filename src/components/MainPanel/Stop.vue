@@ -136,12 +136,12 @@ onUnmounted(() => {
 .stop.is-current:first-of-type .stop-name {
   background-color: var(--ratp-blue);
   color: white;
-  padding: 0.6cqw;
+  padding: 0.08em;
 }
 .stop.is-last-stop .stop-name {
   background-color: black !important;
   color: white;
-  padding: 0.6cqw;
+  padding: 0.08em;
 }
 .stop.is-skipped .stop-indicator::before,
 .stop.is-skipped .stop-indicator::after {
