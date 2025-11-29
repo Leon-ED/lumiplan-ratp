@@ -7,6 +7,9 @@ export class Converter {
         if(mode === "bus_remplacement") {
             return Mode.BUS;
         }
+        if(mode === "telepherique"){
+            return Mode.CABLE;
+        }
         return mode.toUpperCase() as Mode;
     }
 
