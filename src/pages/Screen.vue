@@ -10,3 +10,8 @@ import FitBox from '../components/FitBox.vue';
     </FitBox>
   </div>
 </template>
+<style scoped lang="css">
+.content {
+ background-color: #242424;
+}
+</style>
