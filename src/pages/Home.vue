@@ -1,28 +1,66 @@
 <template>
   <main>
     <section class="search-section">
-    <label for="search-input">Rechercher une ligne</label>
-    <input name="search-input" class="search-input" type="text" v-model="_search" placeholder="RER A, Metro 5, T5, 393" />
+      <label for="search-input">Rechercher une ligne</label>
+      <input
+        name="search-input"
+        class="search-input"
+        type="text"
+        v-model="_search"
+        placeholder="RER A, Metro 5, T5, 393"
+      />
     </section>
-    <ul class="line-list">
-      <li v-for="line in lines" :key="line.id" @click="selectedLine = line" class="line" :class="{'selected':selectedLine?.id === line.id}">
-        <LineLogo :line="line" class-name="line-logo" size="3em" />
-      </li>
-    </ul>
-    <section class="desserte-list" v-if="dessertes.length > 0">
-      <h2>Services disponibles pour la ligne {{ selectedLine?.name }}</h2>
+    <section>
+      <label for="search-input" v-if="lines.length !== 0"
+        >Sélectionner une ligne</label
+      >
+      <label for="search-input" v-if="linesSearchStatus === 'loading'"
+        >Chargement des lignes...</label
+      >
+      <label for="search-input" v-if="linesSearchStatus === 'no_results'"
+        >Aucune ligne n'a pu être trouvée pour cette recherche.</label
+      >
+      <label for="search-input" v-if="linesSearchStatus === 'error'"
+        >Erreur lors de la recherche des lignes. Veuillez réessayer plus tard.
+      </label>
+      <ul class="line-list">
+        <li
+          v-for="line in lines"
+          :key="line.id"
+          @click="selectedLine = line"
+          class="line"
+          :class="{ selected: selectedLine?.id === line.id }"
+        >
+          <LineLogo :line="line" class-name="line-logo" size="3rem" />
+        </li>
+      </ul>
+    </section>
+    <section>
+      <span v-if="desserteSearchStatus === 'loading'"
+        >Chargement des services de la ligne en cours ...</span
+      >
+      <span v-if="desserteSearchStatus === 'error'"
+        >Erreur lors du chargement des services. Veuillez réessayer plus
+        tard.</span
+      >
+      <span v-if="desserteSearchStatus === 'no_results'"
+        >Aucun service n'a pu être trouvé pour cette ligne.<br />
+        Elle ne dispose peut-être d'aucun service dans la fourchette
+        [-90min;+25min]</span
+      >
+    </section>
+
+    <section class="desserte-list" v-if="dessertes.length > 0 && selectedLine">
+      <div class="desserte-list-header">
+        <span>Sélectionner un service pour la ligne </span>
+        <LineLogo :line="selectedLine" class-name="line-logo" size="2rem" />
+      </div>
       <ul class="service-list">
         <li v-for="desserte in dessertes" @click="selectedDesserte = desserte">
-          <RouterLink
-            :to="{
-              name: 'DesserteDetails',
-              query: { tripRef: desserte.id, lineRef: selectedLine?.id },
-            }"
-          >
-          Direction : {{ desserte.direction }}<br />Prochain arret: {{ desserte.stops[0]?.stop.name }}<br />
-          <template v-if="desserte.stops[0].isFirstStop">Départ prévu dans {{ getMinutesFromDate(desserte.stops[0].timeOfArrival) }} min</template>
-          <template v-if="desserte.stops[0].isTerminus">Terminus</template>
-          </RouterLink>
+          <ServiceOverview
+            :line="selectedLine"
+            :desserte="desserte"
+          ></ServiceOverview>
         </li>
       </ul>
     </section>
@@ -34,26 +72,45 @@ import { ref } from "vue";
 import { Desserte, Line } from "../types";
 import { Api } from "../api";
 import LineLogo from "../components/Other/LineLogo.vue";
-import { getMinutesFromDate } from "../utils";
+import ServiceOverview from "../components/HomePage/ServiceOverview.vue";
 const selectedLine = ref<Line | null>(null);
 const selectedDesserte = ref<Desserte | null>(null);
 const dessertes = ref<Desserte[]>([]);
 const _search = ref("");
 const lines = ref<Line[]>([]);
+type DESSERTE_SEARCH_STATUS =
+  | "idle"
+  | "loading"
+  | "error"
+  | "done"
+  | "no_results";
+type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
+const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
+const linesSearchStatus = ref<LINES_SEARCH_STATUS>("idle");
 watchDebounced(
   _search,
   async () => {
     selectedDesserte.value = null;
+    desserteSearchStatus.value = "idle";
     dessertes.value = [];
+    lines.value = [];
     selectedLine.value = null;
+    if (_search.value.trim() === "") {
+      linesSearchStatus.value = "idle";
+      return;
+    }
     try {
+      linesSearchStatus.value = "loading";
       const apiLines = await Api.searchLines(_search.value);
       if (!apiLines || apiLines.length === 0) {
+        linesSearchStatus.value = "no_results";
         return;
       }
+      linesSearchStatus.value = "done";
       lines.value = apiLines;
       console.log("Fetched lines:", lines.value);
     } catch (error) {
+      linesSearchStatus.value = "error";
       console.error("Error fetching search results:", error);
     }
   },
@@ -62,12 +119,21 @@ watchDebounced(
 watchDebounced(
   selectedLine,
   async (newLine) => {
+    desserteSearchStatus.value = "idle";
     if (newLine) {
+      selectedDesserte.value = null;
+      dessertes.value = [];
       try {
+        desserteSearchStatus.value = "loading";
+        console.log("Fetching vehicles for line:", newLine.id);
         const vehicles = await Api.getVehiclesOnLine(newLine.id);
         dessertes.value = vehicles;
-        console.log("Fetched vehicles for line:", vehicles);
+        desserteSearchStatus.value = "done";
+        if (vehicles.length === 0) {
+          desserteSearchStatus.value = "no_results";
+        }
       } catch (error) {
+        desserteSearchStatus.value = "error";
         console.error("Error fetching vehicles for line:", error);
       }
     }
@@ -76,8 +142,15 @@ watchDebounced(
 );
 </script>
 <style scoped>
+.desserte-list-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
 main {
   display: flex;
+  container-type: inline-size;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -93,34 +166,33 @@ input[type="text"] {
   width: 100%;
   margin-bottom: 1em;
   box-sizing: border-box;
-  padding: .5em 0.3em;
+  padding: 0.5em 0.3em;
   margin-top: 0.5em;
-  border: gray .5px solid;
+  border: gray 0.5px solid;
 }
 input,
 input::placeholder {
-  font-size: .6em;
+  font-size: 0.6em;
 }
 input[type="text"]:focus {
   outline: none;
 }
-a{
+a {
   text-decoration: none;
   color: inherit;
 }
 li {
   width: fit-content;
 }
-li:hover {
+.line-list li:hover {
   cursor: pointer;
-  background-color: #f0f0f0;
 }
-.line-list{
-    list-style: none;
+.line-list {
+  list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1em;
 }
 /* target .line-list child if line-lisdt has only one child with .selected class */
@@ -128,9 +200,14 @@ li:hover {
   opacity: 0.1;
 }
 .service-list {
+  list-style: none;
   padding: 0;
 }
 .service-list li {
   margin-bottom: 1em;
+  width: 100%;
+}
+section {
+  width: 100%;
 }
 </style>
