@@ -10,7 +10,14 @@
       <h2>Dessertes pour la ligne {{ selectedLine?.name }}</h2>
       <ul>
         <li v-for="desserte in dessertes" @click="selectedDesserte = desserte">
+          <RouterLink
+            :to="{
+              name: 'DesserteDetails',
+              query: { tripRef: desserte.id, lineRef: selectedLine?.id },
+            }"
+          >
           {{ desserte.direction }} - Prochain arret: {{ desserte.stops[0]?.stop.name }}
+          </RouterLink>
         </li>
       </ul>
     </section>

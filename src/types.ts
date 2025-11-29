@@ -13,6 +13,7 @@ export interface StopWithTime {
 }
 
 export interface Desserte {
+  id: string;
   direction: string;
   stops: StopWithTime[];
 }

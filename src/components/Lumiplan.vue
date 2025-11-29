@@ -51,7 +51,6 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import ScreenHeader from "./ScreenHeader.vue";
 import StopList from "./MainPanel/StopList.vue";
 import DataUnavailable from "./MainPanel/DataUnavailable.vue";
-import json from "../mock/treated303.json";
 import Direction from "./MainPanel/Direction.vue";
 import CurrentStop from "./MainPanel/CurrentStop.vue";
 import { getSecondesFromDate } from "../utils";
@@ -62,7 +61,12 @@ import TripUnavailable from "./MainPanel/TripUnavailable.vue";
 import { Desserte, Line } from "../types";
 import { useIntervalFn } from "@vueuse/core";
 import ArrivingToIn from "./SidePanel/ArrivingToIn.vue";
-const desserteIntact = ref<Desserte>(json as Desserte);
+const fakeDesserte:Desserte = {
+  direction: "",
+  id: "",
+  stops: [],
+}
+const desserte = ref<Desserte>(fakeDesserte);
 const line = ref<Line | null>(null);
 const route = useRoute();
 const fetchLineData = async () => {
@@ -71,6 +75,22 @@ const fetchLineData = async () => {
     line.value = lineData;
   } catch (error) {
     console.error("Error fetching line data:", error);
+  }
+};
+
+const fetchJourneyData = async () => {
+  try {
+    const tripRef = route.query.tripRef as string;
+    if (tripRef) {
+      const journeyData = await Api.getJourney(tripRef);
+      if (!journeyData) {
+        console.warn("No journey data found for tripRef:", tripRef);
+        return;
+      }
+      desserte.value = journeyData;
+    }
+  } catch (error) {
+    console.error("Error fetching journey data:", error);
   }
 };
 
@@ -121,14 +141,6 @@ const computeState = () => {
     state.value = "NOT_AT_STOP";
   }
 };
-
-const desserte = ref<Desserte>({
-  ...desserteIntact.value,
-  stops: desserteIntact.value.stops.map((stop, i) => ({
-    ...stop,
-    timeOfArrival: new Date(Date.now() + (i + 1) * 15 * 1000).toISOString(),
-  })),
-});
 watch(
   () => desserte.value,
   () => {
@@ -143,12 +155,6 @@ watch(
   },
   { deep: true }
 );
-
-addEventListener("keydown", (event) => {
-  if (event.key === "ArrowRight") {
-    desserte.value.stops.shift();
-  }
-});
 
 let updateIntervalId: NodeJS.Timeout;
 
@@ -169,6 +175,7 @@ const updateState = () => {
 const isSplit = ref(false);
 onMounted(() => {
   fetchLineData();
+  fetchJourneyData();
   updateIntervalId = setInterval(updateState, 1_000);
   useIntervalFn(() => {
     const oldValue = isSplit.value;

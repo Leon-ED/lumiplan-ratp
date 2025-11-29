@@ -3,6 +3,41 @@ import { Desserte, Line } from "./types";
 
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
+  // static apiBaseUrl = "https://localhost:8000/";
+
+  static async getJourney(journeyId: string): Promise<Desserte | null> {
+    const endpoint = `${this.apiBaseUrl}vehicle_journeys/${journeyId}`;
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch journey data: ${response.status} ${response.statusText}`
+      );
+    }
+    try {
+      const journeyData: any = await response.json();
+      const desserte: Desserte = {
+        id: journeyData.journeyId,
+        direction: journeyData.directionName,
+        stops: journeyData.stops.map((stop: any) => ({
+          stop: {
+            id: stop.stop.id,
+            name: stop.stop.name,
+            landmarkName: stop.stop.pointOfInterest,
+            isAccessible: stop.stop.isAccessible,
+          },
+          timeOfArrival: stop.timeOfArrival,
+          isTerminus: stop.isTerminus,
+          isFirstStop: stop.isFirstStop,
+          isStopSkipped: stop.isStopSkipped,
+        })),
+      };
+      return desserte;
+    } catch (error) {
+      console.error("Error parsing journey data:", error);
+      return null;
+    }
+  }
+
   static async getVehiclesOnLine(lineId: string): Promise<Desserte[]> {
     const endpoint = `${this.apiBaseUrl}lines/line/${lineId}/vehicles_on_line`;
     const response = await fetch(endpoint);
@@ -13,7 +48,27 @@ export class Api {
     }
     try {
       const vehiclesData: any = await response.json();
-      const dessertes: Desserte[] = vehiclesData.journeys
+
+      const dessertes: Desserte[] = [];
+      for (const vehicle of vehiclesData.journeys) {
+        const desserte: Desserte = {
+          id: vehicle.journeyId,
+          direction: vehicle.directionName,
+          stops: vehicle.stops.map((stop: any) => ({
+            stop: {
+              id: stop.stop.id,
+              name: stop.stop.name,
+              landmarkName: stop.stop.pointOfInterest,
+              isAccessible: stop.stop.isAccessible,
+            },
+            timeOfArrival: stop.timeOfArrival,
+            isTerminus: stop.isTerminus,
+            isFirstStop: stop.isFirstStop,
+            isStopSkipped: stop.isStopSkipped,
+          })),
+        };
+        dessertes.push(desserte);
+      }
       return dessertes;
     }
     catch (error) {

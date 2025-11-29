@@ -5,6 +5,7 @@ import Screen from "./pages/Screen.vue";
 const routes = [
   { path: "/", component: Home },
   {
+    name: "DesserteDetails",
     path: "/screen/:lineRef?/:tripRef?",
     component: Screen,
   },
