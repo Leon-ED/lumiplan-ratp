@@ -100,6 +100,9 @@ onUnmounted(() => {
 .stop:has(.stop-name.stop-name-very-long) .stop-indicator {
   top: 0.7cqw;
 }
+.stop:has(.stop-name.stop-name-long) .stop-indicator {
+  top: .65cqw;
+}
 
 .stop-name {
   color: var(--ratp-blue);
