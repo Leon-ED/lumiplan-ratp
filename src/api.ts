@@ -1,5 +1,6 @@
 import { Mode } from "fs";
 import { Desserte, Line } from "./types";
+import { Converter } from "./converter";
 
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
@@ -94,9 +95,9 @@ export class Api {
         name: line.shortName,
         color: line.backgroundColor,
         textColor: line.textColor,
-        //@ts-expect-error
-        mode: line.mode.toUpperCase() as Mode,
+        mode: Converter.convertLineMode(line.mode),
       };
+      console.log("Fetched line data:", realLine);
       return realLine;
     } catch (error) {
       console.error("Error parsing line data:", error);
@@ -109,7 +110,7 @@ export class Api {
       query
     )}`;
     const response = await fetch(endpoint);
-    if (!response.ok) {
+    if (!response.ok && response.status !== 404) {
       throw new Error(
         `Failed to search lines: ${response.status} ${response.statusText}`
       );
@@ -121,10 +122,13 @@ export class Api {
         name: line.shortName,
         color: line.backgroundColor,
         textColor: line.textColor,
-        mode: line.mode.toUpperCase() as Mode,
+        mode: Converter.convertLineMode(line.mode),
       }));
       return lines;
     } catch (error) {
+      if (response.status === 404) {
+        return [];
+      }
       console.error("Error parsing search results:", error);
       throw error;
     }
