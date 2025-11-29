@@ -84,6 +84,9 @@ body,
 .blink{
   animation: blink 1s infinite;
 }
+.hidden{
+  visibility: hidden;
+}
 @keyframes blink {
   0%,
   49% {
