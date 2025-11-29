@@ -28,22 +28,21 @@ const getIndexForStop = (i: number) => {
   // Cas 3 : les deux sont skip → aucun index 0
   return 1;
 };
-
 </script>
 
 <template>
   <div class="stops-list-container">
+    <div class="next-stop-container" key="next-stop">
+      <div class="next-stop-arrow-indicator">
+        <img
+          src="../../assets/img/down-arrow.png"
+          alt="arrow"
+          class="arrow-icon"
+        />
+      </div>
+      <span class="next-stop-description">{{ text }}</span>
+    </div>
     <ol class="stops-list">
-      <li class="next-stop-container" key="next-stop">
-        <div class="next-stop-arrow-indicator">
-          <img
-            src="../../assets/img/down-arrow.png"
-            alt="arrow"
-            class="arrow-icon"
-          />
-        </div>
-        <span class="next-stop-description">{{ text }}</span>
-      </li>
       <TransitionGroup
         name="stop-transition"
         tag="div"
@@ -78,12 +77,13 @@ const getIndexForStop = (i: number) => {
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: 2cqw;
   height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-around;
+  justify-content: space-evenly;
   padding-right: 2cqw;
 }
 .stop-transition-move {
@@ -144,12 +144,12 @@ const getIndexForStop = (i: number) => {
 }
 
 .next-stop-container {
+  position: relative;
   transition: opacity 0.5s ease;
 }
 
-.stops-list:has(.stop-transition-enter-active) .next-stop-container,
-.stops-list:has(.stop-transition-leave-active) .next-stop-container {
+.stops-list-container:has(.stops-list .stop-transition-enter-active) .next-stop-container,
+.stops-list-container:has(.stops-list .stop-transition-leave-active) .next-stop-container {
   opacity: 0;
-  pointer-events: none; /* Empêche les clics pendant l'animation */
 }
 </style>

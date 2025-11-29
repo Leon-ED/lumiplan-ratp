@@ -104,6 +104,9 @@ const isLineSpecial = computed(() => {
   align-items: center;
   background-color: var(--bg-color);
   color: var(--text-color);
+  user-select: none;
+  -webkit-user-drag: none;
+
 
   margin: 0;
   padding: 0 !important;

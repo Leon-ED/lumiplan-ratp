@@ -126,8 +126,8 @@ const computeState = () => {
   } else if (
     currentStop.value &&
     !currentStop.value.isStopSkipped &&
-    getSecondesFromDate(currentStop.value.timeOfArrival) <= 5 &&
-    getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -5
+    getSecondesFromDate(currentStop.value.timeOfArrival) <= 10 &&
+    getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -2
   ) {
     state.value = "AT_STOP";
   } else if (
@@ -165,9 +165,9 @@ const updateState = () => {
     // Si c'est un terminus on attend un peu plus longtemps avant de supprimer l'arrêt
     ((currentStop.value.isTerminus &&
       getSecondesFromDate(currentStop.value.timeOfArrival, true) < -20) ||
-      // Sinon on supprime dès que le bus est parti depuis plus de 6 secondes
+      // Sinon on supprime dès que le bus est parti depuis plus de 2 secondes
       (!currentStop.value.isTerminus &&
-        getSecondesFromDate(currentStop.value.timeOfArrival, true) < -6))
+        getSecondesFromDate(currentStop.value.timeOfArrival, true) < -3))
   ) {
     desserte.value.stops.shift();
   }
