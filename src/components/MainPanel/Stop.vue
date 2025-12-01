@@ -49,16 +49,22 @@ onUnmounted(() => {
   >
     <div class="stop-indicator"></div>
     <span class="stop-name" :class="stopNameClass">
-      <span class="text-bg">{{ stop.stop.name }}</span>
+      <div class="text-bg">
+        {{ stop.stop.name }}
+        <img
+          class="non-accessible-stop"
+          src="../../assets/img/non-accessible-stop.png"
+          alt="non accessible stop"
+          v-if="!stop.stop.isAccessible && !stop.isTerminus && !isStopCurrent(stop, index)"
+        />
+                <img
+          class="non-accessible-stop"
+          src="../../assets/img/non-accessible-stop-white-bg.png"
+          alt="non accessible stop"
+          v-if="!stop.stop.isAccessible && (stop.isTerminus || isStopCurrent(stop, index))"
+        />
+      </div>
     </span>
-    <div>
-      <img
-        class="non-accessible-stop"
-        src="../../assets/img/non-accessible-stop.png"
-        alt="non accessible stop"
-        v-if="!stop.stop.isAccessible"
-      />
-    </div>
   </li>
 </template>
 <style lang="css" scoped>
@@ -101,7 +107,7 @@ onUnmounted(() => {
   top: 0.7cqw;
 }
 .stop:has(.stop-name.stop-name-long) .stop-indicator {
-  top: .65cqw;
+  top: 0.65cqw;
 }
 
 .stop-name {
@@ -152,14 +158,18 @@ onUnmounted(() => {
   animation: blink 1.2s infinite steps(1);
 }
 
-
 /* On applique le style sur le span interne qui est "inline" par défaut */
 .stop.is-last-stop .stop-name .text-bg {
   background-color: black;
   color: white;
-  padding: 0.1em 0.2em; 
+  padding: 0.1em 0.2em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+}
+.text-bg {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
 }
 
 .stop.is-current:first-of-type .stop-name .text-bg {
@@ -171,8 +181,8 @@ onUnmounted(() => {
 }
 /* Retirer le style du parent is-current */
 .stop.is-current:first-of-type .stop-name {
-    background-color: transparent;
-    padding: 0;
+  background-color: transparent;
+  padding: 0;
 }
 .stop.is-skipped .stop-indicator::before,
 .stop.is-skipped .stop-indicator::after {
