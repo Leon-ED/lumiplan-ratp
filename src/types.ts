@@ -3,7 +3,9 @@ export interface Stop {
   name: string;
   landmarkName?: string;
   isAccessible: boolean;
+  connectedLines: Line[];
 }
+
 export interface StopWithTime {
   stop: Stop;
   timeOfArrival: string;

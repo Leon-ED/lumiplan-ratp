@@ -3,7 +3,6 @@ import { Mode } from "./types";
 export class Converter {
 
     static convertLineMode(mode: string): Mode {
-        console.log("Converting mode:", mode);
         if(mode === "bus_remplacement") {
             return Mode.BUS;
         }
@@ -12,5 +11,6 @@ export class Converter {
         }
         return mode.toUpperCase() as Mode;
     }
+
 
 }
