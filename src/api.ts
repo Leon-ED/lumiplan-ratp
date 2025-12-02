@@ -24,6 +24,13 @@ export class Api {
             name: stop.stop.name,
             landmarkName: stop.stop.pointOfInterest,
             isAccessible: stop.stop.isAccessible,
+            connectedLines: stop.stop.connectedLines.map((line: any) => ({
+              id: line.id,
+              name: line.name,
+              color: line.color,
+              textColor: line.textColor,
+              mode: Converter.convertLineMode(line.mode),
+            })),
           },
           timeOfArrival: stop.timeOfArrival,
           isTerminus: stop.isTerminus,
