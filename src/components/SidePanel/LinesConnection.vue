@@ -17,7 +17,7 @@
           class="mode-group"
         >
           <img
-            :src="`/public/modes/${mode.toString().toLowerCase()}.svg`"
+            :src="`/modes/${mode.toString().toLowerCase()}.svg`"
             :alt="mode.toString()"
             class="mode-logo"
           />
