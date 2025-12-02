@@ -246,7 +246,7 @@ const shouldShowSidePanel = computed(() => {
 });
 
 // Watcher pour gérer l'arrivée à l'arrêt et le timer de 5s
-watch(state, (newState, oldState) => {
+watch(state, (newState) => {
   if (newState === "AT_STOP") {
     // On arrive à l'arrêt : on cache le panneau (mode pleine page)
     stopDisplayTimerDone.value = false;
