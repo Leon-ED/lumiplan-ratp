@@ -10,7 +10,7 @@ let timer: ReturnType<typeof setInterval>;
 
 const stopNameClass = computed(() => {
   return {
-    "stop-name-long": props.stop.stop.name.length >= 22,
+    "stop-name-long": props.stop.stop.name.length >= 21  ,
     "stop-name-very-long": props.stop.stop.name.length >= 30,
   };
 });
@@ -55,13 +55,13 @@ onUnmounted(() => {
           class="non-accessible-stop"
           src="../../assets/img/non-accessible-stop.png"
           alt="non accessible stop"
-          v-if="!stop.stop.isAccessible && !stop.isTerminus && !isStopCurrent(stop, index)"
+          v-if="!stop.stop.isAccessible && !stop.isTerminus && !isStopCurrent(stop, index) && !stop.isStopSkipped"
         />
                 <img
           class="non-accessible-stop"
           src="../../assets/img/non-accessible-stop-white-bg.png"
           alt="non accessible stop"
-          v-if="!stop.stop.isAccessible && (stop.isTerminus || isStopCurrent(stop, index))"
+          v-if="!stop.stop.isAccessible  && !stop.isStopSkipped && (stop.isTerminus || isStopCurrent(stop, index))"
         />
       </div>
     </span>
@@ -90,6 +90,12 @@ onUnmounted(() => {
 }
 .non-accessible-stop {
   height: 5cqw;
+}
+.stop:has(.stop-name.stop-name-long) .non-accessible-stop {
+  height: 4.5cqw;
+}
+.stop:has(.stop-name.stop-name-very-long) .non-accessible-stop {
+  height: 4cqw;
 }
 .stop-indicator {
   width: 2.5cqw;
@@ -166,11 +172,7 @@ onUnmounted(() => {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.text-bg {
-  display: flex;
-  align-items: center;
-  gap: 1ch;
-}
+
 
 .stop.is-current:first-of-type .stop-name .text-bg {
   background-color: var(--ratp-blue);
@@ -207,7 +209,4 @@ onUnmounted(() => {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-.stop.is-skipped .stop-name {
-  color: gray;
-}
 </style>
