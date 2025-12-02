@@ -45,7 +45,7 @@ header {
   font-family: "ParisineBold", sans-serif;
   box-shadow: 0 5px 5px -5px black;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 .line-and-mode {
   display: flex;
