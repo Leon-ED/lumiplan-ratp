@@ -77,13 +77,14 @@ const getIndexForStop = (i: number) => {
   list-style: none;
   padding: 0;
   margin: 0;
-  margin-top: 2cqw;
+  margin-top: 4.5cqw;
   height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  gap: 3cqw;
   padding-right: 2cqw;
 }
 .stop-transition-move {
