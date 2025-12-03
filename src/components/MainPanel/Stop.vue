@@ -10,7 +10,7 @@ let timer: ReturnType<typeof setInterval>;
 
 const stopNameClass = computed(() => {
   return {
-    "stop-name-long": props.stop.stop.name.length >= 21  ,
+    "stop-name-long": props.stop.stop.name.length >= 21,
     "stop-name-very-long": props.stop.stop.name.length >= 30,
   };
 });
@@ -20,6 +20,7 @@ onMounted(() => {
     nowTrigger.value = Date.now();
   }, 1000);
 });
+
 const isStopCurrent = (stop: StopWithTime, index: number) => {
   // @ts-ignore
   const _ = nowTrigger.value;
@@ -47,7 +48,10 @@ onUnmounted(() => {
     }"
     :data-time="getSecondesFromDate(stop.timeOfArrival, true)"
   >
-    <div class="stop-indicator"></div>
+    <div class="stop-indicator-wrapper">
+      <div class="stop-indicator"></div>
+    </div>
+
     <span class="stop-name" :class="stopNameClass">
       <div class="text-bg">
         {{ stop.stop.name }}
@@ -57,64 +61,57 @@ onUnmounted(() => {
           alt="non accessible stop"
           v-if="!stop.stop.isAccessible && !stop.isTerminus && !isStopCurrent(stop, index) && !stop.isStopSkipped"
         />
-                <img
+        <img
           class="non-accessible-stop"
           src="../../assets/img/non-accessible-stop-white-bg.png"
           alt="non accessible stop"
-          v-if="!stop.stop.isAccessible  && !stop.isStopSkipped && (stop.isTerminus || isStopCurrent(stop, index))"
+          v-if="!stop.stop.isAccessible && !stop.isStopSkipped && (stop.isTerminus || isStopCurrent(stop, index))"
         />
       </div>
     </span>
   </li>
 </template>
+
 <style lang="css" scoped>
 .stop {
   display: flex;
-  gap: 3cqw;
   position: relative;
+  align-items: baseline; 
+  gap: 0; 
 }
 
-.stop.is-last-stop::after {
-  content: "";
-  position: absolute;
-  left: 2cqw;
-  width: 2.5cqw;
-  top: 3.8cqw;
-  height: 100vh;
-  background-color: var(--ratp-beige);
-  z-index: 1;
-  pointer-events: none;
+.stop-indicator-wrapper {
+  width: var(--gutter-width); 
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  flex-shrink: 0;
+  z-index: 2;
 }
-.next-stop-arrow-indicator {
-  position: relative;
-}
-.non-accessible-stop {
-  height: 5cqw;
-}
-.stop:has(.stop-name.stop-name-long) .non-accessible-stop {
-  height: 4.5cqw;
-}
-.stop:has(.stop-name.stop-name-very-long) .non-accessible-stop {
-  height: 4cqw;
-}
+
 .stop-indicator {
   width: 2.5cqw;
   height: 2.5cqw;
   background-color: white;
   border: 0.5cqw solid black;
   border-radius: 50%;
-  left: 1.4cqw;
-  top: 1.25cqw;
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
 }
-.stop:has(.stop-name.stop-name-very-long) .stop-indicator {
-  top: 0.7cqw;
+
+.stop.is-last-stop::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--gutter-width) / 2);
+  transform: translateX(-50%);
+  width: 2.8cqw; 
+  
+  top: 50%; 
+  height: 100vh;
+  background-color: var(--ratp-beige);
+  z-index: 1;
+  pointer-events: none;
 }
-.stop:has(.stop-name.stop-name-long) .stop-indicator {
-  top: 0.65cqw;
-}
+
+
 
 .stop-name {
   color: var(--ratp-blue);
@@ -127,7 +124,17 @@ onUnmounted(() => {
   font-size: 3.5cqw;
 }
 
-/* Animations pour les transitions */
+.non-accessible-stop {
+  height: 4.3cqw;
+}
+.stop:has(.stop-name.stop-name-long) .non-accessible-stop {
+  height: 4.1cqw;
+}
+.stop:has(.stop-name.stop-name-very-long) .non-accessible-stop {
+  height: 3.8cqw;
+}
+
+
 .stop-transition-enter-active,
 .stop-transition-leave-active {
   transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -141,14 +148,12 @@ onUnmounted(() => {
 .stop-transition-leave-active {
   transition: transform 1.5s ease-in-out;
   z-index: 10;
-
   position: absolute;
   width: 100%;
 }
 .stop-transition-enter-from {
   transform: translateY(200%);
 }
-
 .stop-transition-leave-to {
   transform: translateY(-450%);
 }
@@ -164,7 +169,7 @@ onUnmounted(() => {
   animation: blink 1.2s infinite steps(1);
 }
 
-/* On applique le style sur le span interne qui est "inline" par défaut */
+
 .stop.is-last-stop .stop-name .text-bg {
   background-color: black;
   color: white;
@@ -173,7 +178,6 @@ onUnmounted(() => {
   box-decoration-break: clone;
 }
 
-
 .stop.is-current:first-of-type .stop-name .text-bg {
   background-color: var(--ratp-blue);
   color: white;
@@ -181,11 +185,11 @@ onUnmounted(() => {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-/* Retirer le style du parent is-current */
 .stop.is-current:first-of-type .stop-name {
   background-color: transparent;
   padding: 0;
 }
+
 .stop.is-skipped .stop-indicator::before,
 .stop.is-skipped .stop-indicator::after {
   content: "";
@@ -198,15 +202,10 @@ onUnmounted(() => {
   border-radius: 1px;
   z-index: 15;
 }
-
-/* Barre 1 : Rotation 45 deg */
 .stop.is-skipped .stop-indicator::before {
   transform: translate(-50%, -50%) rotate(45deg);
 }
-
-/* Barre 2 : Rotation -45 deg */
 .stop.is-skipped .stop-indicator::after {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
-
 </style>
