@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { getMinutesFromDate } from "../../utils";
 import { useIntervalFn } from "@vueuse/core";
-
+const element = ref<HTMLElement>();
 interface Props {
   direction: string;
   departureDate: string;
@@ -10,12 +10,47 @@ interface Props {
 const props = defineProps<Props>();
 
 const minutes = ref<number>(getMinutesFromDate(props.departureDate));
+const displayedMinutes = ref<number>(minutes.value);
+
+const animateChange = async () => {
+  if (!element.value) return;
+  await element.value.animate(
+    [{ transform: "scale(1)", opacity: 1 }, { transform: "scale(0.9)", opacity: 0.8 }],
+    {
+      duration: 2000,
+      easing: "ease-out",
+      fill: "forwards",
+    }
+  ).finished;
+  await element.value.animate(
+    [{ transform: "scale(0.9)", opacity: 0.8 },{ transform: "scale(1.1)", opacity: 1 }],
+    {
+      duration: 1000,
+      easing: "ease-in-out",
+      fill: "forwards",
+    }
+  ).finished;
+    displayedMinutes.value = minutes.value;
+      await element.value.animate(
+    [{ transform: "scale(1.1)", opacity: 1 },{ transform: "scale(1)", opacity: 1 },],
+    {
+      duration: 1200,
+      easing: "ease-in-out",
+      fill: "forwards",
+    }
+  ).finished;
+};
+watch(minutes, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    animateChange();
+  }
+});
 
 useIntervalFn(
   () => {
     minutes.value = getMinutesFromDate(props.departureDate);
   },
-  30_000,
+  10_000,
   { immediate: true }
 );
 </script>
@@ -28,9 +63,9 @@ useIntervalFn(
     <aside class="aside">
       <div class="text">Départ dans</div>
       <div class="time">
-        <span :class="{ 'blink-text': minutes === 0 }">
-          {{ minutes }}
-        </span>
+        <div :class="{ 'blink-text': minutes === 0 }" ref="element">
+          {{ displayedMinutes }}
+        </div>
       </div>
       <div class="unit">min</div>
     </aside>
