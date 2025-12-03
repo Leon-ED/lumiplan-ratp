@@ -63,7 +63,7 @@ useIntervalFn(
     <aside class="aside">
       <div class="text">Départ dans</div>
       <div class="time">
-        <div :class="{ 'blink-text': minutes === 0 }" ref="element">
+        <div :class="{ 'blink-text': displayedMinutes === 0 }" ref="element">
           {{ displayedMinutes }}
         </div>
       </div>
