@@ -78,8 +78,8 @@ const getIndexForStop = (i: number) => {
   margin: 0;
   height: 100%;
   position: relative;
-  margin-top: 1cqw;
-  gap: 3cqw;
+  margin-top: 2.5cqw;
+  gap: 4cqw;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

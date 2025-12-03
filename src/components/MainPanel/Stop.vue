@@ -11,7 +11,7 @@ let timer: ReturnType<typeof setInterval>;
 const stopNameClass = computed(() => {
   return {
     "stop-name-long": props.stop.stop.name.length >= 21,
-    "stop-name-very-long": props.stop.stop.name.length >= 30,
+    "stop-name-very-long": props.stop.stop.name.length >= 29,
   };
 });
 
@@ -76,12 +76,13 @@ onUnmounted(() => {
 .stop {
   display: flex;
   position: relative;
-  align-items: baseline; 
+  align-items: center; 
   gap: 0; 
 }
 
 .stop-indicator-wrapper {
   width: var(--gutter-width); 
+  height: 100%;
   display: flex;
   justify-content: center; 
   align-items: center;     
@@ -125,14 +126,9 @@ onUnmounted(() => {
 }
 
 .non-accessible-stop {
-  height: 4.3cqw;
+  height: .8em;
 }
-.stop:has(.stop-name.stop-name-long) .non-accessible-stop {
-  height: 4.1cqw;
-}
-.stop:has(.stop-name.stop-name-very-long) .non-accessible-stop {
-  height: 3.8cqw;
-}
+
 
 
 .stop-transition-enter-active,
