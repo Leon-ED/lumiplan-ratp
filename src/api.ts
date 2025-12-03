@@ -97,7 +97,7 @@ export class Api {
       const linesData: any = await response.json();
       const line = linesData.lines[0];
       const realLine: Line = {
-        id: line,
+        id: line.ref,
         name: line.shortName,
         color: line.backgroundColor,
         textColor: line.textColor,
