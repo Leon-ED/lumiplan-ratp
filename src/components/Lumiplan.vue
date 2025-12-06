@@ -16,7 +16,6 @@
         'split-view': shouldShowSidePanel,
       }"
     >
-      <!-- PANNEAU GAUCHE (Principal) -->
       <Transition name="fade" mode="out-in">
         <Direction
           v-if="state === 'FIRST_STOP'"
@@ -40,28 +39,24 @@
         />
       </Transition>
 
-      <!-- PANNEAU DROIT (Latéral / Ardoises) -->
-      <!-- N'apparait que si shouldShowSidePanel est vrai -->
       <div v-if="shouldShowSidePanel" class="side-panel">
         <Transition name="slide" mode="out-in">
-          <!-- Ardoise : Temps de parcours (ArrivingToIn) -->
           <ArrivingToIn
             v-if="currentSlate?.type === 'TRAVEL_TIME'"
             :stops-list="importantStops"
             key="travel-time"
           />
 
-          <!-- Ardoise : Correspondances (LinesConnection) -->
           <LinesConnection
             v-else-if="currentSlate?.type === 'CONNECTIONS'"
             :connections="currentConnections"
             key="connections"
           />
 
-          <!-- Ardoise : Messages INFOS_TRAFFIC -->
           <Messages
+          :withArrow="displayedInfosTraffic.length === 1 && specialSkippedStopMessage?.id === 'next-stop-skipped-alert'"
             v-else-if="currentSlate?.type === 'INFOS_TRAFFIC'"
-            :messages="INFOS_TRAFFICMessages"
+            :infosTraffic="displayedInfosTraffic"
             key="messages"
           />
         </Transition>
@@ -87,13 +82,14 @@ import Messages from "./SidePanel/Messages.vue";
 
 import { getSecondesFromDate } from "../utils";
 import { Api } from "../api";
-import { Desserte, Line, Mode, Stop } from "../types";
+import { Desserte, InfoTraffic, Line, Mode, Stop } from "../types";
+import { useIntervalFn } from "@vueuse/core";
 
 const SLATE_DURATIONS = {
-  CONNECTIONS: 5000, // 5 sec
-  TOURIST: 5000, // 5 sec
-  TRAVEL_TIME: 10000, // 10 sec
-  INFOS_TRAFFIC: 10_000, // 10 sec 
+  CONNECTIONS: 5000,
+  TOURIST: 5000,
+  TRAVEL_TIME: 10000,
+  INFOS_TRAFFIC: 10_000,
 };
 
 const fakeDesserte: Desserte = {
@@ -104,16 +100,91 @@ const fakeDesserte: Desserte = {
 const desserte = ref<Desserte>(fakeDesserte);
 const line = ref<Line | null>(null);
 const route = useRoute();
-const INFOS_TRAFFICMessages = ref<string[]>([]);
+const INFOS_TRAFFICMessages = ref<InfoTraffic[]>([]);
 
-// Simulation messages (décommenter pour tester)
-INFOS_TRAFFICMessages.value = ["Colis suspect en gare", "Ralentissement prévu"];
+INFOS_TRAFFICMessages.value = [];
+const INFOS_TRAFFIC_LINES = computed(() => {
 
-// Variable pour gérer le délai de 5s à l'arrêt
+  const whitelistedModes = [Mode.RER, Mode.TRANSILIEN, Mode.METRO];
+  const allLines: Line[] = [];
+  const linesIdsSet = new Set<string>();
+  desserte.value.stops.forEach((ds) => {
+    ds.stop.connectedLines.forEach((l) => {
+      if (
+        l.id !== line.value?.id &&
+        !linesIdsSet.has(l.id) &&
+        whitelistedModes.includes(l.mode)
+      ) {
+        allLines.push(l);
+        linesIdsSet.add(l.id);
+      }
+    });
+  });
+
+  const finalSorted = allLines.sort((a, b) => {
+    return whitelistedModes.indexOf(a.mode) - whitelistedModes.indexOf(b.mode);
+  });
+  finalSorted.unshift(line.value!);
+  return finalSorted;
+});
+const INFOS_TRAFFIC_REFRESH_INTERVAL = 60 * 1000 * 3; 
 const stopDisplayTimerDone = ref(false);
 let stopTimer: NodeJS.Timeout | null = null;
 
-// --- LOGIQUE METIER DONNEES ---
+const specialSkippedStopMessage = computed<InfoTraffic | null>(() => {
+  const stops = desserte.value.stops;
+  if (!stops || stops.length === 0) return null;
+
+  let skippedCount = 0;
+  let nextServedStopName = "";
+
+  // On compte combien d'arrêts consécutifs sont sautés en partant du prochain arrêt immédiat (index 0)
+  for (const s of stops) {
+    if (s.isStopSkipped) {
+      skippedCount++;
+    } else {
+      nextServedStopName = s.stop.name;
+      break; // On a trouvé le prochain arrêt desservi, on arrête de compter
+    }
+  }
+
+  // Si aucun arrêt n'est sauté au début de la liste, pas de message
+  if (skippedCount === 0) return null;
+  if(skippedCount === 1){
+    nextServedStopName = "non desservi";
+  }
+
+  // Création du message
+  const messageContent = skippedCount === 1 
+    ? "Point d’arrêt" 
+    : `Prochain arrêt desservi : `;
+  const messageId = skippedCount === 1 
+    ? 'next-stop-skipped-alert' 
+    : 'multiple-stops-skipped-alert';
+  // On retourne un objet simulant une InfoTraffic
+  return {
+    cause: nextServedStopName,
+    effect: 'INFO',
+    impactedLines: [],
+    message:messageContent,
+    id: messageId,
+    title: messageContent,
+    content: messageContent,
+    status: 'ACTIVE',
+    updatedAt: new Date().toISOString(),
+  } as InfoTraffic;
+});
+
+const displayedInfosTraffic = computed(() => {
+  const messages = [...INFOS_TRAFFICMessages.value];
+  
+  if (specialSkippedStopMessage.value) {
+    return [specialSkippedStopMessage.value];
+  }
+  
+  return messages;
+});
+
 
 const fetchLineData = async () => {
   try {
@@ -158,10 +229,11 @@ const importantStops = computed(() => {
 });
 
 const currentConnections = computed(() => {
-  return currentStop.value ? currentStop.value.stop.connectedLines.filter(
-    (l: Line) =>
-      l.id !== line.value?.id
-  ) : [];
+  return currentStop.value
+    ? currentStop.value.stop.connectedLines.filter(
+        (l: Line) => l.id !== line.value?.id
+      )
+    : [];
 });
 
 const fetchJourneyData = async () => {
@@ -178,8 +250,6 @@ const fetchJourneyData = async () => {
     console.error("Error fetching journey data:", error);
   }
 };
-
-// --- GESTION DES ETATS ECRAN ---
 
 type ScreenState =
   | "NO_DATA"
@@ -228,11 +298,6 @@ const computeState = () => {
   }
 };
 
-// --- LOGIQUE D'AFFICHAGE DU PANNEAU LATERAL ---
-
-// Le panneau s'affiche si :
-// 1. On est en train de rouler (NOT_AT_STOP)
-// 2. OU On est à l'arrêt (AT_STOP) ET que les 5 secondes de "Pleine Page" sont passées.
 const shouldShowSidePanel = computed(() => {
   if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0)
     return true;
@@ -245,30 +310,20 @@ const shouldShowSidePanel = computed(() => {
   return false;
 });
 
-// Watcher pour gérer l'arrivée à l'arrêt et le timer de 5s
 watch(state, (newState) => {
   if (newState === "AT_STOP") {
-    // On arrive à l'arrêt : on cache le panneau (mode pleine page)
     stopDisplayTimerDone.value = false;
-
-    // On lance le chrono de 5 secondes
     if (stopTimer) clearTimeout(stopTimer);
     stopTimer = setTimeout(() => {
       stopDisplayTimerDone.value = true;
-      // Quand le panneau réapparait, on force un reset de la rotation si nécessaire
-      // (géré par le watcher availableSlates)
     }, 5000);
   } else if (newState === "NOT_AT_STOP") {
-    // En roulant, le panneau est toujours visible (s'il y a des ardoises)
-    // Mais on attend 5 secondes avant de l'afficher
     setTimeout(() => {
       stopDisplayTimerDone.value = true;
       if (stopTimer) clearTimeout(stopTimer);
     }, 5000);
   }
 });
-
-// --- GESTION DU CYCLE D'ARDOISES (SLATES) ---
 
 type SlateType = "CONNECTIONS" | "TRAVEL_TIME" | "INFOS_TRAFFIC";
 interface Slate {
@@ -279,33 +334,31 @@ interface Slate {
 const availableSlates = computed<Slate[]>(() => {
   const slates: Slate[] = [];
 
-  // --- LOGIQUE SPÉCIALE "A L'ARRET" ---
-  // Règle : "Le ou les messages INFOS_TRAFFIC restent affichés pendant toute la durée de l'arrêt une fois les 5 premières secondes passées."
+  const hasTrafficMessages = displayedInfosTraffic.value.length > 0;
+if (specialSkippedStopMessage.value) {
+    return [{ type: "INFOS_TRAFFIC", duration: 999999 }]; 
+  }
   if (state.value === "AT_STOP") {
-    if (INFOS_TRAFFICMessages.value.length > 0) {
-      // Si INFOS_TRAFFIC existe à l'arrêt, on affiche QUE INFOS_TRAFFIC en permanence
+    if (hasTrafficMessages) {
       return [{ type: "INFOS_TRAFFIC", duration: 999999 }];
     }
-    // A L'ARRÊT SANS INFOS_TRAFFIC, PAS D'ARDOISES
     return [];
   }
 
-  // --- LOGIQUE STANDARD (EN ROUTE ou ARRET SANS INFOS_TRAFFIC) ---
-
-  // A. Correspondances (5 sec)
+  // Standard
   if (currentConnections.value.length > 0) {
-    console.log("Adding CONNECTIONS slate", currentConnections.value);
     slates.push({ type: "CONNECTIONS", duration: SLATE_DURATIONS.CONNECTIONS });
   }
 
-  // B. Temps de parcours (10 sec)
   if (importantStops.value.length > 0) {
     slates.push({ type: "TRAVEL_TIME", duration: SLATE_DURATIONS.TRAVEL_TIME });
   }
 
-  // C. Messagerie INFOS_TRAFFIC (10 sec)
-  if (INFOS_TRAFFICMessages.value.length > 0) {
-    slates.push({ type: "INFOS_TRAFFIC", duration: SLATE_DURATIONS.INFOS_TRAFFIC });
+  if (hasTrafficMessages) {
+    slates.push({
+      type: "INFOS_TRAFFIC",
+      duration: SLATE_DURATIONS.INFOS_TRAFFIC,
+    });
   }
 
   return slates;
@@ -330,31 +383,22 @@ const rotateSlates = () => {
 
 const scheduleNextRotation = () => {
   if (slateTimer) clearTimeout(slateTimer);
-
-  // Si on a 0 ou 1 ardoise, pas de rotation nécessaire
   if (availableSlates.value.length <= 1) return;
-
   const duration = currentSlate.value?.duration || 10000;
   slateTimer = setTimeout(rotateSlates, duration);
 };
 
-// Reset de la boucle quand la liste des ardoises change
 watch(
   availableSlates,
   (newVal, oldVal) => {
     const isDifferent = JSON.stringify(newVal) !== JSON.stringify(oldVal);
-
     if (isDifferent) {
-      // On remet à 0 pour être sûr d'afficher la première ardoise prioritaire
-      // (Ex: passage en mode "INFOS_TRAFFIC Fixe" à l'arrêt)
       currentSlateIndex.value = 0;
       scheduleNextRotation();
     }
   },
   { deep: true }
 );
-
-// --- LIFECYCLE ---
 
 let updateIntervalId: NodeJS.Timeout;
 
@@ -371,11 +415,31 @@ const updateState = () => {
   }
 };
 
-onMounted(() => {
-  fetchLineData();
-  fetchJourneyData();
+const fetchInfosTrafficMessages = async () => {
+  if (!line.value || !desserte.value || desserte.value.stops.length === 0){
+    return;
+  }
+  try {
+    const allMessages = await Api.getInfosTraffic(
+      INFOS_TRAFFIC_LINES.value.map((l) => l.id)
+    );
+    INFOS_TRAFFICMessages.value = allMessages
+      .filter((msg) => msg.status === "ACTIVE")
+      .slice(0, 5);
+  } catch (error) {
+    console.error("Error fetching INFOS_TRAFFIC messages:", error);
+  }
+};
+
+onMounted(async () => {
+  await fetchLineData();
+  await fetchJourneyData();
+  fetchInfosTrafficMessages();
   updateIntervalId = setInterval(updateState, 1_000);
   scheduleNextRotation();
+  useIntervalFn(fetchInfosTrafficMessages, INFOS_TRAFFIC_REFRESH_INTERVAL, {
+    immediate: true,
+  });
 });
 
 onUnmounted(() => {

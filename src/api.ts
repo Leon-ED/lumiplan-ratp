@@ -1,5 +1,6 @@
 import { Desserte, InfoTraffic, Line } from "./types";
 import { Converter } from "./converter";
+import { cleanId } from "./utils";
 
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
@@ -112,6 +113,7 @@ export class Api {
     if (linesIds.length === 0) {
       return [];
     }
+    const primaryLineId = linesIds[0];
     const effectRanking = [
       "SUSPENDED",
       "DISRUPTED",
@@ -129,12 +131,30 @@ export class Api {
     }
     try {
       const infosData: any = await response.json();
-      const infos: InfoTraffic[] = infosData.disruptions
+     const infos: InfoTraffic[] = infosData.disruptions
         .map((info: any) => Converter.convertInfoTraffic(info))
         .sort((a: InfoTraffic, b: InfoTraffic) => {
-          return (
-            effectRanking.indexOf(a.effect) - effectRanking.indexOf(b.effect)
-          );
+          // --- 1. Vérifier l'appartenance au "Groupe VIP" (Ligne 0) ---
+          const isAPrimary = a.impactedLines.map((id) => cleanId(id)).includes(primaryLineId);
+          const isBPrimary = b.impactedLines.map((id) => cleanId(id)).includes(primaryLineId);
+
+          // Si A est sur la ligne 0 et pas B, A passe devant
+          if (isAPrimary && !isBPrimary) return -1;
+          // Si B est sur la ligne 0 et pas A, B passe devant
+          if (!isAPrimary && isBPrimary) return 1;
+
+          // --- 2. Tri par Gravité (Effect) ---
+          // On arrive ici si les deux sont VIP ou si les deux sont "autres".
+          // Dans les deux cas, la logique est la même : on trie par effectRanking.
+
+          let rankA = effectRanking.indexOf(a.effect);
+          let rankB = effectRanking.indexOf(b.effect);
+
+          // Gestion des effets inconnus (on les met à la fin)
+          if (rankA === -1) rankA = Number.MAX_SAFE_INTEGER;
+          if (rankB === -1) rankB = Number.MAX_SAFE_INTEGER;
+
+          return rankA - rankB;
         });
       return infos;
     } catch (error) {

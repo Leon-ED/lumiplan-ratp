@@ -20,7 +20,7 @@ export class Converter {
             title: object.title,
             message: object.message,
             status: object.status,
-            impactedLines: object.impactedLines
+            impactedLines: object.affectedLinesRefs,
         };
         return infoTraffic;
     }

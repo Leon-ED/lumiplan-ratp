@@ -49,6 +49,8 @@ const linesByMode = computed(() => {
     Mode.TRAM,
     Mode.TER,
     Mode.BUS,
+    Mode.BUS,
+    Mode.NOCTILIEN,
   ];
   props.connections.forEach((line) => {
     if (line.id === (params.lineRef as string)) {
@@ -72,15 +74,19 @@ const linesByMode = computed(() => {
     grouped[Mode.TER] = [];
   }
   // trier les modes selon MODES_ORDER
+  console.log("grouped lines by mode:", grouped);
   const sortedGrouped: { [mode: string]: Line[] } = {};
-  MODES_ORDER.forEach((mode,index) => {
+  let index = 1;
+  MODES_ORDER.forEach((mode) => {
     if(index>MAX_DISPLAYED_MODES){
       return;
     }
-    if (grouped[mode]) {
+    if (Object.keys(grouped).includes(mode.toString())) {
+    index++;
       sortedGrouped[mode] = grouped[mode];
     }
   });
+  console.log("sorted grouped lines by mode:", sortedGrouped);
 
   return sortedGrouped;
 });
