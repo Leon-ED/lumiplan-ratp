@@ -1,4 +1,4 @@
-import { Desserte, Line } from "./types";
+import { Desserte, InfoTraffic, Line } from "./types";
 import { Converter } from "./converter";
 
 export class Api {
@@ -77,13 +77,11 @@ export class Api {
         dessertes.push(desserte);
       }
       return dessertes;
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error parsing vehicles data:", error);
       return [];
     }
   }
-
 
   static async getLine(lineId: string): Promise<Line> {
     const endpoint = `${this.apiBaseUrl}lines/lines:${lineId}`;
@@ -108,6 +106,40 @@ export class Api {
     } catch (error) {
       console.error("Error parsing line data:", error);
       throw error;
+    }
+  }
+  static async getInfosTraffic(linesIds: string[]): Promise<InfoTraffic[]> {
+    if (linesIds.length === 0) {
+      return [];
+    }
+    const effectRanking = [
+      "SUSPENDED",
+      "DISRUPTED",
+      "DEVIATED",
+      "WORKS",
+      "STRIKE",
+      "INFO",
+    ];
+    const endpoint = `${this.apiBaseUrl}disruptions/${linesIds.join(",")}`;
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch traffic info: ${response.status} ${response.statusText}`
+      );
+    }
+    try {
+      const infosData: any = await response.json();
+      const infos: InfoTraffic[] = infosData.disruptions
+        .map((info: any) => Converter.convertInfoTraffic(info))
+        .sort((a: InfoTraffic, b: InfoTraffic) => {
+          return (
+            effectRanking.indexOf(a.effect) - effectRanking.indexOf(b.effect)
+          );
+        });
+      return infos;
+    } catch (error) {
+      console.error("Error parsing traffic info data:", error);
+      return [];
     }
   }
 
