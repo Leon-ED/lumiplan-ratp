@@ -1,6 +1,6 @@
 <template>
   <header>
-    <BusPicto class="mode-picto picto" />
+    <img v-if="line" :src="'public/modes/' + line.mode.toLowerCase() + '.svg'" class="mode-picto" />
     <LineLogo v-if="line" :line="line" className="picto" size="100%" />
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
@@ -10,7 +10,6 @@
 </template>
 <script setup lang="ts">
 import { Line } from "../types";
-import BusPicto from "./BusPicto.vue";
 import LineLogo from "./Other/LineLogo.vue";
 defineProps<{
   direction: string;
@@ -25,7 +24,8 @@ defineProps<{
   font-size: 0 !important;
 }
 
-.no-data-available header .picto {
+.no-data-available header .picto,
+.no-data-available header .mode-picto{
   display: none !important;
 }
 .clock {
@@ -53,12 +53,13 @@ header {
   justify-content: flex-start;
   padding: 0.2em;
   padding-left: 1cqw;
-  gap: 0.5em;
+  gap: 0.2em;
 }
 .picto {
   height: 70%;
 }
 .mode-picto {
+  height: 70%;
   width: auto;
 }
 
