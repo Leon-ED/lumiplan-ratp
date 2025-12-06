@@ -1,4 +1,4 @@
-import { Mode } from "./types";
+import { InfoTraffic, Mode } from "./types";
 
 export class Converter {
 
@@ -10,6 +10,18 @@ export class Converter {
             return Mode.CABLE;
         }
         return mode.toUpperCase() as Mode;
+    }
+
+    static convertInfoTraffic(object: any): InfoTraffic {
+        const infoTraffic: InfoTraffic = {
+            effect: object.type,
+            id: object.ref,
+            title: object.title,
+            message: object.message,
+            status: object.status,
+            impactedLines: object.impactedLines
+        };
+        return infoTraffic;
     }
 
 

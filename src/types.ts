@@ -19,17 +19,24 @@ export interface Desserte {
   direction: string;
   stops: StopWithTime[];
 }
-
+export interface InfoTraffic{
+  id: string;
+  title: string;
+  message: string;
+  effect: 'SUSPENDED' | 'DISRUPTED' | 'DEVIATED' | 'WORKS' | 'STRIKE' | 'INFO';
+  status: "PAST" | "ACTIVE" | "FUTURE";
+  impactedLines: string[];
+}
 export enum Mode{
   BUS = "BUS",
   NOCTILIEN = "NOCTILIEN",
   TRAM = "TRAM",
   METRO = "METRO",
   RER = "RER",
+  TER = "TER",
   TRANSILIEN = "TRANSILIEN",
   CABLE = "CABLE"
 }
-
 export interface Line{
   id: string;
   name: string;
