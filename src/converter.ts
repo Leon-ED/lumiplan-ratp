@@ -15,6 +15,7 @@ export class Converter {
     static convertInfoTraffic(object: any): InfoTraffic {
         const infoTraffic: InfoTraffic = {
             effect: object.type,
+            cause: object.causeLabel,
             id: object.ref,
             title: object.title,
             message: object.message,

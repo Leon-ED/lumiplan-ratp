@@ -25,6 +25,7 @@ export interface InfoTraffic{
   message: string;
   effect: 'SUSPENDED' | 'DISRUPTED' | 'DEVIATED' | 'WORKS' | 'STRIKE' | 'INFO';
   status: "PAST" | "ACTIVE" | "FUTURE";
+  cause: string;
   impactedLines: string[];
 }
 export enum Mode{
