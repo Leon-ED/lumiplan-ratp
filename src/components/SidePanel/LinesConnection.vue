@@ -40,8 +40,17 @@ const props = defineProps<{
 }>();
 const linesByMode = computed(() => {
   const grouped: { [mode: string]: Line[] } = {};
+  const MAX_DISPLAYED_MODES = 3;
+  const MODES_ORDER = [
+    Mode.RER,
+    Mode.TRANSILIEN,
+    Mode.METRO,
+    Mode.CABLE,
+    Mode.TRAM,
+    Mode.TER,
+    Mode.BUS,
+  ];
   props.connections.forEach((line) => {
-    console.log("line", line);
     if (line.id === (params.lineRef as string)) {
       console.log("skip line", line.id);
       return;
@@ -59,8 +68,21 @@ const linesByMode = computed(() => {
   if (grouped[Mode.BUS]) {
     grouped[Mode.BUS] = [];
   }
+    if (grouped[Mode.TER]) {
+    grouped[Mode.TER] = [];
+  }
+  // trier les modes selon MODES_ORDER
+  const sortedGrouped: { [mode: string]: Line[] } = {};
+  MODES_ORDER.forEach((mode,index) => {
+    if(index>MAX_DISPLAYED_MODES){
+      return;
+    }
+    if (grouped[mode]) {
+      sortedGrouped[mode] = grouped[mode];
+    }
+  });
 
-  return grouped;
+  return sortedGrouped;
 });
 </script>
 <style lang="css" scoped>
