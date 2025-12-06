@@ -191,9 +191,9 @@ onUnmounted(() => {
   content: "";
   position: absolute;
   background-color: #ff1400;
-  width: 180%;
+  width: 4.5cqw;
   height: 0.7cqw;
-  left: 50%;
+  left: 3cqw;
   top: 50%;
   border-radius: 1px;
   z-index: 15;
