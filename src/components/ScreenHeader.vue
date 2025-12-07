@@ -1,6 +1,6 @@
 <template>
   <header>
-    <img v-if="line" :src="'public/modes/' + line.mode.toLowerCase() + '.svg'" class="mode-picto" />
+    <img v-if="line" :src="'/modes/' + line.mode.toLowerCase() + '.svg'" class="mode-picto" />
     <LineLogo v-if="line" :line="line" className="picto" size="100%" />
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
