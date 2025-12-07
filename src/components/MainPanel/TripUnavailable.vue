@@ -12,7 +12,7 @@ defineProps<{
       <span>Bienvenue</span>
       <div class="second-line">
         <span>sur la ligne</span>
-        <LineLogo :line="line" class-name="line-logo" />
+        <LineLogo :line="line" class-name="line-logo" size="6.3cqw" />
       </div>
     </div>
     <aside class="aside">
@@ -53,9 +53,7 @@ aside {
   align-items: center;
 
 }
-.line-logo {
-  height: 5cqw;
-}
+
 .tool-icon {
 position: absolute;
   width: 20cqw;
