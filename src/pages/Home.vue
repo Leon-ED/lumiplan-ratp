@@ -11,7 +11,12 @@
       />
     </section>
     <section class="modes">
-      <QuickMode v-for="mode in QUICK_MODES" :key="mode.name" :name="mode.name" :onClick="mode.callback"/>
+      <QuickMode
+        v-for="mode in QUICK_MODES"
+        :key="mode.name"
+        :name="mode.name"
+        :onClick="mode.callback"
+      />
     </section>
     <section>
       <label for="search-input" v-if="lines.length !== 0"
@@ -89,14 +94,50 @@ type DESSERTE_SEARCH_STATUS =
   | "done"
   | "no_results";
 
-  const QUICK_MODES = [
-  { name: "RER", callback: () => {_search.value = "RER ";} },
-  { name: "Transilien", callback: () => {_search.value = "Transilien ";} },
-  { name: "Métro", callback: () => {_search.value = "Metro ";} },
-  { name: "Tramway", callback: () => {_search.value = "Tram ";} },
-  { name: "Câble", callback: () => {_search.value = "Telepherique ";} },
-
-  ];
+const QUICK_MODES = [
+  {
+    name: "RER",
+    callback: () => {
+      _search.value = "RER ";
+    },
+  },
+  {
+    name: "Transilien",
+    callback: () => {
+      _search.value = "Transilien ";
+    },
+  },
+  {
+    name: "Métro",
+    callback: () => {
+      _search.value = "Metro ";
+    },
+  },
+  {
+    name: "Tramway",
+    callback: () => {
+      _search.value = "Tram ";
+    },
+  },
+  {
+    name: "Câble",
+    callback: () => {
+      _search.value = "Telepherique ";
+    },
+  },
+  {
+    name: "Noctiliens",
+    callback: () => {
+      _search.value = "Noctilien ";
+    },
+  },
+  {
+    name: "Bus de remplacement",
+    callback: () => {
+      _search.value = "BUS_REMPLACEMENT ";
+    },
+  },
+];
 
 type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
 const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
@@ -162,9 +203,9 @@ watchDebounced(
   gap: 0.5em;
   margin-bottom: 1em;
 }
-.modes{
+.modes {
   display: flex;
-  gap: .5em;
+  gap: 0.5em;
   flex-wrap: wrap;
   margin-bottom: 1em;
 }
