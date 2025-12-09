@@ -10,6 +10,9 @@
         placeholder="RER A, Metro 5, T5, 393"
       />
     </section>
+    <section class="modes">
+      <QuickMode v-for="mode in QUICK_MODES" :key="mode.name" :name="mode.name" :onClick="mode.callback"/>
+    </section>
     <section>
       <label for="search-input" v-if="lines.length !== 0"
         >Sélectionner une ligne</label
@@ -71,6 +74,7 @@ import { watchDebounced } from "@vueuse/core";
 import { ref } from "vue";
 import { Desserte, Line } from "../types";
 import { Api } from "../api";
+import QuickMode from "../components/HomePage/QuickMode.vue";
 import LineLogo from "../components/Other/LineLogo.vue";
 import ServiceOverview from "../components/HomePage/ServiceOverview.vue";
 const selectedLine = ref<Line | null>(null);
@@ -84,6 +88,16 @@ type DESSERTE_SEARCH_STATUS =
   | "error"
   | "done"
   | "no_results";
+
+  const QUICK_MODES = [
+  { name: "RER", callback: () => {_search.value = "RER ";} },
+  { name: "Transilien", callback: () => {_search.value = "Transilien ";} },
+  { name: "Métro", callback: () => {_search.value = "Metro ";} },
+  { name: "Tramway", callback: () => {_search.value = "Tram ";} },
+  { name: "Câble", callback: () => {_search.value = "Telepherique ";} },
+
+  ];
+
 type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
 const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
 const linesSearchStatus = ref<LINES_SEARCH_STATUS>("idle");
@@ -148,6 +162,12 @@ watchDebounced(
   gap: 0.5em;
   margin-bottom: 1em;
 }
+.modes{
+  display: flex;
+  gap: .5em;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
 main {
   display: flex;
   container-type: inline-size;
@@ -164,8 +184,8 @@ input[type="text"] {
   border-radius: 0.2em;
   box-shadow: unset;
   width: 100%;
-  margin-bottom: 1em;
   box-sizing: border-box;
+  border-bottom-left-radius: 0;
   padding: 0.5em 0.3em;
   margin-top: 0.5em;
   border: gray 0.5px solid;
