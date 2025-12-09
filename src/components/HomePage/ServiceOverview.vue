@@ -5,7 +5,7 @@
         <span class="direction">➡️ {{ desserte.direction }}</span>
         <span class="status">{{ status }}</span>
       </div>
-      <div>
+      <div v-if="desserte.stops.length > 1">
         <details class="desserte">
           <summary>Desserte</summary>
           <ul class="stops-list">
@@ -114,6 +114,7 @@ const status = computed(() => {
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-top: 1em;
 }
 a{
   height: fit-content;
