@@ -3,6 +3,7 @@ import { computed } from "vue";
 import BusLineLogo from "./BusLineLogo.vue";
 import NoctilienLogo from "./NoctilienLogo.vue";
 import { Line, Mode } from "../../types";
+import { cleanId } from "../../utils";
 
 interface Props {
   line: Line;
@@ -13,9 +14,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const logoShape = computed(() =>
-  'none'
-);
+const logoShape = computed(() => "none");
 const style = computed(() => {
   return {
     "--bg-color": props.line.color,
@@ -24,40 +23,105 @@ const style = computed(() => {
   };
 });
 const isLineSpecial = computed(() => {
-  const specialModes = [Mode.TRAM, Mode.RER, Mode.METRO,Mode.CABLE,Mode.TRANSILIEN];
-     const specialNames = [
-      "AUDONIE",
-      "TUVIM",
-      "TILLBUS",
-      "ORLYBUS",
-      "FUN",
-      "ORLYVAL",
-      "TVM",
-      "ROISSYBUS",
-      "CHARONNE",
-      "AMIBUS",
-      "MONTBUS",
-      "RIVER",
-      "PORT",
-      "EOLIEN",
-      "AS",
-      "LBLEUE",
-      "THIAIS",
-      "CHOISYBUS",
-      "BIEVRES",
-    ];
-  return specialModes.includes(props.line.mode) || specialNames.includes(props.line.name.toLocaleUpperCase().replace(/\s/g, ''));
-
-
+  const specialModes = [
+    Mode.TRAM,
+    Mode.RER,
+    Mode.METRO,
+    Mode.CABLE,
+    Mode.TRANSILIEN,
+  ];
+  const specialNames = [
+    "AUDONIE",
+    "TUVIM",
+    "TILLBUS",
+    "ORLYBUS",
+    "FUN",
+    "ORLYVAL",
+    "TVM",
+    "ROISSYBUS",
+    "CHARONNE",
+    "AMIBUS",
+    "MONTBUS",
+    "RIVER",
+    "PORT",
+    "EOLIEN",
+    "AS",
+    "LBLEUE",
+    "THIAIS",
+    "CHOISYBUS",
+    "BIEVRES",
+  ];
+  const specialIds = [
+    "C01840",
+    "C01841",
+    "C02310",
+    "C01842",
+    "C01843",
+    "C02512",
+    "C01844",
+    "C02405",
+    "C02483",
+    "C02534",
+    "C02494",
+    "C02527",
+    "C02492",
+    "C02268",
+    "C02475",
+    "C02533",
+    "C02442",
+    "C02385",
+    "C02019",
+    "C02514",
+    "C02532",
+    "C02531",
+    "C02471",
+    "C01683",
+    "C02406",
+    "C02590",
+    "C02407",
+    "C02408",
+    "C02409",
+    "C02410",
+    "C02411",
+    "C02573",
+    "C02469",
+    "C02180",
+    "C01845",
+    "C01846",
+    "C01847",
+    "C01848",
+    "C01849",
+    "C01850",
+    "C01851",
+    "C01852",
+    "C01853",
+    "C02404",
+  ];
+  return (
+    specialModes.includes(props.line.mode) ||
+    specialNames.includes(
+      props.line.name.toLocaleUpperCase().replace(/\s/g, "")
+    ) ||
+    specialIds.includes(cleanId(props.line.id))
+  );
 });
-
-
+const computeBackupImgLink = computed(() => {
+  return "/lines/" + props.line.name.toLowerCase().replace(/\s/g, "_") + ".svg";
+});
+const computeNormalImgLink = computed(() => {
+  return "/lines/" + cleanId(cleanId(props.line.id)) + ".svg";
+});
 </script>
 <template>
   <!-- Logo Tram -->
   <img
+    :data-line-mode-and-name="
+      props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
+    "
     v-if="isLineSpecial"
-    :src="'/lines/'+props.line.name.toLowerCase().replace(/\s/g, '_')+'.svg'"
+    :src="computeNormalImgLink"
+    :data-line-id="cleanId(props.line.id)"
+    :onerror="'this.onerror=null;this.src=\'' + computeBackupImgLink + '\''"
     :class="'line-logo' + ' specialLogo ' + props.className + ' '"
     :style="style"
   />
@@ -67,6 +131,10 @@ const isLineSpecial = computed(() => {
     :class="props.className"
   >
     <BusLineLogo
+      :data-line-mode-and-name="
+        props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
+      "
+      :data-line-id="cleanId(props.line.id)"
       :lineName="props.line.name"
       :height="props.size ? props.size : '100%'"
       :bgColor="props.line.color"
@@ -79,12 +147,17 @@ const isLineSpecial = computed(() => {
     :class="'line-logo' + ' ' + props.className + ' ' + logoShape"
     v-else-if="props.line.mode === Mode.NOCTILIEN"
   >
-  <NoctilienLogo
-    :lineName="props.line.name"
-    :height="props.size ? props.size : '100%'"
-    :bgColor="props.line.color"
-    :textColor="props.line.textColor" />
-</div>
+    <NoctilienLogo
+      :data-line-mode-and-name="
+        props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
+      "
+      :data-line-id="cleanId(props.line.id)"
+      :lineName="props.line.name"
+      :height="props.size ? props.size : '100%'"
+      :bgColor="props.line.color"
+      :textColor="props.line.textColor"
+    />
+  </div>
   <!-- Logo Normal -->
   <div
     :class="'line-logo' + ' ' + props.className + ' ' + logoShape"
@@ -106,7 +179,6 @@ const isLineSpecial = computed(() => {
   color: var(--text-color);
   user-select: none;
   -webkit-user-drag: none;
-
 
   margin: 0;
   padding: 0 !important;
