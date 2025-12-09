@@ -115,6 +115,9 @@ const status = computed(() => {
   padding: 0;
   margin: 0;
 }
+a{
+  height: fit-content;
+}
 
 .stop-item {
   display: flex;
@@ -158,7 +161,7 @@ const status = computed(() => {
 .go-to-screen {
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-top: 20%;
 }
 .go-button {
   background-color: #2cbf53;
