@@ -114,6 +114,7 @@ const linesByMode = computed(() => {
 }
 
 .header {
+        color: #212121;
   font-size: 1.6cqw;
   margin-bottom: 1cqw;
 }
