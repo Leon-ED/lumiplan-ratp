@@ -236,4 +236,13 @@ a{
   color: #666;
   margin-top: 4px;
 }
+@media (prefers-color-scheme: dark) {
+  .desserte-overview {
+    background-color: #1e1e1e;
+    color: white;
+  }
+  .status {
+    color: #aaa;
+  }
+}
 </style>

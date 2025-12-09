@@ -230,4 +230,15 @@ li {
 section {
   width: 100%;
 }
+@media (prefers-color-scheme: dark) {
+  main {
+    background-color: #121212;
+    color: white;
+  }
+  input[type="text"] {
+    background-color: #1e1e1e;
+    color: white;
+    border: gray 0.5px solid;
+  }
+}
 </style>

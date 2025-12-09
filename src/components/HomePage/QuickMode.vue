@@ -29,4 +29,13 @@ defineProps<{
   font-size: 0.8em;
   font-weight: bold;
 }
+@media (prefers-color-scheme: dark) {
+  .quick-mode-btn {
+    border: gray 0.5px solid;
+    opacity: 0.85;
+  }
+  .quick-mode-btn:hover {
+    background-color: #004880;
+  }
+}
 </style>
