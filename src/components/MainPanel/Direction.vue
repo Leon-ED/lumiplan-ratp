@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 import { getMinutesFromDate } from "../../utils";
 import { useIntervalFn } from "@vueuse/core";
 import { useRotatedText } from "../../hooks/useRotatedText";
-import { DIRECTION_TEXTS } from "../../translations";
+import { DEPARTURE_IN_TEXTS, DIRECTION_TEXTS } from "../../translations";
 const element = ref<HTMLElement>();
 interface Props {
   direction: string;
@@ -65,17 +65,19 @@ useIntervalFn(
   { immediate: true }
 );
 const translation = useRotatedText(DIRECTION_TEXTS);
+const departureInTranslation = useRotatedText(DEPARTURE_IN_TEXTS)
 </script>
 <template>
   <main class="direction">
     <div class="direction-name-container">
-      <span>Direction</span>
-      <Transition name="text-translation-fade" mode="out-in">
-        <span class="direction-name translation" v-html="translation" :key="translation"></span>
+       <Transition name="text-translation-fade" mode="out-in">
+        <span class="translation" v-html="translation" :key="translation"></span>
       </Transition>
+      <span class="direction-name ">{{ props.direction }}</span>
+     
     </div>
     <aside class="aside">
-      <div class="text">Départ dans</div>
+      <div class="text" v-html="departureInTranslation"></div>
       <div class="time">
         <div :class="{ 'blink-text': displayedMinutes === 0 }" ref="element">
           {{ displayedMinutes }}
