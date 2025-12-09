@@ -2,26 +2,29 @@
 import { computed } from "vue";
 import Stop from "./Stop.vue";
 import { StopWithTime } from "../../types";
+import { useRotatedText } from "../../hooks/useRotatedText";
+import { NEXT_STOP_TEXTS, TERMINUS_TEXTS } from "../../translations";
 
 const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 
-const text = computed(() => {
-  return props.stops[props.stops.length - 1].isTerminus &&
-    props.stops.length === 1
-    ? "Prochain arrêt : terminus"
-    : "Prochains arrêts";
+// 1. On initialise les hooks au niveau supérieur (meilleure performance/stabilité)
+const terminusLabel = useRotatedText(TERMINUS_TEXTS);
+const nextStopLabel = useRotatedText(NEXT_STOP_TEXTS);
+
+// 2. On calcule simplement quelle chaîne de caractères afficher
+const currentDescription = computed(() => {
+  const isTerminusScenario = props.stops[props.stops.length - 1].isTerminus && props.stops.length === 1;
+  
+  // On accède à .value ici car useRotatedText retourne une ref/computed
+  return isTerminusScenario ? terminusLabel.value : nextStopLabel.value;
 });
 
 const getIndexForStop = (i: number) => {
+  // ... (votre logique existante inchangée)
   const stop0 = props.stops[0];
   const stop1 = props.stops[1];
-
-  if (!stop0.isStopSkipped) {
-    return i === 0 ? 0 : 1;
-  }
-  if (stop1 && !stop1.isStopSkipped) {
-    return i === 1 ? 0 : 1;
-  }
+  if (!stop0.isStopSkipped) return i === 0 ? 0 : 1;
+  if (stop1 && !stop1.isStopSkipped) return i === 1 ? 0 : 1;
   return 1;
 };
 </script>
@@ -36,7 +39,13 @@ const getIndexForStop = (i: number) => {
           class="arrow-icon"
         />
       </div>
-      <span class="next-stop-description">{{ text }}</span>
+     <Transition name="text-translation-fade" mode="out-in">
+        <span 
+          :key="currentDescription" 
+          class="next-stop-description translation" 
+          v-html="currentDescription"
+        ></span>
+      </Transition>
     </div>
     <ol class="stops-list">
       <TransitionGroup
@@ -136,9 +145,8 @@ const getIndexForStop = (i: number) => {
   font-family: "ParisineRegular";
   font-size: 2cqw;
   color: #212121;
+  display: inline-block;
 }
-
-
 .stops-list-container:has(.stops-list .stop-transition-enter-active) .next-stop-container,
 .stops-list-container:has(.stops-list .stop-transition-leave-active) .next-stop-container {
   opacity: 0;

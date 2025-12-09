@@ -3,7 +3,11 @@
     <table cellpadding="15">
       <thead>
         <tr>
-          <th class="destination-header">Arrivée prévue dans</th>
+          <th class="destination-header">
+          <Transition name="text-translation-fade" mode="out-in">
+            <span class="translation" v-html="translation" :key="translation"></span>
+          </Transition>
+          </th>
           <th class="minutes-header">min</th>
         </tr>
       </thead>  
@@ -23,9 +27,11 @@
   </aside>
 </template>
 <script setup lang="ts">
+import { useRotatedText } from "../../hooks/useRotatedText";
+import { ETA_TEXTS } from "../../translations";
 import { StopWithTime } from "../../types";
 import { getMinutesFromDate } from "../../utils";
-
+const translation = useRotatedText(ETA_TEXTS);
 interface Props {
   stopsList: StopWithTime[];
 }

@@ -110,6 +110,21 @@ body,
     opacity: .5;
   }
 }
+.text-translation-fade-enter-active,
+.text-translation-fade-leave-active {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.text-translation-fade-enter-from {
+  opacity: 0;
+}
+
+.text-translation-fade-leave-to {
+  opacity: 0;
+}
+.translation {
+  display: inline-block;
+}
 @media (prefers-color-scheme: dark) {
 body {
     background-color: #121212;

@@ -2,6 +2,8 @@
 import { ref, watch } from "vue";
 import { getMinutesFromDate } from "../../utils";
 import { useIntervalFn } from "@vueuse/core";
+import { useRotatedText } from "../../hooks/useRotatedText";
+import { DIRECTION_TEXTS } from "../../translations";
 const element = ref<HTMLElement>();
 interface Props {
   direction: string;
@@ -15,7 +17,10 @@ const displayedMinutes = ref<number>(minutes.value);
 const animateChange = async () => {
   if (!element.value) return;
   await element.value.animate(
-    [{ transform: "scale(1)", opacity: 1 }, { transform: "scale(0.9)", opacity: 0.8 }],
+    [
+      { transform: "scale(1)", opacity: 1 },
+      { transform: "scale(0.9)", opacity: 0.8 },
+    ],
     {
       duration: 2000,
       easing: "ease-out",
@@ -23,16 +28,22 @@ const animateChange = async () => {
     }
   ).finished;
   await element.value.animate(
-    [{ transform: "scale(0.9)", opacity: 0.8 },{ transform: "scale(1.1)", opacity: 1 }],
+    [
+      { transform: "scale(0.9)", opacity: 0.8 },
+      { transform: "scale(1.1)", opacity: 1 },
+    ],
     {
       duration: 1000,
       easing: "ease-in-out",
       fill: "forwards",
     }
   ).finished;
-    displayedMinutes.value = minutes.value;
-      await element.value.animate(
-    [{ transform: "scale(1.1)", opacity: 1 },{ transform: "scale(1)", opacity: 1 },],
+  displayedMinutes.value = minutes.value;
+  await element.value.animate(
+    [
+      { transform: "scale(1.1)", opacity: 1 },
+      { transform: "scale(1)", opacity: 1 },
+    ],
     {
       duration: 1200,
       easing: "ease-in-out",
@@ -53,12 +64,15 @@ useIntervalFn(
   10_000,
   { immediate: true }
 );
+const translation = useRotatedText(DIRECTION_TEXTS);
 </script>
 <template>
   <main class="direction">
     <div class="direction-name-container">
       <span>Direction</span>
-      <span class="direction-name">{{ direction }}</span>
+      <Transition name="text-translation-fade" mode="out-in">
+        <span class="direction-name translation" v-html="translation" :key="translation"></span>
+      </Transition>
     </div>
     <aside class="aside">
       <div class="text">Départ dans</div>

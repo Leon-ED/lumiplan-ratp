@@ -7,7 +7,9 @@
     />
     <div class="line-connection">
       <div class="header">
-        <span>Correspondances</span>
+        <Transition name="text-translation-fade" mode="out-in">
+          <span class="translation" v-html="translation" :key="translation"></span>
+        </Transition>
       </div>
 
       <div class="content">
@@ -36,7 +38,10 @@ import { computed } from "vue";
 import { Line, Mode } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 import { useRoute } from "vue-router";
+import { useRotatedText } from "../../hooks/useRotatedText";
+import { CONNECTING_LINES_TEXTS } from "../../translations";
 const params = useRoute().query;
+const translation = useRotatedText(CONNECTING_LINES_TEXTS);
 const props = defineProps<{
   connections: Array<Line>;
 }>();
@@ -114,7 +119,7 @@ const linesByMode = computed(() => {
 }
 
 .header {
-        color: #212121;
+  color: #212121;
   font-size: 1.6cqw;
   margin-bottom: 1cqw;
 }
@@ -129,7 +134,7 @@ const linesByMode = computed(() => {
 }
 .mode-group {
   display: flex;
-  gap: .4em;
+  gap: 0.4em;
 }
 .lines-list {
   display: flex;
