@@ -21,8 +21,10 @@
             :alt="mode.toString()"
             class="mode-logo"
           />
-          <div v-for="line in lines" :key="line.id" class="line">
-            <LineLogo :line="line" class-name="line-logo" size="4cqw" />
+          <div class="lines-list">
+            <div v-for="line in lines" :key="line.id" class="line">
+              <LineLogo :line="line" class-name="line-logo" size="3.8cqw" />
+            </div>
           </div>
         </div>
       </div>
@@ -70,7 +72,7 @@ const linesByMode = computed(() => {
   if (grouped[Mode.BUS]) {
     grouped[Mode.BUS] = [];
   }
-    if (grouped[Mode.TER]) {
+  if (grouped[Mode.TER]) {
     grouped[Mode.TER] = [];
   }
   // trier les modes selon MODES_ORDER
@@ -78,11 +80,11 @@ const linesByMode = computed(() => {
   const sortedGrouped: { [mode: string]: Line[] } = {};
   let index = 1;
   MODES_ORDER.forEach((mode) => {
-    if(index>MAX_DISPLAYED_MODES){
+    if (index > MAX_DISPLAYED_MODES) {
       return;
     }
     if (Object.keys(grouped).includes(mode.toString())) {
-    index++;
+      index++;
       sortedGrouped[mode] = grouped[mode];
     }
   });
@@ -95,16 +97,16 @@ const linesByMode = computed(() => {
 .lines-connection-container {
   width: 100%;
   position: relative;
-  padding: 0; 
+  padding: 0;
   height: 100%;
-  overflow: visible; 
+  overflow: visible;
 }
 
 .line-connection {
-  background-color: #f4eeea; 
+  background-color: #f4eeea;
   position: relative;
   z-index: 4;
-  
+  box-sizing: border-box;
   padding: 1.5cqw;
   padding-top: 0.5cqw;
   width: 100%;
@@ -121,13 +123,17 @@ const linesByMode = computed(() => {
   gap: 1cqw;
 }
 .mode-logo {
-  height: 4cqw;
+  height: 3.8cqw;
   width: auto;
 }
 .mode-group {
   display: flex;
-  align-items: center;
-  gap: 1cqw;
+  gap: .4em;
+}
+.lines-list {
+  display: flex;
+  gap: 0.4em;
+  flex-wrap: wrap;
 }
 .triangle-icon {
   position: absolute;
@@ -135,7 +141,7 @@ const linesByMode = computed(() => {
   left: -6.5%;
   height: 5cqw;
   width: auto;
-  opacity: 0; 
+  opacity: 0;
   transform: translateX(100%);
   z-index: 1; /* triangle derrière */
   animation: slide-from-behind 0.2s ease-out 1.17s forwards;
@@ -143,16 +149,15 @@ const linesByMode = computed(() => {
 
 @keyframes slide-from-behind {
   0% {
-    transform: translateX(100%); 
-    opacity: 0;                  
+    transform: translateX(100%);
+    opacity: 0;
   }
   1% {
-   
-    opacity: 1; 
+    opacity: 1;
   }
   100% {
-    transform: translateX(0);    
-    opacity: 1;                 
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 </style>
