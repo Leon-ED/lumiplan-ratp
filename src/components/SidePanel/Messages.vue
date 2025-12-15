@@ -14,8 +14,11 @@
         class="message-icon"
       />
       <br />
-      <span class="message-text" v-if="infosTraffic[0].cause !== 'Cause inconnue'"
-        >{{ infosTraffic[0].title }} <br />{{ infosTraffic[0].cause }}</span
+      <span class="message-text"
+        >{{ infosTraffic[0].title }} <br /><template
+          v-if="infosTraffic[0].cause !== 'Cause inconnue'"
+          >{{ infosTraffic[0].cause }}</template
+        ></span
       >
     </div>
   </div>
