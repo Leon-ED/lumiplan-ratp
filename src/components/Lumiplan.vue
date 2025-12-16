@@ -54,7 +54,10 @@
           />
 
           <Messages
-          :withArrow="displayedInfosTraffic.length === 1 && specialSkippedStopMessage?.id === 'next-stop-skipped-alert'"
+            :withArrow="
+              displayedInfosTraffic.length === 1 &&
+              specialSkippedStopMessage?.id === 'next-stop-skipped-alert'
+            "
             v-else-if="currentSlate?.type === 'INFOS_TRAFFIC'"
             :infosTraffic="displayedInfosTraffic"
             key="messages"
@@ -66,8 +69,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
+// Import des composables VueUse
+import { useIntervalFn, useTimeoutFn } from "@vueuse/core";
 
 import ScreenHeader from "./ScreenHeader.vue";
 import StopList from "./MainPanel/StopList.vue";
@@ -83,7 +88,6 @@ import Messages from "./SidePanel/Messages.vue";
 import { getSecondesFromDate } from "../utils";
 import { Api } from "../api";
 import { Desserte, InfoTraffic, Line, Mode, Stop } from "../types";
-import { useIntervalFn } from "@vueuse/core";
 
 const SLATE_DURATIONS = {
   CONNECTIONS: 5000,
@@ -92,19 +96,64 @@ const SLATE_DURATIONS = {
   INFOS_TRAFFIC: 10_000,
 };
 
-const fakeDesserte: Desserte = {
-  direction: "",
-  id: "",
-  stops: [],
-};
+// --- DATA REFS ---
+const fakeDesserte: Desserte = { direction: "", id: "", stops: [] };
 const desserte = ref<Desserte>(fakeDesserte);
 const line = ref<Line | null>(null);
 const route = useRoute();
 const INFOS_TRAFFICMessages = ref<InfoTraffic[]>([]);
 
-INFOS_TRAFFICMessages.value = [];
-const INFOS_TRAFFIC_LINES = computed(() => {
+// --- STATE TIMING ---
+const stopDisplayTimerDone = ref(false);
+const currentSecondsToArrival = ref<number>(9999);
+const isPostStopLocked = ref(false);
 
+const INFOS_TRAFFIC_REFRESH_INTERVAL = 60 * 1000 * 3;
+
+// --- VUEUSE TIMERS ---
+
+// 1. Timer pour le verrouillage après le départ (5s)
+const { start: startPostStopLock, stop: stopPostStopLock } = useTimeoutFn(
+  () => {
+    isPostStopLocked.value = false;
+  },
+  5000,
+  { immediate: false }
+);
+
+// 2. Timer pour l'affichage progressif à l'arrêt (5s)
+const { start: startStopDisplay, stop: stopStopDisplay } = useTimeoutFn(
+  () => {
+    stopDisplayTimerDone.value = true;
+  },
+  5000,
+  { immediate: false }
+);
+
+// 3. Timer pour la rotation des Slates (Durée dynamique)
+const currentSlateDuration = ref(10000); // Durée initiale par défaut
+const { start: startSlateTimer, stop: stopSlateTimer } = useTimeoutFn(
+  () => {
+    rotateSlates();
+  },
+  currentSlateDuration, // Passé en Ref, VueUse utilisera la valeur courante au start()
+  { immediate: false }
+);
+
+// --- COMPUTED HELPERS ---
+const APPROACHING_THRESHOLD_START = 15;
+const APPROACHING_THRESHOLD_END = 10;
+
+const isApproachingStop = computed(() => {
+  return (
+    state.value === "NOT_AT_STOP" &&
+    currentSecondsToArrival.value <= APPROACHING_THRESHOLD_START &&
+    currentSecondsToArrival.value > APPROACHING_THRESHOLD_END
+  );
+});
+
+// --- INFOS TRAFFIC LOGIC ---
+const INFOS_TRAFFIC_LINES = computed(() => {
   const whitelistedModes = [Mode.RER, Mode.TRANSILIEN, Mode.METRO];
   const allLines: Line[] = [];
   const linesIdsSet = new Set<string>();
@@ -120,72 +169,57 @@ const INFOS_TRAFFIC_LINES = computed(() => {
       }
     });
   });
-
   const finalSorted = allLines.sort((a, b) => {
     return whitelistedModes.indexOf(a.mode) - whitelistedModes.indexOf(b.mode);
   });
   finalSorted.unshift(line.value!);
   return finalSorted;
 });
-const INFOS_TRAFFIC_REFRESH_INTERVAL = 60 * 1000 * 3; 
-const stopDisplayTimerDone = ref(false);
-let stopTimer: NodeJS.Timeout | null = null;
 
 const specialSkippedStopMessage = computed<InfoTraffic | null>(() => {
   const stops = desserte.value.stops;
   if (!stops || stops.length === 0) return null;
-
   let skippedCount = 0;
   let nextServedStopName = "";
-
-  // On compte combien d'arrêts consécutifs sont sautés en partant du prochain arrêt immédiat (index 0)
   for (const s of stops) {
-    if (s.isStopSkipped) {
-      skippedCount++;
-    } else {
+    if (s.isStopSkipped) skippedCount++;
+    else {
       nextServedStopName = s.stop.name;
-      break; // On a trouvé le prochain arrêt desservi, on arrête de compter
+      break;
     }
   }
-
-  // Si aucun arrêt n'est sauté au début de la liste, pas de message
   if (skippedCount === 0) return null;
-  if(skippedCount === 1){
-    nextServedStopName = "non desservi";
-  }
+  if (skippedCount === 1) nextServedStopName = "non desservi";
 
-  // Création du message
-  const messageContent = skippedCount === 1 
-    ? "Point d’arrêt" 
-    : `Prochain arrêt desservi : `;
-  const messageId = skippedCount === 1 
-    ? 'next-stop-skipped-alert' 
-    : 'multiple-stops-skipped-alert';
-  // On retourne un objet simulant une InfoTraffic
+  const messageContent =
+    skippedCount === 1 ? "Point d’arrêt" : `Prochain arrêt desservi : `;
+  const messageId =
+    skippedCount === 1
+      ? "next-stop-skipped-alert"
+      : "multiple-stops-skipped-alert";
+
   return {
     cause: nextServedStopName,
-    effect: 'INFO',
+    effect: "INFO",
     impactedLines: [],
-    message:messageContent,
+    message: messageContent,
     id: messageId,
     title: messageContent,
     content: messageContent,
-    status: 'ACTIVE',
+    status: "ACTIVE",
     updatedAt: new Date().toISOString(),
   } as InfoTraffic;
 });
 
 const displayedInfosTraffic = computed(() => {
   const messages = [...INFOS_TRAFFICMessages.value];
-  
   if (specialSkippedStopMessage.value) {
     return [specialSkippedStopMessage.value];
   }
-  
   return messages;
 });
 
-
+// --- DATA FETCHING ---
 const fetchLineData = async () => {
   try {
     const lineData = await Api.getLine(route.query.lineRef as string);
@@ -241,9 +275,7 @@ const fetchJourneyData = async () => {
     const tripRef = route.query.tripRef as string;
     if (tripRef) {
       const journeyData = await Api.getJourney(tripRef);
-      if (!journeyData) {
-        return;
-      }
+      if (!journeyData) return;
       desserte.value = journeyData;
     }
   } catch (error) {
@@ -273,16 +305,26 @@ const computeState = () => {
   }
   if (desserte.value.stops.length === 0) {
     state.value = "NO_TRIP_DATA_AVAILABLE";
-  } else if (
+    return;
+  }
+
+  // Mise à jour du compteur de temps global
+  if (currentStop.value) {
+    currentSecondsToArrival.value = getSecondesFromDate(
+      currentStop.value.timeOfArrival
+    );
+  }
+
+  if (
     currentStop.value &&
     currentStop.value.isFirstStop &&
-    getSecondesFromDate(currentStop.value.timeOfArrival) >= -5
+    currentSecondsToArrival.value >= -5
   ) {
     state.value = "FIRST_STOP";
   } else if (
     currentStop.value &&
     !currentStop.value.isStopSkipped &&
-    getSecondesFromDate(currentStop.value.timeOfArrival) <= 10 &&
+    currentSecondsToArrival.value <= 10 &&
     getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -2
   ) {
     state.value = "AT_STOP";
@@ -299,29 +341,46 @@ const computeState = () => {
 };
 
 const shouldShowSidePanel = computed(() => {
+  // Verrouillage après départ
+  if (isPostStopLocked.value){
+    console.log("Post stop lock active, no side panel");
+  }
+
+  // Si on est en approche mais pas de slate à afficher
+  if (isApproachingStop.value && availableSlates.value.length === 0)
+    return false;
+
   if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0)
     return true;
+
   if (
     state.value === "AT_STOP" &&
     stopDisplayTimerDone.value &&
     availableSlates.value.length > 0
   )
     return true;
+
   return false;
 });
 
-watch(state, (newState) => {
+watch(state, (newState, oldState) => {
+  // --- GESTION DU TIMER "AT_STOP" ---
   if (newState === "AT_STOP") {
     stopDisplayTimerDone.value = false;
-    if (stopTimer) clearTimeout(stopTimer);
-    stopTimer = setTimeout(() => {
-      stopDisplayTimerDone.value = true;
-    }, 5000);
+    stopStopDisplay(); // Clean previous
+    startStopDisplay(); // Start new 5s timer
   } else if (newState === "NOT_AT_STOP") {
-    setTimeout(() => {
-      stopDisplayTimerDone.value = true;
-      if (stopTimer) clearTimeout(stopTimer);
-    }, 5000);
+    // Si on change d'état, on s'assure que le flag AT_STOP est reset correctement après délai
+    // (optionnel selon la logique UI souhaitée, ici on garde la logique précédente)
+    stopStopDisplay();
+    startStopDisplay();
+
+    // --- LOGIQUE "QUITTER L'ARRET" ---
+    if (oldState === "AT_STOP") {
+      isPostStopLocked.value = true;
+      stopPostStopLock(); // Clean previous
+      startPostStopLock(); // Start new 5s lock
+    }
   }
 });
 
@@ -332,12 +391,20 @@ interface Slate {
 }
 
 const availableSlates = computed<Slate[]>(() => {
-  const slates: Slate[] = [];
+  // 1. Verrouillage post-arrêt
+  if (isPostStopLocked.value){
+    console.log("Post stop lock active, no slates available");
+    return [];
+  }
 
   const hasTrafficMessages = displayedInfosTraffic.value.length > 0;
-if (specialSkippedStopMessage.value) {
-    return [{ type: "INFOS_TRAFFIC", duration: 999999 }]; 
+
+  // 2. Pour afficher le msg des arrêts non desservis
+  if (specialSkippedStopMessage.value) {
+    return [{ type: "INFOS_TRAFFIC", duration: 999999 }];
   }
+
+  // 3. À l'arrêt
   if (state.value === "AT_STOP") {
     if (hasTrafficMessages) {
       return [{ type: "INFOS_TRAFFIC", duration: 999999 }];
@@ -345,27 +412,48 @@ if (specialSkippedStopMessage.value) {
     return [];
   }
 
-  // Standard
-  if (currentConnections.value.length > 0) {
+  // 4.Juste avant d'afficher le nom du prochain arrêt en gros, on affiche le panneau des correspondances
+  if (isApproachingStop.value) {
+    if (currentConnections.value.length > 0) {
+      return [{ type: "CONNECTIONS", duration: 5000 }];
+    }
+    return [];
+  }
+
+  // 5. Rotation Standard
+  const slates: Slate[] = [];
+  const timeBudgetBeforeApproach =
+    currentSecondsToArrival.value - APPROACHING_THRESHOLD_START;
+  const SAFETY_ANIMATION_BUFFER = 0.5;
+  
+  const canFitInBudget = (duration: number) => {
+    return duration + SAFETY_ANIMATION_BUFFER < timeBudgetBeforeApproach * 1_000;
+  };
+
+  if (
+    currentConnections.value.length > 0
+  ) {
     slates.push({ type: "CONNECTIONS", duration: SLATE_DURATIONS.CONNECTIONS });
   }
 
-  if (importantStops.value.length > 0) {
+  if (
+    importantStops.value.length > 0 &&
+    canFitInBudget(SLATE_DURATIONS.TRAVEL_TIME)
+  ) {
     slates.push({ type: "TRAVEL_TIME", duration: SLATE_DURATIONS.TRAVEL_TIME });
   }
 
-  if (hasTrafficMessages) {
+  if (hasTrafficMessages && canFitInBudget(SLATE_DURATIONS.INFOS_TRAFFIC)) {
     slates.push({
       type: "INFOS_TRAFFIC",
       duration: SLATE_DURATIONS.INFOS_TRAFFIC,
     });
   }
-
+  console.log(slates);
   return slates;
 });
 
 const currentSlateIndex = ref(0);
-let slateTimer: NodeJS.Timeout | null = null;
 
 const currentSlate = computed(() => {
   if (availableSlates.value.length === 0) return null;
@@ -382,10 +470,14 @@ const rotateSlates = () => {
 };
 
 const scheduleNextRotation = () => {
-  if (slateTimer) clearTimeout(slateTimer);
+  stopSlateTimer();
+
   if (availableSlates.value.length <= 1) return;
-  const duration = currentSlate.value?.duration || 10000;
-  slateTimer = setTimeout(rotateSlates, duration);
+
+  const nextDuration = currentSlate.value?.duration || 10000;
+  currentSlateDuration.value = nextDuration;
+
+  startSlateTimer();
 };
 
 watch(
@@ -399,8 +491,6 @@ watch(
   },
   { deep: true }
 );
-
-let updateIntervalId: NodeJS.Timeout;
 
 const updateState = () => {
   computeState();
@@ -416,7 +506,7 @@ const updateState = () => {
 };
 
 const fetchInfosTrafficMessages = async () => {
-  if (!line.value || !desserte.value || desserte.value.stops.length === 0){
+  if (!line.value || !desserte.value || desserte.value.stops.length === 0) {
     return;
   }
   try {
@@ -435,17 +525,13 @@ onMounted(async () => {
   await fetchLineData();
   await fetchJourneyData();
   fetchInfosTrafficMessages();
-  updateIntervalId = setInterval(updateState, 1_000);
+
+  useIntervalFn(updateState, 1000);
+
   scheduleNextRotation();
   useIntervalFn(fetchInfosTrafficMessages, INFOS_TRAFFIC_REFRESH_INTERVAL, {
     immediate: true,
   });
-});
-
-onUnmounted(() => {
-  if (updateIntervalId) clearInterval(updateIntervalId);
-  if (slateTimer) clearTimeout(slateTimer);
-  if (stopTimer) clearTimeout(stopTimer);
 });
 </script>
 
