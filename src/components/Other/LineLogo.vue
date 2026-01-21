@@ -34,6 +34,7 @@ const isLineSpecial = computed(() => {
     "AUDONIE",
     "TUVIM",
     "TILLBUS",
+    "TUC",
     "ORLYBUS",
     "FUN",
     "ORLYVAL",
