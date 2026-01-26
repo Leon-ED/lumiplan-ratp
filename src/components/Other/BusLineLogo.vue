@@ -1,15 +1,15 @@
 <template>
   <svg
-    width="2704"
+    width="3016"
     height="1939"
-    viewBox="0 0 2704 1939"
+    viewBox="0 0 3016 1939"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     :style="style"
     :class="classes"
   >
     <g clip-path="url(#clip0_28_16)">
-      <rect width="2704" height="1939" :fill="bgColor" />
+      <rect width="3016" height="1939" :fill="bgColor" />
       <text
         x="50%"
         :y="wrappedLines.length > 1 ? '30%' : '50%'"
@@ -63,67 +63,67 @@ const classes = computed(() => ({
 
 const getFontSize = (length: number): number => {
   if (length <= 2) {
-    return 1800;
+    return 2000;
   }
-  if (length <= 3){
-    return 1300;
+  if (length <= 3) {
+    return 1500;
   }
   if (length === 4) {
-    return 1150;
+    return 1200;
   }
-    if (length === 5) {
-    return 750;
+  if (length === 5) {
+    return 1000;
   }
-  return 700;
+  return 800;
 };
 
 const wrappedLines = computed(() => {
-  const MAX_LINE_LENGTH = 7
+  const MAX_LINE_LENGTH = 7;
 
-  // 1. On commence par séparer la ligne sur les espaces, 
+  // 1. On commence par séparer la ligne sur les espaces,
   //    pour traiter chaque "mot" indépendamment.
-  const rawParts = props.lineName.split(' ')
+  const rawParts = props.lineName.split(" ");
 
   // 2. Pour chaque "mot", on va découper sur "BUS"
   //    en veillant à inclure "BUS" à la fin de la sous-chaîne.
-  const segmentsAfterBusSplit: string[] = []
+  const segmentsAfterBusSplit: string[] = [];
   rawParts.forEach((part) => {
-    let cursor = 0
-    const token = 'BUS'
-    let idxBus: number
+    let cursor = 0;
+    const token = "BUS";
+    let idxBus: number;
 
     // Tant qu'on trouve "BUS" dans le mot à partir de la position "cursor"
     while ((idxBus = part.indexOf(token, cursor)) !== -1) {
       // On prend tout depuis cursor jusque juste après "BUS"
-      segmentsAfterBusSplit.push(part.slice(cursor, idxBus + token.length))
+      segmentsAfterBusSplit.push(part.slice(cursor, idxBus + token.length));
       // On décale cursor après "BUS"
-      cursor = idxBus + token.length
+      cursor = idxBus + token.length;
     }
 
     // Si, après la dernière occurrence de "BUS", il reste des caractères,
     // on les pousse aussi comme segment à découper plus loin.
     if (cursor < part.length) {
-      segmentsAfterBusSplit.push(part.slice(cursor))
+      segmentsAfterBusSplit.push(part.slice(cursor));
     }
-  })
+  });
 
-  // 3. Maintenant, chaque segment ne contient ni espace, ni "BUS" à l’intérieur 
-  //    (seulement éventuellement en fin de segment). Il faut découper ces segments 
+  // 3. Maintenant, chaque segment ne contient ni espace, ni "BUS" à l’intérieur
+  //    (seulement éventuellement en fin de segment). Il faut découper ces segments
   //    si leur longueur dépasse MAX_LINE_LENGTH (= 7).
-  const finalLines: string[] = []
+  const finalLines: string[] = [];
   segmentsAfterBusSplit.forEach((seg) => {
     if (seg.length <= MAX_LINE_LENGTH) {
-      finalLines.push(seg)
+      finalLines.push(seg);
     } else {
       // On découpe en tranches de 7 caractères
       for (let i = 0; i < seg.length; i += MAX_LINE_LENGTH) {
-        finalLines.push(seg.slice(i, i + MAX_LINE_LENGTH))
+        finalLines.push(seg.slice(i, i + MAX_LINE_LENGTH));
       }
     }
-  })
+  });
 
-  return finalLines
-})
+  return finalLines;
+});
 </script>
 
 <style scoped>
@@ -143,5 +143,4 @@ svg.idfm-style {
   font-family: "IDFMMedium" !important;
   border-radius: 10% !important;
 }
-
 </style>
