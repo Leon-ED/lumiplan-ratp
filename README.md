@@ -95,7 +95,7 @@ Ces données sont soumises à leurs licences respectives (Licence Ouverte Etalab
 ## Disclaimer
 Ce projet est un projet indépendant et non officiel.
 
-Il n’est en aucun cas affilié, associé, autorisé, soutenu ou approuvé par Île-de-France Mobilités, RATP, SNCF, ni par aucun autre opérateur de transport public.
+Il n’est en aucun cas affilié, associé, autorisé, soutenu ou approuvé par Île-de-France Mobilités, RATP, SNCF, Lumiplan, ni par aucun autre opérateur de transport public.
 
 Toutes les marques, noms commerciaux et logos mentionnés restent la propriété exclusive de leurs détenteurs respectifs.
 
