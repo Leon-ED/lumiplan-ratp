@@ -65,7 +65,7 @@ Si la ligne n'existe pas ou si une erreur est survenue lors de son chargement ce
 
 
 ## Exemples
-![Liste des arrêts](thermo/9.png)
+![Liste des arrêts](previews/thermo.png)
 ![A l'arrêt](previews/atstop.png)
 ![Affichage du temps avant le départ](previews/departs_dans_a.png)
 ![Affichage avant terminus](previews/next_terminus.png)
