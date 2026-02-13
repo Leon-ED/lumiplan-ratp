@@ -222,7 +222,7 @@ const displayedInfosTraffic = computed(() => {
 // --- DATA FETCHING ---
 const fetchLineData = async () => {
   try {
-    const lineData = await Api.getLine(route.query.lineRef as string);
+    const lineData = await Api.getLine(route.query.line as string);
     line.value = lineData;
   } catch (error) {
     console.error("Error fetching line data:", error);
@@ -242,7 +242,7 @@ const importantStops = computed(() => {
       (l: Line) =>
         l.mode !== Mode.BUS &&
         l.mode !== Mode.NOCTILIEN &&
-        l.id != route.query.lineRef
+        l.id != route.query.line
     ).length;
   };
 
@@ -272,7 +272,7 @@ const currentConnections = computed(() => {
 
 const fetchJourneyData = async () => {
   try {
-    const tripRef = route.query.tripRef as string;
+    const tripRef = route.query.trip as string;
     if (tripRef) {
       const journeyData = await Api.getJourney(tripRef);
       if (!journeyData) return;

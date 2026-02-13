@@ -60,7 +60,7 @@ const linesByMode = computed(() => {
     Mode.NOCTILIEN,
   ];
   props.connections.forEach((line) => {
-    if (line.id === (params.lineRef as string)) {
+    if (line.id === (params.line as string)) {
       console.log("skip line", line.id);
       return;
     }

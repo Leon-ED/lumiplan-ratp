@@ -55,7 +55,7 @@
       <RouterLink
         :to="{
           name: 'DesserteDetails',
-          query: { tripRef: desserte.id, lineRef: line.id },
+          query: { line: line.id,trip: desserte.id },
         }">
       <div class="go-button">
         GO

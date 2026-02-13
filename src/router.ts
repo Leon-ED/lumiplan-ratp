@@ -6,7 +6,7 @@ const routes = [
   { path: "/", component: Home },
   {
     name: "DesserteDetails",
-    path: "/screen/:lineRef?/:tripRef?",
+    path: "/screen/:line?/:trip?",
     component: Screen,
   },
 ];
