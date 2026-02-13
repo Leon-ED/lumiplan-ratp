@@ -1,4 +1,5 @@
 
+
 # Ecran Lumiplan -- RATP
 Dépot Git pour la reproduction de l'écran d'affichage à l'intérieur des bus RATP 
 ![Présentation de l'affichage de l'écran](previews/presentation.png)
@@ -6,7 +7,10 @@ Dépot Git pour la reproduction de l'écran d'affichage à l'intérieur des bus 
 > [!WARNING]
 > Attention : L'écran est encore en développement, toutes les fonctionnalités ne sont pas encore disponibles et certaines peuvent être instables.
 
-
+## A faire
+ - [ ] Ajouter un mode pour créer ses propres courses et les afficher sur l'écran
+ - [ ] Amélioration des animations & transitions
+ - [ ] Implémenter le temps réel
 ## Démo de l'écran
 L'écran est en ligne et disponible à la sélection sur le site suivant :
 - https://lumiplan.leon.gp/
