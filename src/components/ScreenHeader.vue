@@ -5,12 +5,13 @@
     <div class="direction">
       <span class="direction-name"> {{ direction }}</span>
     </div>
-    <div class="clock">00:00</div>
+    <div class="clock"><Clock /></div>
   </header>
 </template>
 <script setup lang="ts">
 import { Line } from "../types";
 import LineLogo from "./Other/LineLogo.vue";
+import Clock from "./Other/Clock.vue";
 defineProps<{
   direction: string;
   line: Line;
