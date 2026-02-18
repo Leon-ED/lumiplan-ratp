@@ -218,6 +218,25 @@ const displayedInfosTraffic = computed(() => {
   }
   return messages;
 });
+watch(
+  () => [route.query.trip, route.query.line],
+  async ([newTrip, newLine], [oldTrip, oldLine]) => {
+    if (newLine !== oldLine) {
+      line.value = null;
+      await fetchLineData();
+    }
+
+    if (newTrip !== oldTrip) {
+      desserte.value = fakeDesserte;
+      await fetchJourneyData();
+    }
+
+    computeState();
+    currentSlateIndex.value = 0;
+    scheduleNextRotation();
+  }
+);
+
 
 // --- DATA FETCHING ---
 const fetchLineData = async () => {
