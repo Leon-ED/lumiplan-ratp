@@ -77,11 +77,14 @@ export class Api {
             isTerminus: stop.isTerminus,
             isFirstStop: stop.isFirstStop,
             isStopSkipped: stop.isStopSkipped,
-          })),
+          })).filter((stop: StopWithTime) => {
+            const stopDate = new Date(stop.timeOfArrival);
+            return stopDate >= new Date();
+          }),
         };
         dessertes.push(desserte);
       }
-      return dessertes;
+      return dessertes.filter((desserte) => desserte.stops.length > 0);
     } catch (error) {
       console.error("Error parsing vehicles data:", error);
       return [];
