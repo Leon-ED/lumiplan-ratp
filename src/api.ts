@@ -1,4 +1,4 @@
-import { Desserte, InfoTraffic, Line } from "./types";
+import { Desserte, InfoTraffic, Line, StopWithTime } from "./types";
 import { Converter } from "./converter";
 import { cleanId } from "./utils";
 
@@ -7,6 +7,7 @@ export class Api {
   // static apiBaseUrl = "https://localhost:8000/";
 
   static async getJourney(journeyId: string): Promise<Desserte | null> {
+    const now = new Date();
     const endpoint = `${this.apiBaseUrl}vehicle_journeys/${journeyId}`;
     const response = await fetch(endpoint);
     if (!response.ok) {
@@ -37,7 +38,10 @@ export class Api {
           isTerminus: stop.isTerminus,
           isFirstStop: stop.isFirstStop,
           isStopSkipped: stop.isStopSkipped,
-        })),
+        }))   .filter((stop: StopWithTime) => {
+          const stopDate = new Date(stop.timeOfArrival);
+          return stopDate >= now;
+        }),
       };
       return desserte;
     } catch (error) {
