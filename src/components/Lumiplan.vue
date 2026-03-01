@@ -3,7 +3,7 @@
     class="screen"
     :class="{
       'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(
-        state
+        state,
       ),
     }"
   >
@@ -17,30 +17,43 @@
         'split-view': shouldShowSidePanel,
       }"
     >
-      <Transition name="fade" mode="out-in">
-        <Direction
-          v-if="state === 'FIRST_STOP'"
-          :direction="desserte.direction"
-          :departure-date="currentStop!.timeOfArrival"
-        />
-        <NotInService v-else-if="state === 'NOT_IN_SERVICE'" />
-        <CurrentStop
-          v-else-if="state === 'AT_STOP'"
-          :stop="currentStop!.stop"
-        />
+      <div class="main-panel-wrapper">
         <StopList
-          v-else-if="state === 'NOT_AT_STOP'"
+          v-show="['FIRST_STOP', 'AT_STOP', 'NOT_AT_STOP'].includes(state)"
+          class="background-panel"
           :stops="desserte.stops"
           :primary-color="line?.color || '#000000'"
         />
-        <DataUnavailable v-else-if="state === 'NO_DATA'" />
-        <TripUnavailable
-          v-else-if="state === 'NO_TRIP_DATA_AVAILABLE'"
-          :line="line!"
-        />
-      </Transition>
 
-      <div v-if="shouldShowSidePanel" class="side-panel">
+        <Transition name="slide-over">
+          <Direction
+            v-if="state === 'FIRST_STOP'"
+            class="foreground-panel"
+            :direction="desserte.direction"
+            :departure-date="currentStop!.timeOfArrival"
+          />
+          <NotInService
+            v-else-if="state === 'NOT_IN_SERVICE'"
+            class="foreground-panel"
+          />
+          <CurrentStop
+            v-else-if="state === 'AT_STOP'"
+            class="foreground-panel current-stop-panel"
+            :stop="currentStop!.stop"
+          />
+          <DataUnavailable
+            v-else-if="state === 'NO_DATA'"
+            class="foreground-panel"
+          />
+          <TripUnavailable
+            v-else-if="state === 'NO_TRIP_DATA_AVAILABLE'"
+            class="foreground-panel"
+            :line="line!"
+          />
+        </Transition>
+      </div>
+
+      <div class="side-panel">
         <Transition name="slide" mode="out-in">
           <ArrivingToIn
             v-if="currentSlate?.type === 'TRAVEL_TIME'"
@@ -119,7 +132,7 @@ const { start: startPostStopLock, stop: stopPostStopLock } = useTimeoutFn(
     isPostStopLocked.value = false;
   },
   5000,
-  { immediate: false }
+  { immediate: false },
 );
 
 // 2. Timer pour l'affichage progressif à l'arrêt (5s)
@@ -128,7 +141,7 @@ const { start: startStopDisplay, stop: stopStopDisplay } = useTimeoutFn(
     stopDisplayTimerDone.value = true;
   },
   5000,
-  { immediate: false }
+  { immediate: false },
 );
 
 // 3. Timer pour la rotation des Slates (Durée dynamique)
@@ -138,7 +151,7 @@ const { start: startSlateTimer, stop: stopSlateTimer } = useTimeoutFn(
     rotateSlates();
   },
   currentSlateDuration, // Passé en Ref, VueUse utilisera la valeur courante au start()
-  { immediate: false }
+  { immediate: false },
 );
 
 // --- COMPUTED HELPERS ---
@@ -235,9 +248,8 @@ watch(
     computeState();
     currentSlateIndex.value = 0;
     scheduleNextRotation();
-  }
+  },
 );
-
 
 // --- DATA FETCHING ---
 const fetchLineData = async () => {
@@ -262,7 +274,7 @@ const importantStops = computed(() => {
       (l: Line) =>
         l.mode !== Mode.BUS &&
         l.mode !== Mode.NOCTILIEN &&
-        l.id != route.query.line
+        l.id != route.query.line,
     ).length;
   };
 
@@ -285,7 +297,7 @@ const importantStops = computed(() => {
 const currentConnections = computed(() => {
   return currentStop.value
     ? currentStop.value.stop.connectedLines.filter(
-        (l: Line) => l.id !== line.value?.id
+        (l: Line) => l.id !== line.value?.id,
       )
     : [];
 });
@@ -313,7 +325,7 @@ type ScreenState =
   | "NOT_IN_SERVICE";
 
 const currentStop = computed(() =>
-  desserte.value.stops.length > 0 ? desserte.value.stops[0] : null
+  desserte.value.stops.length > 0 ? desserte.value.stops[0] : null,
 );
 
 const state = ref<ScreenState>("NO_DATA");
@@ -331,7 +343,7 @@ const computeState = () => {
   // Mise à jour du compteur de temps global
   if (currentStop.value) {
     currentSecondsToArrival.value = getSecondesFromDate(
-      currentStop.value.timeOfArrival
+      currentStop.value.timeOfArrival,
     );
   }
 
@@ -362,12 +374,10 @@ const computeState = () => {
 
 const shouldShowSidePanel = computed(() => {
   // Verrouillage après départ
-  if (isPostStopLocked.value){
-    console.log("Post stop lock active, no side panel");
+  if (isPostStopLocked.value) {
+    return false;
   }
-
-  // Si on est en approche mais pas de slate à afficher
-  if (isApproachingStop.value && availableSlates.value.length === 0)
+  if (isApproachingStop.value)
     return false;
 
   if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0)
@@ -412,8 +422,7 @@ interface Slate {
 
 const availableSlates = computed<Slate[]>(() => {
   // 1. Verrouillage post-arrêt
-  if (isPostStopLocked.value){
-    console.log("Post stop lock active, no slates available");
+  if (isPostStopLocked.value) {
     return [];
   }
 
@@ -445,14 +454,14 @@ const availableSlates = computed<Slate[]>(() => {
   const timeBudgetBeforeApproach =
     currentSecondsToArrival.value - APPROACHING_THRESHOLD_START;
   const SAFETY_ANIMATION_BUFFER = 0.5;
-  
+
   const canFitInBudget = (duration: number) => {
-    return duration + SAFETY_ANIMATION_BUFFER < timeBudgetBeforeApproach * 1_000;
+    return (
+      duration + SAFETY_ANIMATION_BUFFER < timeBudgetBeforeApproach * 1_000
+    );
   };
 
-  if (
-    currentConnections.value.length > 0
-  ) {
+  if (currentConnections.value.length > 0) {
     slates.push({ type: "CONNECTIONS", duration: SLATE_DURATIONS.CONNECTIONS });
   }
 
@@ -509,7 +518,7 @@ watch(
       scheduleNextRotation();
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 const updateState = () => {
@@ -531,7 +540,7 @@ const fetchInfosTrafficMessages = async () => {
   }
   try {
     const allMessages = await Api.getInfosTraffic(
-      INFOS_TRAFFIC_LINES.value.map((l) => l.id)
+      INFOS_TRAFFIC_LINES.value.map((l) => l.id),
     );
     INFOS_TRAFFICMessages.value = allMessages
       .filter((msg) => msg.status === "ACTIVE")
@@ -546,7 +555,7 @@ onMounted(async () => {
   await fetchJourneyData();
   fetchInfosTrafficMessages();
 
-  useIntervalFn(updateState, 1000);
+  useIntervalFn(updateState, 1_000);
 
   scheduleNextRotation();
   useIntervalFn(fetchInfosTrafficMessages, INFOS_TRAFFIC_REFRESH_INTERVAL, {
@@ -573,7 +582,29 @@ main {
   overflow: hidden;
   background-color: var(--ratp-beige);
 }
-
+.main-panel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.background-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.foreground-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: var(--ratp-beige);
+}
 main.split-view {
   grid-template-columns: 65% 35%;
 }
@@ -585,16 +616,23 @@ main.split-view {
   background-color: #f4eeea;
   border-left: 2px solid var(--ratp-beige-dark);
 }
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
 }
-
-.fade-enter-from,
-.fade-leave-to {
+.split-view :deep(.triangle-icon) {
+  display: block;
+}
+.slide-up-enter-from {
   opacity: 0;
+  transform: translateY(100%);
 }
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
 .slide-enter-active {
   transition-delay: 0.2s;
   transition: all 0.4s ease-in;
@@ -610,5 +648,23 @@ main.split-view {
 .slide-enter-from {
   opacity: 0;
   transform: translateX(20%);
+}
+.slide-over-enter-active,
+.slide-over-leave-active {
+  transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.current-stop-panel.slide-over-leave-active {
+  transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.current-stop-panel.slide-over-leave-to {
+  transform: translateY(0); 
+  opacity: 0;
+}
+.slide-over-enter-from {
+  transform: translateY(100%);
+}
+
+.slide-over-leave-to {
+  transform: translateY(-100%);
 }
 </style>

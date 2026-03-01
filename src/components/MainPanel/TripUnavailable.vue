@@ -31,7 +31,7 @@ defineProps<{
 
   color: white;
   padding-left: 2cqw;
-  background-color: rgb(36, 36, 36);
+  background-color: rgb(36, 36, 36) !important;
   font-size: 3cqw;
   box-shadow: 0 -5px 5px -5px black;
 }

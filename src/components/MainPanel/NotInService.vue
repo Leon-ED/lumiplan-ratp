@@ -10,7 +10,7 @@
 <style lang="css" scoped>
 .not-in-service {
   width: 100%;
-  background-color: var(--ratp-yellow);
+  background-color: var(--ratp-yellow) !important;
   height: 100%;
   display: flex;
   align-items: center;

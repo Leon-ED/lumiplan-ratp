@@ -20,7 +20,7 @@ defineProps<{stop: Stop}>();
 .current-stop {
     height: 100%;
     width: 100%;
-    background-color: var(--ratp-blue);
+    background-color: var(--ratp-blue) !important;
     font-family: 'ParisineBold', sans-serif;
     display: flex;
     flex-direction: column;

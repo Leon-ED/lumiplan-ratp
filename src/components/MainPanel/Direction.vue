@@ -93,7 +93,6 @@ const departureInTranslation = useRotatedText(DEPARTURE_IN_TEXTS)
   grid-template-columns: 65% 35%;
   grid-template-rows: 100%;
   color: gray;
-  padding-left: 2cqw;
   background-color: white;
   font-size: 3cqw;
   box-shadow: 0 -5px 5px -5px black;
@@ -105,6 +104,7 @@ aside {
   background-color: rgb(36, 36, 36);
 }
 .direction-name-container {
+  background-color: white;
   display: grid;
   grid-template-rows: 10% 90%;
   padding: 1cqw;

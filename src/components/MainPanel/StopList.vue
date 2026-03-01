@@ -13,6 +13,7 @@ const nextStopLabel = useRotatedText(NEXT_STOP_TEXTS);
 
 // 2. On calcule simplement quelle chaîne de caractères afficher
 const currentDescription = computed(() => {
+  if(props.stops.length === 0) return "";
   const isTerminusScenario = props.stops[props.stops.length - 1].isTerminus && props.stops.length === 1;
   
   // On accède à .value ici car useRotatedText retourne une ref/computed
