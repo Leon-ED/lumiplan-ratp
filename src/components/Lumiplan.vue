@@ -10,6 +10,7 @@
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
       :line="line!"
+      :is-at-stop="state === 'AT_STOP'"
     />
     <main
       :class="{
