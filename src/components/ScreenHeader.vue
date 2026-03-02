@@ -22,7 +22,7 @@ import { Line } from "../types";
 import LineLogo from "./Other/LineLogo.vue";
 import Clock from "./Other/Clock.vue";
 
-const props = defineProps<{
+defineProps<{
   direction: string;
   line: Line;
   isAtStop: boolean;
