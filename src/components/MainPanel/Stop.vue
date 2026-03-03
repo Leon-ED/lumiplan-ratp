@@ -8,6 +8,38 @@ const props = defineProps<{ stop: StopWithTime; index: number }>();
 const nowTrigger = ref(Date.now());
 let timer: ReturnType<typeof setInterval>;
 
+const stopRef = ref<HTMLElement | null>(null);
+const isVisible = ref(true);
+let observer: IntersectionObserver;
+
+onMounted(() => {
+  timer = setInterval(() => {
+    nowTrigger.value = Date.now();
+  }, 1000);
+
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      isVisible.value = entry.isIntersecting;
+    },
+    {
+      root: null, 
+      threshold: 1,
+    }
+  );
+
+  if (stopRef.value) {
+    observer.observe(stopRef.value);
+  }
+});
+
+onUnmounted(() => {
+  clearInterval(timer);
+
+  if (observer && stopRef.value) {
+    observer.unobserve(stopRef.value);
+  }
+});
+
 const stopNameClass = computed(() => {
   return {
     "stop-name-long": props.stop.stop.name.length >= 21,
@@ -15,15 +47,10 @@ const stopNameClass = computed(() => {
   };
 });
 
-onMounted(() => {
-  timer = setInterval(() => {
-    nowTrigger.value = Date.now();
-  }, 1000);
-});
-
 const isStopCurrent = (stop: StopWithTime, index: number) => {
-  // @ts-ignore
+  //@ts-ignore
   const _ = nowTrigger.value;
+
   return (
     !stop.isStopSkipped &&
     getSecondesFromDate(stop.timeOfArrival, true) <= 0 &&
@@ -31,16 +58,14 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
     getSecondesFromDate(stop.timeOfArrival, true) > -20
   );
 };
-
-onUnmounted(() => {
-  clearInterval(timer);
-});
 </script>
 
 <template>
   <li
+    ref="stopRef"
     class="stop"
     :class="{
+      'is-out-of-view': !isVisible,
       blinkable: index === 0 && !stop.isStopSkipped,
       'is-last-stop': stop.isTerminus,
       'is-current': isStopCurrent(stop, index),
@@ -55,12 +80,14 @@ onUnmounted(() => {
     <span class="stop-name" :class="stopNameClass">
       <div class="text-bg">
         {{ stop.stop.name }}
+
         <img
           class="non-accessible-stop"
           src="../../assets/img/non-accessible-stop.png"
           alt="non accessible stop"
           v-if="!stop.stop.isAccessible && !stop.isTerminus && !isStopCurrent(stop, index) && !stop.isStopSkipped"
         />
+
         <img
           class="non-accessible-stop"
           src="../../assets/img/non-accessible-stop-white-bg.png"
@@ -72,20 +99,23 @@ onUnmounted(() => {
   </li>
 </template>
 
-<style lang="css" scoped>
+<style scoped>
 .stop {
   display: flex;
   position: relative;
-  align-items: center; 
-  gap: 0; 
+  align-items: center;
+  gap: 0;
 }
 
+.stop.is-out-of-view {
+  visibility: hidden;
+}
 .stop-indicator-wrapper {
-  width: var(--gutter-width); 
+  width: var(--gutter-width);
   height: 100%;
   display: flex;
-  justify-content: center; 
-  align-items: center;     
+  justify-content: center;
+  align-items: center;
   flex-shrink: 0;
   z-index: 2;
 }
@@ -103,28 +133,29 @@ onUnmounted(() => {
   position: absolute;
   left: calc(var(--gutter-width) / 2);
   transform: translateX(-50%);
-  width: 2.8cqw; 
-  
-  top: 50%; 
+  width: 2.8cqw;
+  top: 50%;
   height: 100vh;
   background-color: var(--ratp-beige);
   z-index: 1;
   pointer-events: none;
 }
-
-
-
 .stop-name {
   color: var(--ratp-blue);
   font-size: 5cqw;
 }
+
 .stop-name-long {
   font-size: 4cqw;
 }
+
 .stop-name-very-long {
   font-size: 3.5cqw;
 }
 
+.non-accessible-stop {
+  height: 0.8em;
+}
 .non-accessible-stop {
   height: .8em;
 }

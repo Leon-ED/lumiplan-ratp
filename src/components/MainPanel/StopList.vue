@@ -55,7 +55,7 @@ const getIndexForStop = (i: number) => {
         class="stops-transition-wrapper"
       >
         <Stop
-          v-for="(stopWithTime, index) in stops.slice(0, 2)"
+          v-for="(stopWithTime, index) in stops"
           :index="getIndexForStop(index)"
           :key="stopWithTime.stop.id"
           :stop="stopWithTime"
@@ -75,7 +75,7 @@ const getIndexForStop = (i: number) => {
   font-family: "ParisineBold", sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 
   /* Largeur de la colonne de gauche contenant la ligne et les points */
   --gutter-width: 6cqw; 
@@ -101,8 +101,14 @@ const getIndexForStop = (i: number) => {
 }
 
 .stop-transition-move {
-  transition: transform 1s ease-in-out;
+  transition: transform 1.5s ease-in-out;
   z-index: 10;
+}
+.stop.is-out-of-view.stop-transition-move {
+  visibility: visible;
+  transition: transform 2s ease-in-out;
+
+  
 }
 
 .stops-list::before {

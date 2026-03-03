@@ -5,12 +5,14 @@
       'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(
         state,
       ),
+      'fullscreen': fullScreen
     }"
   >
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
       :line="line!"
       :is-at-stop="state === 'AT_STOP'"
+      @click="emitEvent('toggle-full-screen')"
     />
     <main
       :class="{
@@ -109,6 +111,12 @@ const SLATE_DURATIONS = {
   TRAVEL_TIME: 10000,
   INFOS_TRAFFIC: 10_000,
 };
+defineProps<{
+  fullScreen?: boolean;
+}>();
+const emitEvent = defineEmits<{
+  (e: "toggle-full-screen"): void;
+}>();
 
 // --- DATA REFS ---
 const fakeDesserte: Desserte = { direction: "", id: "", stops: [] };
@@ -573,7 +581,14 @@ onMounted(async () => {
   font-size: 3cqmin;
   container-type: inline-size;
 }
-
+.screen.fullscreen{
+  grid-template-rows: min(22%, 100px) 1fr;
+}
+@media (orientation: portrait) {
+  .screen.screen.fullscreen {
+  grid-template-rows: min(22%, 50px) 1fr;
+  }
+}
 main {
   display: grid;
   grid-template-columns: 100% 35%;
