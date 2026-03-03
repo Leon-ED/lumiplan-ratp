@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Stop } from '../../types';
+import { cleanText } from '../../utils';
 
 defineProps<{stop: Stop}>();
 
@@ -7,7 +8,7 @@ defineProps<{stop: Stop}>();
 <template>
     <div class="current-stop">
         <div class="current-stop-name">
-            {{ stop.name }}
+            {{ cleanText(stop.name) }}
         </div>
         <div class="current-stop-landmark-name" v-if="stop.landmarkName">
             {{ stop.landmarkName }}

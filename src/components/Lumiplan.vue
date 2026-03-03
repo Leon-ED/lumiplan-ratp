@@ -409,12 +409,11 @@ watch(state, (newState, oldState) => {
     startStopDisplay(); // Start new 5s timer
   } else if (newState === "NOT_AT_STOP") {
     // Si on change d'état, on s'assure que le flag AT_STOP est reset correctement après délai
-    // (optionnel selon la logique UI souhaitée, ici on garde la logique précédente)
     stopStopDisplay();
     startStopDisplay();
 
     // --- LOGIQUE "QUITTER L'ARRET" ---
-    if (oldState === "AT_STOP") {
+    if (oldState === "AT_STOP" || oldState === 'FIRST_STOP') {
       isPostStopLocked.value = true;
       stopPostStopLock(); // Clean previous
       startPostStopLock(); // Start new 5s lock
@@ -666,15 +665,20 @@ main.split-view {
 }
 .slide-over-enter-active,
 .slide-over-leave-active {
-  transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform .8s ease-in-out;
 }
+.current-stop-panel.slide-over-enter-active,
 .current-stop-panel.slide-over-leave-active {
-  transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity .7s linear;
 }
 .current-stop-panel.slide-over-leave-to {
   transform: translateY(0); 
   opacity: 0;
 }
+.current-stop-panel.slide-over-enter-from {
+  opacity: 0;
+}
+
 .slide-over-enter-from {
   transform: translateY(100%);
 }

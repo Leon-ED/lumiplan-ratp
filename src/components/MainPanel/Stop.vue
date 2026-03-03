@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { getSecondesFromDate } from "../../utils";
+import { cleanText, getSecondesFromDate } from "../../utils";
 import { StopWithTime } from "../../types";
 
 const props = defineProps<{ stop: StopWithTime; index: number }>();
@@ -79,7 +79,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
 
     <span class="stop-name" :class="stopNameClass">
       <div class="text-bg">
-        {{ stop.stop.name }}
+        {{ cleanText(stop.stop.name) }}
 
         <img
           class="non-accessible-stop"

@@ -95,7 +95,7 @@ header {
 }
 .slide-up {
   display: inline-block;
-  animation: slide-up 0.5s ease-in-out;
+  animation: slide-up .7s ease-in-out;
 }
 @keyframes slide-up {
   0% {
@@ -122,12 +122,11 @@ header {
   align-items: center;
 }
 
-.slide-move{
-  transition: all 0.75s ease-in-out;
-}
+.slide-move,
 .direction-label.slide-enter-active,
 .direction-label.slide-leave-active {
-  transition: all 0.75s ease-in-out;
+  transition: all 1s ease-in-out;
+
 }
 .slide-enter-from,
 .slide-leave-to {

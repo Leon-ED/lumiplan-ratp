@@ -27,3 +27,13 @@ export const getSecondesFromDate = (
       .filter((s) => s)
       .pop() as string;
   };
+
+  // Fonction qui enlève les parenthèses et ce qu'il y a dedans
+export const cleanText = (text: string): string => {
+  return text.replace(/\(.*?\)/g, "").trim();
+};
+// Fonction qui récupère uniquement ce qu'il y a entre les parenthèses
+export const extractTextInParentheses = (text: string): string => {
+  const match = text.match(/\((.*?)\)/);
+  return match ? match[1] : "";
+};
