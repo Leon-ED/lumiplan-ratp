@@ -98,7 +98,7 @@ body,
   }
 }
 .blink-text{
-  animation: blink-text 1.6s infinite;
+  animation: blink-text 2s infinite;
 }
 @keyframes blink-text {
   0%,
