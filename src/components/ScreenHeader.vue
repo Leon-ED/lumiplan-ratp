@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="header">
     <img
       v-if="line"
       :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
@@ -32,6 +32,10 @@ defineProps<{
 </script>
 
 <style lang="scss" scoped>
+.header:hover{
+  cursor: pointer;
+
+}
 .no-data-available header,
 .no-data-available header * {
   background-color: rgb(36, 36, 36);
