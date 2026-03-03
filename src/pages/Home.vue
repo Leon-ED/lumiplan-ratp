@@ -126,12 +126,6 @@ const QUICK_MODES = [
     },
   },
   {
-    name: "Noctiliens",
-    callback: () => {
-      _search.value = "Noctilien ";
-    },
-  },
-  {
     name: "Bus de remplacement",
     callback: () => {
       _search.value = "BUS_REMPLACEMENT ";
