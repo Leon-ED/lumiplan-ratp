@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { getMinutesFromDate } from "../../utils";
+import { computed, ref, watch } from "vue";
+import { getSecondesFromDate } from "../../utils";
 import { useIntervalFn } from "@vueuse/core";
 import { useRotatedText } from "../../hooks/useRotatedText";
 import { DEPARTURE_IN_TEXTS, DIRECTION_TEXTS } from "../../translations";
@@ -10,8 +10,8 @@ interface Props {
   departureDate: string;
 }
 const props = defineProps<Props>();
-
-const minutes = ref<number>(getMinutesFromDate(props.departureDate));
+const secondes = ref<number>(getSecondesFromDate(props.departureDate));
+const minutes = computed(() => Math.round(secondes.value / 60));
 const displayedMinutes = ref<number>(minutes.value);
 
 const animateChange = async () => {
@@ -56,7 +56,8 @@ watch(minutes, (newVal, oldVal) => {
 
 useIntervalFn(
   () => {
-    minutes.value = getMinutesFromDate(props.departureDate);
+    const _secondes = getSecondesFromDate(props.departureDate);
+    secondes.value = _secondes
   },
   10_000,
   { immediate: true },

@@ -4,6 +4,9 @@ import BusLineLogo from "./BusLineLogo.vue";
 import NoctilienLogo from "./NoctilienLogo.vue";
 import { Line, Mode } from "../../types";
 import { cleanId } from "../../utils";
+import TrainLogo from "./TrainLogo.vue";
+import MetroLogo from "./MetroLogo.vue";
+import TramLogo from "./TramLogo.vue";
 
 interface Props {
   line: Line;
@@ -114,11 +117,16 @@ const computeNormalImgLink = computed(() => {
 </script>
 <template>
   <!-- Logo Tram -->
+   <div v-if="[Mode.CABLE,Mode.TRAM,Mode.RER,Mode.METRO,Mode.TRANSILIEN].includes(line.mode)">
+    <TrainLogo v-if="[Mode.TRANSILIEN,Mode.RER].includes(line.mode)" :line-name="line.name" :base-font-size="fontSize" :bg-color="line.color" :text-color="line.textColor" :height="props.size ?? '100%'" />
+    <MetroLogo v-else-if="[Mode.METRO].includes(line.mode)" :line-name="line.name" :base-font-size="fontSize" :bg-color="line.color" :text-color="line.textColor" :height="props.size ?? '100%'" />
+    <TramLogo v-else-if="[Mode.TRAM,Mode.CABLE].includes(line.mode)" :line-name="line.name" :base-font-size="fontSize" :bg-color="line.color" :text-color="line.textColor" :height="props.size ?? '100%'" />
+  </div>
   <img
     :data-line-mode-and-name="
       props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
     "
-    v-if="isLineSpecial"
+    v-else-if="isLineSpecial"
     :src="computeNormalImgLink"
     :data-line-id="cleanId(props.line.id)"
     :onerror="'this.onerror=null;this.src=\'' + computeBackupImgLink + '\''"

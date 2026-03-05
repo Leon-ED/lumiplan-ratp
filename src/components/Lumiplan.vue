@@ -1,11 +1,21 @@
 <template>
+  <LoadSaveModal ref="loadSaveModalRef" @load="handleSaveLoaded" />
+
+  <button
+    class="config-btn"
+    @click="openLoadModal"
+    title="Charger une sauvegarde"
+  >
+    ⚙️
+  </button>
+
   <div
     class="screen"
     :class="{
       'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(
         state,
       ),
-      'fullscreen': fullScreen
+      fullscreen: fullScreen,
     }"
   >
     <ScreenHeader
@@ -41,7 +51,7 @@
           <CurrentStop
             v-else-if="state === 'AT_STOP'"
             class="foreground-panel current-stop-panel"
-            :stop="currentStop!.stop"
+            :stop-with-time="currentStop!"
           />
           <DataUnavailable
             v-else-if="state === 'NO_DATA'"
@@ -87,9 +97,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from "vue";
 import { useRoute } from "vue-router";
-// Import des composables VueUse
 import { useIntervalFn, useTimeoutFn } from "@vueuse/core";
-
 import ScreenHeader from "./ScreenHeader.vue";
 import StopList from "./MainPanel/StopList.vue";
 import DataUnavailable from "./MainPanel/DataUnavailable.vue";
@@ -100,10 +108,10 @@ import TripUnavailable from "./MainPanel/TripUnavailable.vue";
 import ArrivingToIn from "./SidePanel/ArrivingToIn.vue";
 import LinesConnection from "./SidePanel/LinesConnection.vue";
 import Messages from "./SidePanel/Messages.vue";
-
 import { getSecondesFromDate } from "../utils";
 import { Api } from "../api";
-import { Desserte, InfoTraffic, Line, Mode, Stop } from "../types";
+import { Desserte, InfoTraffic, Line, Mode, Stop, SaveFile } from "../types";
+import LoadSaveModal from "./Editor/LoadSaveModal.vue";
 
 const SLATE_DURATIONS = {
   CONNECTIONS: 5000,
@@ -118,23 +126,37 @@ const emitEvent = defineEmits<{
   (e: "toggle-full-screen"): void;
 }>();
 
-// --- DATA REFS ---
 const fakeDesserte: Desserte = { direction: "", id: "", stops: [] };
 const desserte = ref<Desserte>(fakeDesserte);
 const line = ref<Line | null>(null);
 const route = useRoute();
 const INFOS_TRAFFICMessages = ref<InfoTraffic[]>([]);
 
-// --- STATE TIMING ---
+const isUsingLocalSave = ref(false);
+
+const loadSaveModalRef = ref<InstanceType<typeof LoadSaveModal> | null>(null);
+
+const openLoadModal = () => {
+  loadSaveModalRef.value?.open();
+};
+
+const handleSaveLoaded = (saveData: SaveFile) => {
+  isUsingLocalSave.value = true;
+  line.value = saveData.journey.line;
+  desserte.value = saveData.journey.desserte;
+  computeState();
+  currentSlateIndex.value = 0;
+  scheduleNextRotation();
+  fetchInfosTrafficMessages();
+};
+
 const stopDisplayTimerDone = ref(false);
 const currentSecondsToArrival = ref<number>(9999);
 const isPostStopLocked = ref(false);
 
 const INFOS_TRAFFIC_REFRESH_INTERVAL = 60 * 1000 * 3;
 
-// --- VUEUSE TIMERS ---
 
-// 1. Timer pour le verrouillage après le départ (5s)
 const { start: startPostStopLock, stop: stopPostStopLock } = useTimeoutFn(
   () => {
     isPostStopLocked.value = false;
@@ -143,7 +165,6 @@ const { start: startPostStopLock, stop: stopPostStopLock } = useTimeoutFn(
   { immediate: false },
 );
 
-// 2. Timer pour l'affichage progressif à l'arrêt (5s)
 const { start: startStopDisplay, stop: stopStopDisplay } = useTimeoutFn(
   () => {
     stopDisplayTimerDone.value = true;
@@ -152,17 +173,15 @@ const { start: startStopDisplay, stop: stopStopDisplay } = useTimeoutFn(
   { immediate: false },
 );
 
-// 3. Timer pour la rotation des Slates (Durée dynamique)
-const currentSlateDuration = ref(10000); // Durée initiale par défaut
+const currentSlateDuration = ref(10000);
 const { start: startSlateTimer, stop: stopSlateTimer } = useTimeoutFn(
   () => {
     rotateSlates();
   },
-  currentSlateDuration, // Passé en Ref, VueUse utilisera la valeur courante au start()
+  currentSlateDuration,
   { immediate: false },
 );
 
-// --- COMPUTED HELPERS ---
 const APPROACHING_THRESHOLD_START = 15;
 const APPROACHING_THRESHOLD_END = 10;
 
@@ -170,11 +189,11 @@ const isApproachingStop = computed(() => {
   return (
     state.value === "NOT_AT_STOP" &&
     currentSecondsToArrival.value <= APPROACHING_THRESHOLD_START &&
-    currentSecondsToArrival.value > APPROACHING_THRESHOLD_END
+    currentSecondsToArrival.value > APPROACHING_THRESHOLD_END &&
+    desserte.value.stops[0]?.isStopSkipped === false
   );
 });
 
-// --- INFOS TRAFFIC LOGIC ---
 const INFOS_TRAFFIC_LINES = computed(() => {
   const whitelistedModes = [Mode.RER, Mode.TRANSILIEN, Mode.METRO];
   const allLines: Line[] = [];
@@ -194,7 +213,7 @@ const INFOS_TRAFFIC_LINES = computed(() => {
   const finalSorted = allLines.sort((a, b) => {
     return whitelistedModes.indexOf(a.mode) - whitelistedModes.indexOf(b.mode);
   });
-  finalSorted.unshift(line.value!);
+  if (line.value) finalSorted.unshift(line.value);
   return finalSorted;
 });
 
@@ -240,9 +259,12 @@ const displayedInfosTraffic = computed(() => {
   }
   return messages;
 });
+
 watch(
   () => [route.query.trip, route.query.line],
   async ([newTrip, newLine], [oldTrip, oldLine]) => {
+    isUsingLocalSave.value = false;
+
     if (newLine !== oldLine) {
       line.value = null;
       await fetchLineData();
@@ -259,8 +281,8 @@ watch(
   },
 );
 
-// --- DATA FETCHING ---
 const fetchLineData = async () => {
+  if (isUsingLocalSave.value) return; // Ignore l'API si sauvegarde chargée
   try {
     const lineData = await Api.getLine(route.query.line as string);
     line.value = lineData;
@@ -311,6 +333,7 @@ const currentConnections = computed(() => {
 });
 
 const fetchJourneyData = async () => {
+  if (isUsingLocalSave.value) return; // Ignore l'API si sauvegarde chargée
   try {
     const tripRef = route.query.trip as string;
     if (tripRef) {
@@ -348,7 +371,6 @@ const computeState = () => {
     return;
   }
 
-  // Mise à jour du compteur de temps global
   if (currentStop.value) {
     currentSecondsToArrival.value = getSecondesFromDate(
       currentStop.value.timeOfArrival,
@@ -381,12 +403,10 @@ const computeState = () => {
 };
 
 const shouldShowSidePanel = computed(() => {
-  // Verrouillage après départ
   if (isPostStopLocked.value) {
     return false;
   }
-  if (isApproachingStop.value)
-    return false;
+  if (isApproachingStop.value) return false;
 
   if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0)
     return true;
@@ -402,21 +422,18 @@ const shouldShowSidePanel = computed(() => {
 });
 
 watch(state, (newState, oldState) => {
-  // --- GESTION DU TIMER "AT_STOP" ---
   if (newState === "AT_STOP") {
     stopDisplayTimerDone.value = false;
-    stopStopDisplay(); // Clean previous
-    startStopDisplay(); // Start new 5s timer
+    stopStopDisplay();
+    startStopDisplay();
   } else if (newState === "NOT_AT_STOP") {
-    // Si on change d'état, on s'assure que le flag AT_STOP est reset correctement après délai
     stopStopDisplay();
     startStopDisplay();
 
-    // --- LOGIQUE "QUITTER L'ARRET" ---
-    if (oldState === "AT_STOP" || oldState === 'FIRST_STOP') {
+    if (oldState === "AT_STOP" || oldState === "FIRST_STOP") {
       isPostStopLocked.value = true;
-      stopPostStopLock(); // Clean previous
-      startPostStopLock(); // Start new 5s lock
+      stopPostStopLock();
+      startPostStopLock();
     }
   }
 });
@@ -428,19 +445,16 @@ interface Slate {
 }
 
 const availableSlates = computed<Slate[]>(() => {
-  // 1. Verrouillage post-arrêt
   if (isPostStopLocked.value) {
     return [];
   }
 
   const hasTrafficMessages = displayedInfosTraffic.value.length > 0;
 
-  // 2. Pour afficher le msg des arrêts non desservis
   if (specialSkippedStopMessage.value) {
     return [{ type: "INFOS_TRAFFIC", duration: 999999 }];
   }
 
-  // 3. À l'arrêt
   if (state.value === "AT_STOP") {
     if (hasTrafficMessages) {
       return [{ type: "INFOS_TRAFFIC", duration: 999999 }];
@@ -448,7 +462,6 @@ const availableSlates = computed<Slate[]>(() => {
     return [];
   }
 
-  // 4.Juste avant d'afficher le nom du prochain arrêt en gros, on affiche le panneau des correspondances
   if (isApproachingStop.value) {
     if (currentConnections.value.length > 0) {
       return [{ type: "CONNECTIONS", duration: 5000 }];
@@ -456,7 +469,6 @@ const availableSlates = computed<Slate[]>(() => {
     return [];
   }
 
-  // 5. Rotation Standard
   const slates: Slate[] = [];
   const timeBudgetBeforeApproach =
     currentSecondsToArrival.value - APPROACHING_THRESHOLD_START;
@@ -485,7 +497,6 @@ const availableSlates = computed<Slate[]>(() => {
       duration: SLATE_DURATIONS.INFOS_TRAFFIC,
     });
   }
-  console.log(slates);
   return slates;
 });
 
@@ -507,12 +518,9 @@ const rotateSlates = () => {
 
 const scheduleNextRotation = () => {
   stopSlateTimer();
-
   if (availableSlates.value.length <= 1) return;
-
   const nextDuration = currentSlate.value?.duration || 10000;
   currentSlateDuration.value = nextDuration;
-
   startSlateTimer();
 };
 
@@ -558,20 +566,47 @@ const fetchInfosTrafficMessages = async () => {
 };
 
 onMounted(async () => {
-  await fetchLineData();
-  await fetchJourneyData();
+  window.addEventListener("keydown", (event) => {
+    if (event.code === "Space") {
+      loadSaveModalRef.value?.open();
+    }
+  });
+  if (!isUsingLocalSave.value && route.query.line && route.query.trip) {
+    await fetchLineData();
+    await fetchJourneyData();
+  }
+
   fetchInfosTrafficMessages();
-
   useIntervalFn(updateState, 1_000);
-
   scheduleNextRotation();
   useIntervalFn(fetchInfosTrafficMessages, INFOS_TRAFFIC_REFRESH_INTERVAL, {
     immediate: true,
   });
 });
 </script>
-
 <style lang="css" scoped>
+.config-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.config-btn:hover,
+.config-btn:focus {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
 .screen {
   height: 100%;
   width: 100%;
@@ -580,12 +615,12 @@ onMounted(async () => {
   font-size: 3cqmin;
   container-type: inline-size;
 }
-.screen.fullscreen{
+.screen.fullscreen {
   grid-template-rows: min(22%, 100px) 1fr;
 }
 @media (orientation: portrait) {
   .screen.screen.fullscreen {
-  grid-template-rows: min(22%, 50px) 1fr;
+    grid-template-rows: min(22%, 50px) 1fr;
   }
 }
 main {
@@ -665,14 +700,14 @@ main.split-view {
 }
 .slide-over-enter-active,
 .slide-over-leave-active {
-  transition: transform .8s ease-in-out;
+  transition: transform 0.8s ease-in-out;
 }
 .current-stop-panel.slide-over-enter-active,
 .current-stop-panel.slide-over-leave-active {
-  transition: opacity .7s linear;
+  transition: opacity 0.7s linear;
 }
 .current-stop-panel.slide-over-leave-to {
-  transform: translateY(0); 
+  transform: translateY(0);
   opacity: 0;
 }
 .current-stop-panel.slide-over-enter-from {
