@@ -2,7 +2,6 @@
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 64 64"
-    :class="classes"
     :style="style"
   >
     <rect width="100%" height="100%" rx="50" ry="50" :fill="bgColor" />
@@ -12,9 +11,11 @@
       y="50%"
       text-anchor="middle"
       dominant-baseline="central"
+      :letter-spacing="letterSpacing"
       :fill="textColor"
       :font-size="getFontSize(lineName.length)"
       font-family="ParisineBold"
+
     >
       {{ lineName }}
     </text>
@@ -26,33 +27,27 @@ import { computed } from "vue";
 
 interface Props {
   lineName: string;
-  height: string; // ex: "64px"
-  baseFontSize?: string;
+  height: string; 
   bgColor: string;
   textColor: string;
-  style?: string; // pour idfm-style par ex
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  baseFontSize: "1400",
-});
+const props = defineProps<Props>();
 
 const style = computed(() => ({
   "--height": props.height,
 }));
 
-const classes = computed(() => ({
-  chars_3: props.lineName.length <= 3,
-  chars_4: props.lineName.length === 4,
-  more4chars: props.lineName.length > 4,
-  "idfm-style": props.style === "IDFM",
-}));
-
 const getFontSize = (length: number): number => {
-  const base = 45;
-    return base - (length - 1) * 6;
-
+  const base = 52;
+  return base - (length - 1) * 6;
 };
+const letterSpacing = computed(() => {
+  if (props.lineName && props.lineName.length > 1) {
+    return -2;
+  }
+  return 0;
+});
 </script>
 
 <style scoped>
@@ -61,11 +56,4 @@ svg {
   font-family: "ParisineBold";
   height: var(--height);
 }
-svg.more4chars text {
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  text-overflow: ellipsis;
-}
-
 </style>

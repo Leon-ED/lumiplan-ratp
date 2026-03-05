@@ -25,7 +25,7 @@
           />
           <div class="lines-list">
             <div v-for="line in lines" :key="line.id" class="line">
-              <LineLogo :line="line" class-name="line-logo" size="3.8cqw" />
+              <LineLogo :line="line" class-name="line" size="3.8cqw" />
             </div>
           </div>
         </div>
