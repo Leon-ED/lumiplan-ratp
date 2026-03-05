@@ -150,7 +150,7 @@ const linesByMode = computed(() => {
   opacity: 0;
   transform: translateX(100%);
   z-index: 1; /* triangle derrière */
-  animation: slide-from-behind 0.2s ease-out 1.17s forwards;
+  animation: slide-from-behind .4s ease-out 1.17s forwards;
   display: none;
 }
 
