@@ -64,7 +64,6 @@ const linesByMode = computed(() => {
       console.log("skip line", line.id);
       return;
     }
-    // si noctilien on ajoute en bus
     if (line.mode === Mode.NOCTILIEN) {
       line.mode = Mode.BUS;
     }
@@ -80,8 +79,6 @@ const linesByMode = computed(() => {
   if (grouped[Mode.TER]) {
     grouped[Mode.TER] = [];
   }
-  // trier les modes selon MODES_ORDER
-  console.log("grouped lines by mode:", grouped);
   const sortedGrouped: { [mode: string]: Line[] } = {};
   let index = 1;
   MODES_ORDER.forEach((mode) => {
@@ -93,7 +90,6 @@ const linesByMode = computed(() => {
       sortedGrouped[mode] = grouped[mode];
     }
   });
-  console.log("sorted grouped lines by mode:", sortedGrouped);
 
   return sortedGrouped;
 });

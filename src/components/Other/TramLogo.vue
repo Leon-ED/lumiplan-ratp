@@ -26,28 +26,25 @@
 import { computed } from "vue";
 
 interface Props {
-  lineName: string; // ex: "T2", "T3a"
-  height: string;   // ex: "64px"
+  lineName: string; 
+  height: string;   
   bgColor?: string;
-  bandColor?: string; // La couleur des bandes (ex: #C04191 pour le T2)
+  bandColor?: string; 
   textColor?: string;
-  style?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   bgColor: "#FFFFFF",
-  bandColor: "#C04191", // Rose T2 par défaut
-  textColor: "#25303B", // Bleu/Noir par défaut pour le texte
+  bandColor: "#C04191", 
+  textColor: "#25303B", 
 });
 
 const style = computed(() => ({
   "--height": props.height,
 }));
 
-// Ajusté pour un viewBox de 30x30
 const getFontSize = (length: number): number => {
   const base = 20; 
-  // Réduit la taille de la police si le texte est plus long (ex: T3a, T11)
   return base - (length - 1) * 3.5;
 };
 </script>

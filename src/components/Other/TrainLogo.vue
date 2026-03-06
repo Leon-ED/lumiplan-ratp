@@ -21,11 +21,10 @@ import { computed } from "vue";
 
 interface Props {
   lineName: string;
-  height: string; // ex: "64px"
+  height: string; 
   baseFontSize?: string;
   bgColor: string;
   textColor: string;
-  style?: string; // pour idfm-style par ex
 }
 
 const props = withDefaults(defineProps<Props>(), {
