@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { StopWithTime } from "../../types";
 import { cleanText } from "../../utils";
+import { AudioManager } from "../../audio";
 
-const { stopWithTime } = defineProps<{ stopWithTime: StopWithTime }>();
+const { stopWithTime, lineId } = defineProps<{ stopWithTime: StopWithTime, lineId:string }>();
+onMounted(() => {
+  setTimeout(() => {
+    AudioManager.playStop(lineId, stopWithTime.stop.parentId ?? stopWithTime.stop.id);
+  }, 1_000);
+});
 </script>
 <template>
   <div class="current-stop">
