@@ -6,13 +6,17 @@ const emit = defineEmits<{
   (e: "load", data: SaveFile): void;
 }>();
 
+const AUTOSAVE_KEY = "lumiplan_editor_autosave_data";
+
 const dialogRef = ref<HTMLDialogElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const isDragging = ref(false);
 const errorMessage = ref("");
+const hasAutosave = ref(false);
 
 const open = () => {
   errorMessage.value = "";
+  hasAutosave.value = !!localStorage.getItem(AUTOSAVE_KEY);
   dialogRef.value?.showModal();
 };
 
@@ -32,7 +36,16 @@ const processJson = (jsonString: string) => {
       errorMessage.value = "Le fichier ne correspond pas au format de sauvegarde attendu.";
     }
   } catch (error) {
-    errorMessage.value = "Impossible de lire le fichier JSON. Format invalide.";
+    errorMessage.value = "Impossible de lire les données JSON. Format invalide.";
+  }
+};
+
+const loadAutosave = () => {
+  const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
+  if (autosaveData) {
+    processJson(autosaveData);
+  } else {
+    errorMessage.value = "La sauvegarde automatique est introuvable.";
   }
 };
 
@@ -93,6 +106,13 @@ defineExpose({ open, close });
           <input type="file" accept=".json" ref="fileInputRef" @change="handleFileUpload" hidden />
         </div>
 
+        <div v-if="hasAutosave" class="autosave-section">
+          <div class="divider-text"><span>OU</span></div>
+          <button class="btn-autosave" @click="loadAutosave">
+            ↺ Restaurer la sauvegarde automatique
+          </button>
+        </div>
+
         <div v-if="errorMessage" class="error-msg">
           {{ errorMessage }}
         </div>
@@ -140,6 +160,10 @@ defineExpose({ open, close });
   cursor: pointer;
   font-weight: bold;
   color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
 }
 .close-btn:hover {
   background: #e0e0e0;
@@ -162,6 +186,57 @@ defineExpose({ open, close });
   display: block;
   margin-bottom: 12px;
 }
+
+.autosave-section {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+.divider-text {
+  text-align: center;
+  position: relative;
+  margin: 16px 0;
+  color: #adb5bd;
+  font-size: 0.8rem;
+  font-weight: bold;
+  width: 100%;
+}
+.divider-text::before,
+.divider-text::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background-color: #e9ecef;
+}
+.divider-text::before {
+  left: 0;
+}
+.divider-text::after {
+  right: 0;
+}
+.btn-autosave {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: 1px solid #007bff;
+  background-color: #f8faff;
+  color: #007bff;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-autosave:hover {
+  background-color: #007bff;
+  color: white;
+}
+
 .error-msg {
   margin-top: 16px;
   padding: 12px;
