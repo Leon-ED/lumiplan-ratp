@@ -122,7 +122,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useIntervalFn } from "@vueuse/core";
 
 import ScreenHeader from "./ScreenHeader.vue";
@@ -153,7 +153,6 @@ const emitEvent = defineEmits<{
 }>();
 
 const route = useRoute();
-const router = useRouter();
 
 const {
   desserte,
