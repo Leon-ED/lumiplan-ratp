@@ -101,12 +101,14 @@ const getIndexForStop = (i: number) => {
 }
 
 .stop-transition-move {
-  transition: transform 1.5s ease-in-out;
+  transition: transform 1s ease-in-out;
   z-index: 10;
 }
 .stop.is-out-of-view.stop-transition-move {
   visibility: visible;
-  transition: transform 2s ease-in-out;
+transition: transform 1.5s cubic-bezier(0.45, 1, 0.4, 1);
+
+  transition-delay: .7s;
 
   
 }
