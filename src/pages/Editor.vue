@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
+import { useRouter } from "vue-router"; 
 import {
   Desserte,
   DesserteWithLine,
@@ -15,6 +16,8 @@ import ApiImportJourneyModal from "../components/Editor/ApiImportJourneyModal.vu
 import EditorStopList from "../components/Editor/EditorStopList.vue";
 import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue"; 
 import { sortedLines } from "../utils";
+
+const router = useRouter(); 
 
 const defaultLine: Line = {
   id: "editor-made-line",
@@ -255,6 +258,12 @@ const handleAutosaveRestore = (parsedData: SaveFile) => {
   loadData(parsedData, parsedData.header.name);
 };
 
+const launchScreen = () => {
+  localStorage.setItem(AUTOSAVE_KEY, getExportData());
+  const routeData = router.resolve({ path: '/screen', query: { loadSave: 'true' } });
+  window.open(routeData.href, '_blank');
+};
+
 onMounted(() => {
   const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
   if (autosaveData) {
@@ -303,8 +312,14 @@ const deleteLine = (line: Line) => {
 
     <div class="editor-layout">
       <header class="page-header">
-        <h1>Éditeur de Services</h1>
-        <p>Configurez vos lignes et les arrêts de votre service.</p>
+        <div class="header-titles">
+          <h1>Éditeur de Services</h1>
+          <p>Configurez vos lignes et les arrêts de votre service.</p>
+        </div>
+        <button class="btn-launch-screen" @click="launchScreen">
+          <span class="launch-icon">▶</span>
+          Lancer l'écran
+        </button>
       </header>
 
       <div class="editor-grid">
@@ -352,25 +367,66 @@ const deleteLine = (line: Line) => {
 }
 .page-header {
   margin-bottom: 32px;
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
 }
-.page-header h1 {
+.header-titles h1 {
   margin: 0 0 8px 0;
   font-size: 2.2rem;
   color: #1a1a1a;
   letter-spacing: -0.5px;
 }
-.page-header p {
+.header-titles p {
   margin: 0;
   color: #666;
   font-size: 1.1rem;
 }
+
+.btn-launch-screen {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  transition: all 0.2s ease;
+}
+.btn-launch-screen:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+.btn-launch-screen:active {
+  transform: translateY(0);
+}
+.launch-icon {
+  font-size: 1.2rem;
+}
+
 .editor-grid {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 32px;
   align-items: start;
 }
+
 @media (max-width: 850px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .btn-launch-screen {
+    width: 100%;
+    justify-content: center;
+  }
   .editor-grid {
     grid-template-columns: 1fr;
   }

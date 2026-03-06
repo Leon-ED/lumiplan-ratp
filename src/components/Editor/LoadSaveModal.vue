@@ -81,7 +81,7 @@ const onDrop = (event: DragEvent) => {
   }
 };
 
-defineExpose({ open, close });
+defineExpose({ open, close, loadAutosave });
 </script>
 
 <template>

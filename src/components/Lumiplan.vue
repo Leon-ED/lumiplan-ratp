@@ -256,14 +256,9 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeydown);
-
   if (route.query.loadSave) {
-    openLoadModal();
-    const newQuery = { ...route.query };
-    delete newQuery.loadSave;
-    router.replace({ query: newQuery });
+   loadSaveModalRef.value?.loadAutosave();
   }
-
   if (!isUsingLocalSave.value && route.query.line && route.query.trip) {
     isAutoPassStops.value = true;
     await fetchLineData();
