@@ -4,6 +4,9 @@ import BusLineLogo from "./BusLineLogo.vue";
 import NoctilienLogo from "./NoctilienLogo.vue";
 import { Line, Mode } from "../../types";
 import { cleanId } from "../../utils";
+import TrainLogo from "./TrainLogo.vue";
+import MetroLogo from "./MetroLogo.vue";
+import TramLogo from "./TramLogo.vue";
 
 interface Props {
   line: Line;
@@ -23,13 +26,6 @@ const style = computed(() => {
   };
 });
 const isLineSpecial = computed(() => {
-  const specialModes = [
-    Mode.TRAM,
-    Mode.RER,
-    Mode.METRO,
-    Mode.CABLE,
-    Mode.TRANSILIEN,
-  ];
   const specialNames = [
     "AUDONIE",
     "TUVIM",
@@ -53,6 +49,28 @@ const isLineSpecial = computed(() => {
     "BIEVRES",
   ];
   const specialIds = [
+    "C01389",
+    "C01390",
+    "C01391",
+    "C01679",
+    "C01843",
+    "C01684",
+    "C01794",
+    "C01774",
+    "C01795",
+    "C02317",
+    "C02528",
+    "C01999",
+    "C02529",
+    "C02344",
+    "C02732",
+    "C01742",
+    "C01743",
+    "C00563",
+    "C01386",
+    "C01387",
+    "C01384",
+    "C01383",
     "C01840",
     "C01841",
     "C02310",
@@ -98,9 +116,8 @@ const isLineSpecial = computed(() => {
     "C02404",
   ];
   return (
-    specialModes.includes(props.line.mode) ||
     specialNames.includes(
-      props.line.name.toLocaleUpperCase().replace(/\s/g, "")
+      props.line.name.toLocaleUpperCase().replace(/\s/g, ""),
     ) ||
     specialIds.includes(cleanId(props.line.id))
   );
@@ -111,21 +128,43 @@ const computeBackupImgLink = computed(() => {
 const computeNormalImgLink = computed(() => {
   return "/lines/" + cleanId(cleanId(props.line.id)) + ".svg";
 });
+const lineLogoComponent = computed(() => {
+  if(isLineSpecial.value) {
+    return null;
+  }
+  if ([Mode.RER, Mode.TRANSILIEN].includes(props.line.mode)) {
+    return TrainLogo;
+  }
+  if ([Mode.METRO].includes(props.line.mode)) {
+    return MetroLogo;
+  }
+  if ([Mode.TRAM, Mode.CABLE].includes(props.line.mode)) {
+    return TramLogo;
+  }
+  return null;
+});
 </script>
 <template>
-  <!-- Logo Tram -->
+  <div v-if="lineLogoComponent" :class="className">
+    <component
+      :is="lineLogoComponent"
+      :line-name="line.name"
+      :bg-color="line.color"
+      :text-color="line.textColor"
+      :height="props.size ? props.size : '100%'"
+    />
+  </div>
   <img
     :data-line-mode-and-name="
       props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
     "
-    v-if="isLineSpecial"
+    v-else-if="isLineSpecial"
     :src="computeNormalImgLink"
     :data-line-id="cleanId(props.line.id)"
     :onerror="'this.onerror=null;this.src=\'' + computeBackupImgLink + '\''"
     :class="'line-logo' + ' specialLogo ' + props.className + ' '"
     :style="style"
   />
-  <!-- Logo Noctilien -->
   <div
     v-else-if="[Mode.BUS].includes(props.line.mode)"
     :class="props.className"

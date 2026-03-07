@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { getMinutesFromDate } from "../../utils";
+import { computed, ref, watch } from "vue";
+import { getSecondesFromDate } from "../../utils";
 import { useIntervalFn } from "@vueuse/core";
 import { useRotatedText } from "../../hooks/useRotatedText";
 import { DEPARTURE_IN_TEXTS, DIRECTION_TEXTS } from "../../translations";
@@ -10,8 +10,8 @@ interface Props {
   departureDate: string;
 }
 const props = defineProps<Props>();
-
-const minutes = ref<number>(getMinutesFromDate(props.departureDate));
+const secondes = ref<number>(getSecondesFromDate(props.departureDate));
+const minutes = computed(() => Math.round(secondes.value / 60));
 const displayedMinutes = ref<number>(minutes.value);
 
 const animateChange = async () => {
@@ -24,8 +24,7 @@ const animateChange = async () => {
     {
       duration: 2000,
       easing: "ease-out",
-      fill: "forwards",
-    }
+    },
   ).finished;
   await element.value.animate(
     [
@@ -35,8 +34,7 @@ const animateChange = async () => {
     {
       duration: 1000,
       easing: "ease-in-out",
-      fill: "forwards",
-    }
+    },
   ).finished;
   displayedMinutes.value = minutes.value;
   await element.value.animate(
@@ -47,8 +45,7 @@ const animateChange = async () => {
     {
       duration: 1200,
       easing: "ease-in-out",
-      fill: "forwards",
-    }
+    },
   ).finished;
 };
 watch(minutes, (newVal, oldVal) => {
@@ -59,31 +56,45 @@ watch(minutes, (newVal, oldVal) => {
 
 useIntervalFn(
   () => {
-    minutes.value = getMinutesFromDate(props.departureDate);
+    const _secondes = getSecondesFromDate(props.departureDate);
+    secondes.value = _secondes
   },
   10_000,
-  { immediate: true }
+  { immediate: true },
 );
 const translation = useRotatedText(DIRECTION_TEXTS);
-const departureInTranslation = useRotatedText(DEPARTURE_IN_TEXTS)
+const departureInTranslation = useRotatedText(DEPARTURE_IN_TEXTS);
 </script>
 <template>
   <main class="direction">
     <div class="direction-name-container">
-       <Transition name="text-translation-fade" mode="out-in">
-        <span class="translation" v-html="translation" :key="translation"></span>
+      <Transition name="text-translation-fade" mode="out-in">
+        <span
+          class="translation"
+          v-html="translation"
+          :key="translation"
+        ></span>
       </Transition>
-      <span class="direction-name ">{{ props.direction }}</span>
-     
+      <span class="direction-name">{{ props.direction }}</span>
     </div>
     <aside class="aside">
-      <div class="text" v-html="departureInTranslation"></div>
-      <div class="time">
-        <div :class="{ 'blink-text': displayedMinutes === 0 }" ref="element">
-          {{ displayedMinutes }}
-        </div>
+      <div class="text">
+        <Transition name="text-translation-fade" mode="out-in">
+          <span
+            class="translation"
+            v-html="departureInTranslation"
+            :key="departureInTranslation"
+          ></span>
+        </Transition>
       </div>
-      <div class="unit">min</div>
+      <div class="time-information">
+        <div class="time">
+          <div :class="{ 'blink-text': displayedMinutes <= 0 }" ref="element">
+            {{ displayedMinutes }}
+          </div>
+        </div>
+        <div class="unit">min</div>
+      </div>
     </aside>
   </main>
 </template>
@@ -102,6 +113,14 @@ aside {
   font-size: 2.5cqw;
   box-shadow: -5px 0 5px -5px black;
   background-color: rgb(36, 36, 36);
+  display: grid;
+  grid-template-rows: 10% 1fr;
+}
+.time-information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .direction-name-container {
   background-color: white;
@@ -142,4 +161,5 @@ aside {
   font-size: 3cqw;
   opacity: 0.8;
 }
+
 </style>

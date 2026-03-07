@@ -25,7 +25,7 @@
           />
           <div class="lines-list">
             <div v-for="line in lines" :key="line.id" class="line">
-              <LineLogo :line="line" class-name="line-logo" size="3.8cqw" />
+              <LineLogo :line="line" class-name="line" size="3.8cqw" />
             </div>
           </div>
         </div>
@@ -64,7 +64,6 @@ const linesByMode = computed(() => {
       console.log("skip line", line.id);
       return;
     }
-    // si noctilien on ajoute en bus
     if (line.mode === Mode.NOCTILIEN) {
       line.mode = Mode.BUS;
     }
@@ -80,8 +79,6 @@ const linesByMode = computed(() => {
   if (grouped[Mode.TER]) {
     grouped[Mode.TER] = [];
   }
-  // trier les modes selon MODES_ORDER
-  console.log("grouped lines by mode:", grouped);
   const sortedGrouped: { [mode: string]: Line[] } = {};
   let index = 1;
   MODES_ORDER.forEach((mode) => {
@@ -93,7 +90,6 @@ const linesByMode = computed(() => {
       sortedGrouped[mode] = grouped[mode];
     }
   });
-  console.log("sorted grouped lines by mode:", sortedGrouped);
 
   return sortedGrouped;
 });
@@ -150,7 +146,7 @@ const linesByMode = computed(() => {
   opacity: 0;
   transform: translateX(100%);
   z-index: 1; /* triangle derrière */
-  animation: slide-from-behind 0.2s ease-out 1.17s forwards;
+  animation: slide-from-behind .4s ease-out 1.17s forwards;
   display: none;
 }
 

@@ -7,21 +7,17 @@ import { NEXT_STOP_TEXTS, TERMINUS_TEXTS } from "../../translations";
 
 const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
 
-// 1. On initialise les hooks au niveau supérieur (meilleure performance/stabilité)
 const terminusLabel = useRotatedText(TERMINUS_TEXTS);
 const nextStopLabel = useRotatedText(NEXT_STOP_TEXTS);
 
-// 2. On calcule simplement quelle chaîne de caractères afficher
 const currentDescription = computed(() => {
   if(props.stops.length === 0) return "";
   const isTerminusScenario = props.stops[props.stops.length - 1].isTerminus && props.stops.length === 1;
   
-  // On accède à .value ici car useRotatedText retourne une ref/computed
   return isTerminusScenario ? terminusLabel.value : nextStopLabel.value;
 });
 
 const getIndexForStop = (i: number) => {
-  // ... (votre logique existante inchangée)
   const stop0 = props.stops[0];
   const stop1 = props.stops[1];
   if (!stop0.isStopSkipped) return i === 0 ? 0 : 1;
@@ -55,7 +51,7 @@ const getIndexForStop = (i: number) => {
         class="stops-transition-wrapper"
       >
         <Stop
-          v-for="(stopWithTime, index) in stops.slice(0, 2)"
+          v-for="(stopWithTime, index) in stops"
           :index="getIndexForStop(index)"
           :key="stopWithTime.stop.id"
           :stop="stopWithTime"
@@ -75,7 +71,7 @@ const getIndexForStop = (i: number) => {
   font-family: "ParisineBold", sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 
   /* Largeur de la colonne de gauche contenant la ligne et les points */
   --gutter-width: 6cqw; 
@@ -103,6 +99,14 @@ const getIndexForStop = (i: number) => {
 .stop-transition-move {
   transition: transform 1s ease-in-out;
   z-index: 10;
+}
+.stop.is-out-of-view.stop-transition-move {
+  visibility: visible;
+transition: transform 1.5s cubic-bezier(0.45, 1, 0.4, 1);
+
+  transition-delay: .7s;
+
+  
 }
 
 .stops-list::before {

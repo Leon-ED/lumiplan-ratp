@@ -17,6 +17,11 @@
         :name="mode.name"
         :onClick="mode.callback"
       />
+      <QuickMode 
+      class="editor-link"
+        name="Éditeur"
+        :onClick="openEditor"
+      />
     </section>
     <section>
       <label for="search-input" v-if="lines.length !== 0"
@@ -126,18 +131,16 @@ const QUICK_MODES = [
     },
   },
   {
-    name: "Noctiliens",
-    callback: () => {
-      _search.value = "Noctilien ";
-    },
-  },
-  {
     name: "Bus de remplacement",
     callback: () => {
       _search.value = "BUS_REMPLACEMENT ";
     },
   },
 ];
+ 
+const openEditor = () => {
+  window.open('/editor', '_blank');
+};
 
 type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
 const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
@@ -169,7 +172,7 @@ watchDebounced(
       console.error("Error fetching search results:", error);
     }
   },
-  { debounce: 300 }
+  { debounce: 300 },
 );
 watchDebounced(
   selectedLine,
@@ -193,7 +196,7 @@ watchDebounced(
       }
     }
   },
-  { debounce: 300 }
+  { debounce: 300 },
 );
 </script>
 <style scoped>
@@ -281,5 +284,9 @@ section {
     color: white;
     border: gray 0.5px solid;
   }
+}
+.editor-link{
+background-color: rgb(44, 162, 123);
+margin-left: auto;
 }
 </style>

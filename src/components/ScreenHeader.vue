@@ -1,11 +1,11 @@
 <template>
-  <header>
+  <header class="header">
     <img
       v-if="line"
       :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
       class="mode-picto"
     />
-    <LineLogo v-if="line" :line="line" className="picto" size="100%" />
+    <LineLogo v-if="line" :line="line" class-name="picto" size="100%" />
 
     <TransitionGroup name="slide" tag="div" class="direction">
       <span v-if="isAtStop" class="direction-label" key="label">Direction</span>
@@ -22,7 +22,7 @@ import { Line } from "../types";
 import LineLogo from "./Other/LineLogo.vue";
 import Clock from "./Other/Clock.vue";
 
-const props = defineProps<{
+defineProps<{
   direction: string;
   line: Line;
   isAtStop: boolean;
@@ -32,6 +32,10 @@ const props = defineProps<{
 </script>
 
 <style lang="scss" scoped>
+.header:hover{
+  cursor: pointer;
+
+}
 .no-data-available header,
 .no-data-available header * {
   background-color: rgb(36, 36, 36);
@@ -91,7 +95,7 @@ header {
 }
 .slide-up {
   display: inline-block;
-  animation: slide-up 0.5s ease-in-out;
+  animation: slide-up .7s ease-in-out;
 }
 @keyframes slide-up {
   0% {
@@ -118,12 +122,11 @@ header {
   align-items: center;
 }
 
-.slide-move{
-  transition: all 0.75s ease-in-out;
-}
+.slide-move,
 .direction-label.slide-enter-active,
 .direction-label.slide-leave-active {
-  transition: all 0.75s ease-in-out;
+  transition: all 1s ease-in-out;
+
 }
 .slide-enter-from,
 .slide-leave-to {

@@ -2,19 +2,28 @@
   <div class="not-in-service">
     <img
       src="../../assets/img/not-in-service.png"
-      alt="Fin de ligne"
-      style="height: 100%; object-fit: contain"
+      alt="Terminus. Ce véhicule ne prend plus de voyageurs"
+      class="image"
     />
   </div>
 </template>
-<style lang="css" scoped>
+
+<style scoped>
 .not-in-service {
   width: 100%;
-  background-color: var(--ratp-yellow) !important;
   height: 100%;
+  background-color: var(--ratp-yellow) !important;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
-  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.image {
+  width: 80%;
+  display: block;
+}
+.fullscreen .image{
+  width: 100%;
 }
 </style>

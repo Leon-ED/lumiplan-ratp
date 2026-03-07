@@ -27,11 +27,17 @@ onUnmounted(() => {
 </script>
 <style scoped lang="css">
 .divider {
-  animation: blink 2s step-start infinite;
+  animation: blink 1s step-start infinite;
 }
 @keyframes blink {
+  0%{
+    opacity: 1;
+  }
   50% {
     opacity: .3;
+  }
+  100%{
+    opacity: 1;
   }
 }
 </style>

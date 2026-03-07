@@ -6,7 +6,7 @@ export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
   // static apiBaseUrl = "https://localhost:8000/";
 
-  static async getJourney(journeyId: string): Promise<Desserte | null> {
+  static async getJourney(journeyId: string, removePastStops: boolean = true): Promise<Desserte | null> {
     const now = new Date();
     const endpoint = `${this.apiBaseUrl}vehicle_journeys/${journeyId}`;
     const response = await fetch(endpoint);
@@ -23,6 +23,7 @@ export class Api {
         stops: journeyData.stops.map((stop: any) => ({
           stop: {
             id: stop.stop.id,
+            parentId: stop.stop.parentId,
             name: stop.stop.name,
             landmarkName: stop.stop.pointOfInterest,
             isAccessible: stop.stop.isAccessible,
@@ -40,7 +41,7 @@ export class Api {
           isStopSkipped: stop.isStopSkipped,
         }))   .filter((stop: StopWithTime) => {
           const stopDate = new Date(stop.timeOfArrival);
-          return stopDate >= now;
+          return !removePastStops || stopDate >= now;
         }),
       };
       return desserte;
