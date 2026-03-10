@@ -42,7 +42,7 @@ export function useScreenState(
       currentStop.value &&
       !currentStop.value.isStopSkipped &&
       currentSecondsToArrival.value <= 10 &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -2
+      getSecondesFromDate(currentStop.value.timeOfDeparture, true) >= -2
     ) {
       state.value = "AT_STOP";
     } else if (
@@ -75,7 +75,8 @@ export function useScreenState(
       if (currentStop.value) {
         const past = new Date();
         past.setSeconds(past.getSeconds() - 5);
-        currentStop.value.timeOfArrival = past.toISOString();
+        currentStop.value.timeOfArrival = new Date().toISOString()
+        currentStop.value.timeOfDeparture = past.toISOString();
       }
       setTimeout(() => { desserte.value.stops.shift(); }, 2000);
       return;
@@ -88,7 +89,8 @@ export function useScreenState(
       if (currentStop.value) {
         const past = new Date();
         past.setSeconds(past.getSeconds() - 5);
-        currentStop.value.timeOfArrival = past.toISOString();
+        currentStop.value.timeOfArrival = new Date().toISOString()
+        currentStop.value.timeOfDeparture = past.toISOString();
       }
 
       setTimeout(() => { desserte.value.stops.shift(); }, 2000);

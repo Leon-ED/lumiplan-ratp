@@ -35,6 +35,7 @@ const defaultStop: StopWithTime = {
     connectedLines: [],
   },
   timeOfArrival: "12:00",
+  timeOfDeparture: "12:01",
   isTerminus: false,
   isFirstStop: false,
   isStopSkipped: false,

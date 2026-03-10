@@ -51,10 +51,15 @@ defineExpose({
             placeholder="Ex: Grande Arche"
           />
         </div>
-
+      </div>
+      <div class="row-fields">
         <div class="field-group">
-          <label for="stop-time">Heure</label>
+          <label for="stop-time">Heure d'arrivée</label>
           <input type="time" id="stop-time" v-model="stop.timeOfArrival" />
+        </div>
+        <div class="field-group">
+          <label for="stop-time-departure">Heure de départ</label>
+          <input type="time" id="stop-time-departure" v-model="stop.timeOfDeparture" />
         </div>
       </div>
 

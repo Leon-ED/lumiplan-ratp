@@ -63,7 +63,7 @@
             v-if="state === 'FIRST_STOP'"
             class="foreground-panel"
             :direction="desserte.direction"
-            :departure-date="currentStop!.timeOfArrival"
+            :departure-date="currentStop!.timeOfDeparture"
           />
           <NotInService
             v-else-if="state === 'NOT_IN_SERVICE'"
@@ -221,7 +221,7 @@ const updateState = () => {
     ((currentStop.value.isTerminus &&
       getSecondesFromDate(currentStop.value.timeOfArrival, true) < -20) ||
       (!currentStop.value.isTerminus &&
-        getSecondesFromDate(currentStop.value.timeOfArrival, true) < -3))
+        getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -3))
   ) {
     desserte.value.stops.shift();
   }

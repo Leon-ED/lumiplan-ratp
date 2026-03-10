@@ -10,6 +10,7 @@ export interface Stop {
 export interface StopWithTime {
   stop: Stop;
   timeOfArrival: string;
+  timeOfDeparture:string;
   isTerminus: boolean;
   isFirstStop: boolean;
   isStopSkipped: boolean;

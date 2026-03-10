@@ -55,7 +55,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
     !stop.isStopSkipped &&
     getSecondesFromDate(stop.timeOfArrival, true) <= 0 &&
     index === 0 &&
-    getSecondesFromDate(stop.timeOfArrival, true) > -20
+    getSecondesFromDate(stop.timeOfDeparture, true) > -20
   );
 };
 </script>

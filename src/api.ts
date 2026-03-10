@@ -36,11 +36,12 @@ export class Api {
             })),
           },
           timeOfArrival: stop.timeOfArrival,
+          timeOfDeparture: stop.timeOfDeparture ?? stop.timeOfArrival,
           isTerminus: stop.isTerminus,
           isFirstStop: stop.isFirstStop,
           isStopSkipped: stop.isStopSkipped,
         }))   .filter((stop: StopWithTime) => {
-          const stopDate = new Date(stop.timeOfArrival);
+          const stopDate = new Date(stop.timeOfDeparture);
           return !removePastStops || stopDate >= now;
         }),
       };
@@ -75,11 +76,12 @@ export class Api {
               isAccessible: stop.stop.isAccessible,
             },
             timeOfArrival: stop.timeOfArrival,
+            timeOfDeparture: stop.timeOfDeparture ?? stop.timeOfArrival,
             isTerminus: stop.isTerminus,
             isFirstStop: stop.isFirstStop,
             isStopSkipped: stop.isStopSkipped,
           })).filter((stop: StopWithTime) => {
-            const stopDate = new Date(stop.timeOfArrival);
+            const stopDate = new Date(stop.timeOfDeparture);
             return stopDate >= new Date();
           }),
         };
