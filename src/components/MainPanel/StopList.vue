@@ -53,6 +53,7 @@ const getIndexForStop = (i: number) => {
         <Stop
           v-for="(stopWithTime, index) in stops"
           :index="getIndexForStop(index)"
+          :real-index="index"
           :key="stopWithTime.stop.id"
           :stop="stopWithTime"
         />

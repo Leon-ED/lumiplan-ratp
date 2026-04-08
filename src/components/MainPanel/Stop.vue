@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { cleanText, getSecondesFromDate } from "../../utils";
 import { StopWithTime } from "../../types";
 
-const props = defineProps<{ stop: StopWithTime; index: number }>();
+const props = defineProps<{ stop: StopWithTime; index: number, realIndex: number }>();
 
 const nowTrigger = ref(Date.now());
 let timer: ReturnType<typeof setInterval>;
@@ -65,7 +65,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
     ref="stopRef"
     class="stop"
     :class="{
-      'is-out-of-view': !isVisible,
+      'is-out-of-view': !isVisible && realIndex > 2,
       blinkable: index === 0 && !stop.isStopSkipped,
       'is-last-stop': stop.isTerminus,
       'is-current': isStopCurrent(stop, index),
