@@ -65,7 +65,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
     ref="stopRef"
     class="stop"
     :class="{
-      'is-out-of-view': !isVisible && realIndex > 2,
+      'is-out-of-view': !isVisible && realIndex > 1,
       blinkable: index === 0 && !stop.isStopSkipped,
       'is-last-stop': stop.isTerminus,
       'is-current': isStopCurrent(stop, index),
