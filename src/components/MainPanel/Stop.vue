@@ -164,8 +164,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   height: .8em;
 }
 
-.stop-transition-enter-active,
-.stop-transition-leave-active {
+.stop-transition-enter-active{
   transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10;
 }
@@ -175,7 +174,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   z-index: 10;
 }
 .stop-transition-leave-active {
-  transition: transform 1.5s ease-in-out;
+  transition: transform 1.2s ease-in-out;
   z-index: 10;
   position: absolute;
   width: 100%;
