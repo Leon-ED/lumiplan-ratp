@@ -16,12 +16,12 @@ onMounted(() => {
     <div class="current-stop-name">
       {{ cleanText(stopWithTime.stop.name) }}
     </div>
-    <div
+    <!-- <div
       class="current-stop-landmark-name"
       v-if="stopWithTime.stop.landmarkName"
     >
       {{ stopWithTime.stop.landmarkName }}
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -42,10 +42,11 @@ onMounted(() => {
 .current-stop-name {
   font-size: 9cqw;
   text-align: center;
+  text-wrap:balance;
 }
-.current-stop-landmark-name {
+/* .current-stop-landmark-name {
   font-size: 2.5cqw;
   padding: 1cqw;
   background-color: var(--ratp-brown);
-}
+} */
 </style>
