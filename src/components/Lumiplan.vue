@@ -323,18 +323,11 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-rows: 22% 78%;
+  grid-template-rows: 6.25cqw 1fr; 
   font-size: 3cqmin;
   container-type: inline-size;
   position: relative;
-}
-.screen.fullscreen {
-  grid-template-rows: min(22%, 100px) 1fr;
-}
-@media (orientation: portrait) {
-  .screen.screen.fullscreen {
-    grid-template-rows: min(22%, 50px) 1fr;
-  }
+  overflow: hidden;
 }
 main {
   display: grid;
