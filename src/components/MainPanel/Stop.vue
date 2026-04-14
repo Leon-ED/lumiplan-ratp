@@ -143,8 +143,12 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
 .stop-name {
   color: var(--ratp-blue);
   font-size: 5cqw;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 6cqw; 
+  line-height: 1;
 }
-
 .stop-name-long {
   font-size: 4cqw;
 }
@@ -159,8 +163,6 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
 .non-accessible-stop {
   height: .8em;
 }
-
-
 
 .stop-transition-enter-active,
 .stop-transition-leave-active {
@@ -196,7 +198,6 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   animation: blink 1.2s infinite steps(1);
 }
 
-
 .stop.is-last-stop .stop-name .text-bg {
   background-color: black;
   color: white;
@@ -209,6 +210,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   background-color: var(--ratp-blue);
   color: white;
   padding: 0.1em 0.2em;
+  font-size: .9em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
