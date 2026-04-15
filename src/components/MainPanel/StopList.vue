@@ -104,7 +104,8 @@ const getIndexForStop = (i: number) => {
 }
 .stop-transition-move:nth-child(n + 3) {
   visibility: visible;
-  transition-delay: .3s;
+  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: .8s;
 }
 
 .stops-list::before {

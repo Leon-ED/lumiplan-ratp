@@ -174,7 +174,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   z-index: 10;
 }
 .stop-transition-leave-active {
-  transition: transform 1.2s ease-in-out;
+  transition: transform 1s ease-in-out;
   z-index: 10;
   position: absolute;
   width: 100%;
