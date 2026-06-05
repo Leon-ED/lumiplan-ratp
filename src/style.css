@@ -1,11 +1,11 @@
 @font-face {
   font-family: "ParisineBold";
-  src: url("./assets/fonts/Parisine-Bold.otf") format("opentype");
+  src: url("./assets/fonts/Parisine-Bold-Fixed.woff2") format("woff2");
 }
 
 @font-face {
   font-family: "ParisineRegular";
-  src: url("./assets/fonts/Parisine-Regular.otf") format("opentype");
+  src: url("./assets/fonts/Parisine-Regular-Fixed.woff2") format("woff2");
 }
 
 @font-face {
