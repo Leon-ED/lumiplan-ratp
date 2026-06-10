@@ -118,8 +118,9 @@ const exportToPDF = () => {
 
       <div class="thermometer-list">
         <EditorStopItem
-          v-for="stop in sortedStops"
+          v-for="(stop, index) in sortedStops"
           :key="stop.stop.id"
+          :is-first-stop="index === 0"
           :stop="stop"
           :route="desserteWithLine.line"
           @edit-stop="emit('edit-stop', stop)"

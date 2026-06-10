@@ -34,8 +34,9 @@ const defaultStop: StopWithTime = {
     isAccessible: false,
     connectedLines: [],
   },
-  timeOfArrival: "12:00",
-  timeOfDeparture: "12:01",
+  timeOfArrival: new Date().toISOString(),
+  timeOfDeparture: new Date().toISOString(),
+  travelTime: 45,
   isTerminus: false,
   isFirstStop: false,
   isStopSkipped: false,
@@ -46,12 +47,6 @@ const defaultDesserte: DesserteWithLine = {
     id: "editor-made-journey",
     direction: "Ma direction",
     stops: [
-      {
-        ...defaultStop,
-        stop: { ...defaultStop.stop, name: "Arrêt Origine" },
-        timeOfArrival: "08:00",
-        isFirstStop: true,
-      },
     ],
   },
 };
@@ -69,26 +64,24 @@ const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(null)
 const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(null);
 
 const sortedStops = computed(() => {
-  return [...desserteWithLine.value.desserte.stops].sort((a, b) => {
-    return (a.timeOfArrival || "00:00").localeCompare(
-      b.timeOfArrival || "00:00",
-    );
-  });
+  return desserteWithLine.value.desserte.stops;
 });
 
+
 const normalizeStopFlags = () => {
-  const stops = sortedStops.value;
-
+  const stops = desserteWithLine.value.desserte.stops;
   if (stops.length === 0) return;
-  if (stops.length === 1) {
-    stops[0].isFirstStop = true;
-    stops[0].isTerminus = false;
-    return;
-  }
-
   stops.forEach((stop, index) => {
     stop.isFirstStop = index === 0;
     stop.isTerminus = index === stops.length - 1;
+
+    if (index > 0) {
+      const travelTime = Math.max(stop.travelTime || 60, 20);
+      stop.travelTime = travelTime; 
+      
+      stop.timeOfArrival = addTimeToDate(stops[index - 1].timeOfDeparture || new Date().toISOString(), travelTime);
+      stop.timeOfDeparture = addTimeToDate(stop.timeOfArrival, 20);
+    }
   });
 };
 
@@ -116,21 +109,29 @@ const addLine = () =>
   });
 
 const addStop = () => {
-  const lastTime =
-    sortedStops.value.length > 0
-      ? sortedStops.value[sortedStops.value.length - 1].timeOfArrival
-      : "12:00";
+  const lastDate = desserteWithLine.value.desserte.stops.length > 0
+    ? desserteWithLine.value.desserte.stops[desserteWithLine.value.desserte.stops.length - 1].timeOfDeparture
+    : new Date().toISOString();
+
   desserteWithLine.value.desserte.stops.push({
     ...defaultStop,
     stop: {
       ...defaultStop.stop,
       id: `editor-made-stop-${crypto.randomUUID()}`,
     },
-    timeOfArrival: lastTime,
+    travelTime: 60,
+    timeOfDeparture: addTimeToDate(lastDate, 60),
+    timeOfArrival: addTimeToDate(lastDate, 75),
   });
   normalizeStopFlags();
 };
-
+const addTimeToDate = (isoString: string, additionalSeconds: number): string => {
+  console.log("Adding time:", additionalSeconds, "seconds to", isoString);
+  const date = new Date(isoString);
+  date.setSeconds(date.getSeconds() + additionalSeconds);
+  console.log("New date after adding time:", date.toISOString());
+  return date.toISOString();
+}
 const handleSelectBaseLine = (lineId: string) => {
   const selectedBaseLine = lines.value.find((l) => l.id === lineId);
   if (selectedBaseLine) {

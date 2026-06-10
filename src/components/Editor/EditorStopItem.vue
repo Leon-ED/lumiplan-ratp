@@ -6,6 +6,7 @@ import { sortedLines } from "../../utils";
 
 const props = defineProps<{
   stop: StopWithTime;
+  isFirstStop: boolean;
   route: Line;
 }>();
 
@@ -62,6 +63,8 @@ const processedConnections = computed(() =>
   >
     <div class="stop-time">
       {{
+        stop.travelTime  && !isFirstStop         ? `${stop.travelTime}s`
+          :
         new Date(stop.timeOfArrival).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",

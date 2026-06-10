@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { Line, StopWithTime } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 
-defineProps<{
+const props = defineProps<{
   allLines: Line[];
   stop: StopWithTime | null;
 }>();
@@ -17,7 +17,18 @@ const open = () => {
 const close = () => {
   dialogRef.value?.close();
 };
+const extractTime = (isoString: string) => {
+  if (!isoString) return "12:00:00";
+  return isoString.includes('T') ? isoString.split('T')[1].substring(0, 8) : isoString;
+};
 
+const updateTime = (field: 'timeOfArrival' | 'timeOfDeparture', timeValue: string) => {
+  if (!props.stop) return;
+  const currentVal = props.stop[field];
+  const baseDate = currentVal && currentVal.includes('T') ? currentVal.split('T')[0] : new Date().toISOString().split('T')[0];
+  
+  props.stop[field] = `${baseDate}T${timeValue}`;
+};
 defineExpose({
   open,
 });
@@ -52,17 +63,45 @@ defineExpose({
           />
         </div>
       </div>
-      <div class="row-fields">
-        <div class="field-group">
-          <label for="stop-time">Heure d'arrivée</label>
-          <input type="time" id="stop-time" v-model="stop.timeOfArrival" />
-        </div>
-        <div class="field-group">
-          <label for="stop-time-departure">Heure de départ</label>
-          <input type="time" id="stop-time-departure" v-model="stop.timeOfDeparture" />
-        </div>
-      </div>
+    <div class="row-fields">
+        <!-- Pour le premier arrêt : Heures fixes -->
+    <template v-if="stop.isFirstStop">
+          <div class="field-group">
+            <label for="stop-time">Heure d'arrivée</label>
+            <input 
+              type="time" 
+              id="stop-time" 
+              step="1" 
+              :value="extractTime(stop.timeOfArrival)"
+              @input="updateTime('timeOfArrival', ($event.target as HTMLInputElement).value)" 
+            />
+          </div>
+          <div class="field-group">
+            <label for="stop-time-departure">Heure de départ</label>
+            <input 
+              type="time" 
+              id="stop-time-departure" 
+              step="1" 
+              :value="extractTime(stop.timeOfDeparture)"
+              @input="updateTime('timeOfDeparture', ($event.target as HTMLInputElement).value)" 
+            />
+          </div>
+        </template>
 
+        <!-- Pour les autres arrêts : Temps de trajet -->
+        <template v-else>
+          <div class="field-group">
+            <label for="stop-travel-time">Temps de trajet depuis l'arrêt précédent (sec)</label>
+            <input 
+              type="number" 
+              id="stop-travel-time" 
+              v-model.number="stop.travelTime" 
+              min="20" 
+              placeholder="Ex: 60"
+            />
+          </div>
+        </template>
+      </div>
       <div class="checkbox-grid">
         <label class="checkbox-item">
           <input type="checkbox" v-model="stop.stop.isAccessible" />
@@ -187,7 +226,8 @@ dialog.line-edition::backdrop {
 }
 
 input[type="text"],
-input[type="time"] {
+input[type="time"],
+input[type="number"] {
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;

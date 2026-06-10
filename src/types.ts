@@ -14,6 +14,7 @@ export interface StopWithTime {
   isTerminus: boolean;
   isFirstStop: boolean;
   isStopSkipped: boolean;
+  travelTime?: number;
 }
 export interface DesserteWithLine {
   line: Line;

@@ -37,6 +37,7 @@ export class Api {
           },
           timeOfArrival: stop.timeOfArrival,
           timeOfDeparture: stop.timeOfDeparture ?? stop.timeOfArrival,
+          travelTime: stop.travelTime ? stop.travelTime : undefined,
           isTerminus: stop.isTerminus,
           isFirstStop: stop.isFirstStop,
           isStopSkipped: stop.isStopSkipped,
