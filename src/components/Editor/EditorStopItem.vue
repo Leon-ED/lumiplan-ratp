@@ -13,6 +13,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "edit-stop", stop: StopWithTime): void;
   (e: "delete-stop", stop: StopWithTime): void;
+  (e: "move-up", stop: StopWithTime): void;
+  (e: "move-down", stop: StopWithTime): void;
 }>();
 
 const processConnections = (lines: Line[]) => {
@@ -61,6 +63,51 @@ const processedConnections = computed(() =>
       'is-terminus': stop.isTerminus,
     }"
   >
+    <div class="move-buttons no-print">
+      <button
+        class="action-btn move-btn"
+        @click.stop="emit('move-up', stop)"
+        :disabled="isFirstStop"
+        :class="{ disabled: isFirstStop }"
+        title="Monter l'arrêt"
+        aria-label="Monter l'arrêt"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
+      <button
+        class="action-btn move-btn"
+        @click.stop="emit('move-down', stop)"
+        title="Descendre l'arrêt"
+        aria-label="Descendre l'arrêt"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+
     <div class="stop-time">
       {{
         stop.travelTime && !isFirstStop
@@ -71,10 +118,13 @@ const processedConnections = computed(() =>
             })
       }}
     </div>
+
     <div class="stop-node"><div class="inner-dot"></div></div>
+
     <div class="stop-details">
       <div class="stop-header">
         <span
+          @click.stop="emit('edit-stop', stop)"
           class="stop-name"
           :class="{
             'strike-through': stop.isStopSkipped,
@@ -111,21 +161,24 @@ const processedConnections = computed(() =>
           title="Éditer cet arrêt"
           aria-label="Éditer cet arrêt"
         >
-      <svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="18"
-  height="18"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-</svg>
-
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            ></path>
+            <path
+              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+            ></path>
+          </svg>
         </button>
         <button
           class="action-btn delete-btn no-print"
@@ -193,6 +246,12 @@ const processedConnections = computed(() =>
 button:hover {
   cursor: pointer;
 }
+button.disabled,
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  pointer-events: none; /* Empêche les clics accidentels */
+}
 .delete-btn {
   background-color: #ff4d4f;
   color: white;
@@ -206,10 +265,12 @@ button:hover {
   border-radius: 4px;
   padding: 4px 8px;
 }
+
+/* Position de la ligne verticale ajustée à 102px pour compenser les boutons de déplacement */
 .thermometer-stop:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 74px;
+  left: 102px;
   top: 24px;
   bottom: -12px;
   width: 6px;
@@ -217,11 +278,39 @@ button:hover {
   transform: translateX(-50%);
   z-index: 1;
 }
+
 .is-terminus .stop-name {
   background-color: black;
   color: white;
   padding: 0.2em 0.5em;
 }
+
+/* Styles pour les boutons de déplacement à gauche */
+.move-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 8px;
+  margin-right: 8px;
+  width: 20px;
+  flex-shrink: 0;
+}
+.move-btn {
+  background: transparent;
+  color: #adb5bd;
+  border: none;
+  border-radius: 4px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.move-btn:hover {
+  color: #212529;
+  background-color: #f8f9fa;
+}
+
 .stop-time {
   width: 50px;
   padding-top: 10px;
@@ -259,6 +348,7 @@ button:hover {
   font-weight: 700;
   font-size: 1.15rem;
   color: #212529;
+  cursor: pointer;
 }
 .strike-through {
   text-decoration: line-through;

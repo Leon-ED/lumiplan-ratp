@@ -15,6 +15,8 @@ const emit = defineEmits<{
   (e: "edit-stop", stop: StopWithTime): void;
   (e: "delete-stop", stop: StopWithTime): void;
   (e: "select-base-line", lineId: string): void;
+  (e: "move-up", stop: StopWithTime): void;
+  (e: "move-down", stop: StopWithTime): void;
 }>();
 
 const onBaseLineChange = (event: Event) => {
@@ -126,6 +128,8 @@ const exportToPDF = () => {
           :route="desserteWithLine.line"
           @edit-stop="emit('edit-stop', stop)"
           @delete-stop="emit('delete-stop', stop)"
+          @move-up="emit('move-up', stop)"
+          @move-down="emit('move-down', stop)"
         />
       </div>
     </section>

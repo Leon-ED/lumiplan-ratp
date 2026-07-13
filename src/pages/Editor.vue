@@ -236,6 +236,26 @@ const copyToClipboard = async () => {
 const openApiModal = () => {
   apiModalRef.value?.open();
 };
+const moveUpStop = (stop: StopWithTime) => {
+  const index = desserteWithLine.value.desserte.stops.findIndex(
+    (s) => s.stop.id === stop.stop.id,
+  );
+  if (index > 0) {
+    const stops = desserteWithLine.value.desserte.stops;
+    [stops[index - 1], stops[index]] = [stops[index], stops[index - 1]];
+    normalizeStopFlags();
+  }
+};
+const moveDownStop = (stop: StopWithTime) => {
+  const index = desserteWithLine.value.desserte.stops.findIndex(
+    (s) => s.stop.id === stop.stop.id,
+  );
+  if (index < desserteWithLine.value.desserte.stops.length - 1) {
+    const stops = desserteWithLine.value.desserte.stops;
+    [stops[index], stops[index + 1]] = [stops[index + 1], stops[index]];
+    normalizeStopFlags();
+  }
+};
 
 const downloadJson = () => {
   try {
@@ -354,6 +374,8 @@ const deleteLine = (line: Line) => {
           @edit-stop="openStopEditorModal"
           @delete-stop="deleteStop"
           @select-base-line="handleSelectBaseLine"
+          @move-up="moveUpStop"
+          @move-down="moveDownStop"
         />
       </div>
     </div>
