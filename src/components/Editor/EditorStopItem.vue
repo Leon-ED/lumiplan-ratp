@@ -12,6 +12,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "edit-stop", stop: StopWithTime): void;
+  (e: "delete-stop", stop: StopWithTime): void;
 }>();
 
 const processConnections = (lines: Line[]) => {
@@ -59,16 +60,15 @@ const processedConnections = computed(() =>
       'is-skipped': stop.isStopSkipped,
       'is-terminus': stop.isTerminus,
     }"
-    @click="emit('edit-stop', stop)"
   >
     <div class="stop-time">
       {{
-        stop.travelTime  && !isFirstStop         ? `${stop.travelTime}s`
-          :
-        new Date(stop.timeOfArrival).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
+        stop.travelTime && !isFirstStop
+          ? `${stop.travelTime}s`
+          : new Date(stop.timeOfArrival).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
       }}
     </div>
     <div class="stop-node"><div class="inner-dot"></div></div>
@@ -105,7 +105,53 @@ const processedConnections = computed(() =>
             >Descente uniquement</span
           >
         </span>
+        <button
+          class="action-btn edit-btn no-print"
+          @click.stop="emit('edit-stop', stop)"
+          title="Éditer cet arrêt"
+          aria-label="Éditer cet arrêt"
+        >
+      <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="18"
+  height="18"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+</svg>
+
+        </button>
+        <button
+          class="action-btn delete-btn no-print"
+          @click.stop="emit('delete-stop', stop)"
+          title="Supprimer cet arrêt"
+          aria-label="Supprimer cet arrêt"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path
+              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            ></path>
+          </svg>
+        </button>
       </div>
+
       <div class="stop-landmark" v-if="stop.stop.landmarkName">
         {{ stop.stop.landmarkName }}
       </div>
@@ -143,7 +189,22 @@ const processedConnections = computed(() =>
   align-items: flex-start;
   position: relative;
   min-height: 70px;
+}
+button:hover {
   cursor: pointer;
+}
+.delete-btn {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+.edit-btn {
+  color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
 }
 .thermometer-stop:not(:last-child)::after {
   content: "";

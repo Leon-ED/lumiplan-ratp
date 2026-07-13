@@ -13,6 +13,7 @@ const emit = defineEmits<{
   (e: "edit-operated-line", line: Line): void;
   (e: "add-stop"): void;
   (e: "edit-stop", stop: StopWithTime): void;
+  (e: "delete-stop", stop: StopWithTime): void;
   (e: "select-base-line", lineId: string): void;
 }>();
 
@@ -124,6 +125,7 @@ const exportToPDF = () => {
           :stop="stop"
           :route="desserteWithLine.line"
           @edit-stop="emit('edit-stop', stop)"
+          @delete-stop="emit('delete-stop', stop)"
         />
       </div>
     </section>

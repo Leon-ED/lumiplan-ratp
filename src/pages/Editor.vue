@@ -265,6 +265,10 @@ const launchScreen = () => {
   const routeData = router.resolve({ path: '/screen', query: { loadSave: 'true' } });
   window.open(routeData.href, '_blank');
 };
+const deleteStop = (stop: StopWithTime) => {
+  desserteWithLine.value.desserte.stops = desserteWithLine.value.desserte.stops.filter(s => s.stop.id !== stop.stop.id);
+  normalizeStopFlags();
+};
 
 onMounted(() => {
   const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
@@ -348,6 +352,7 @@ const deleteLine = (line: Line) => {
           @edit-operated-line="openLineEditorModal"
           @add-stop="addStop"
           @edit-stop="openStopEditorModal"
+          @delete-stop="deleteStop"
           @select-base-line="handleSelectBaseLine"
         />
       </div>
