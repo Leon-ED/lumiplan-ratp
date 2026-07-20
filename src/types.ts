@@ -4,6 +4,7 @@ export interface Stop {
   name: string;
   landmarkName?: string;
   isAccessible: boolean;
+  hasGapWhenSteppingOff: boolean;
   connectedLines: Line[];
 }
 

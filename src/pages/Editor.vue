@@ -32,6 +32,7 @@ const defaultStop: StopWithTime = {
     name: "",
     landmarkName: "",
     isAccessible: false,
+    hasGapWhenSteppingOff: false,
     connectedLines: [],
   },
   timeOfArrival: new Date().toISOString(),

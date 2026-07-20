@@ -17,6 +17,7 @@ const open = () => {
 const close = () => {
   dialogRef.value?.close();
 };
+
 const extractTime = (isoString: string) => {
   if (!isoString) return "12:00:00";
   return isoString.includes('T') ? isoString.split('T')[1].substring(0, 8) : isoString;
@@ -29,6 +30,7 @@ const updateTime = (field: 'timeOfArrival' | 'timeOfDeparture', timeValue: strin
   
   props.stop[field] = `${baseDate}T${timeValue}`;
 };
+
 defineExpose({
   open,
 });
@@ -63,9 +65,10 @@ defineExpose({
           />
         </div>
       </div>
-    <div class="row-fields">
+
+      <div class="row-fields">
         <!-- Pour le premier arrêt : Heures fixes -->
-    <template v-if="stop.isFirstStop">
+        <template v-if="stop.isFirstStop">
           <div class="field-group">
             <label for="stop-time">Heure d'arrivée</label>
             <input 
@@ -102,19 +105,16 @@ defineExpose({
           </div>
         </template>
       </div>
+
       <div class="checkbox-grid">
         <label class="checkbox-item">
           <input type="checkbox" v-model="stop.stop.isAccessible" />
           <span>Accès UFR</span>
         </label>
-        <!-- <label class="checkbox-item">
-          <input type="checkbox" v-model="stop.isTerminus" />
-          <span>Terminus</span>
-        </label>
         <label class="checkbox-item">
-          <input type="checkbox" v-model="stop.isFirstStop" />
-          <span>Premier arrêt</span>
-        </label> -->
+          <input type="checkbox" v-model="stop.stop.hasGapWhenSteppingOff" />
+          <span>Écart entre le quai et le véhicule</span>
+        </label>
         <label class="checkbox-item">
           <input type="checkbox" v-model="stop.isStopSkipped" />
           <span>Arrêt non desservi</span>
