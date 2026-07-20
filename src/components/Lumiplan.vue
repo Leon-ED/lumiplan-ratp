@@ -209,7 +209,6 @@ const handleSaveLoaded = (saveData: SaveFile) => {
   forcedState.value = null;
   computeState();
   scheduleNextRotation();
-  fetchInfosTrafficMessages();
 };
 
 const updateState = () => {
