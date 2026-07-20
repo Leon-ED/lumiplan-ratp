@@ -30,8 +30,9 @@ const simulatedTime = computed({
     ).padStart(2, "0")}`;
   },
   set(value: string) {
+    if (!value) return;
     const [hours, minutes] = value.split(":").map(Number);
-
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return;
     const date = new Date(now.value);
     date.setHours(hours, minutes, 0, 0);
 

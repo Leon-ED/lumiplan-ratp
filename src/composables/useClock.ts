@@ -8,10 +8,24 @@ setInterval(() => {
 }, 1000);
 
 export function useClock() {
-  const now = computed(() => new Date(currentTime.value + offset.value));
+  const now = computed(() => {
+    const timestamp = currentTime.value + offset.value;
+    if (!Number.isFinite(timestamp)) {
+      return new Date(currentTime.value);
+    }
+
+    return new Date(timestamp);
+  });
 
   const setCurrentTime = (date: Date) => {
-    offset.value = date.getTime() - Date.now();
+    const time = date.getTime();
+
+    if (!Number.isFinite(time)) {
+      console.error("Date invalide :", date);
+      return;
+    }
+
+    offset.value = time - Date.now();
   };
 
   const resetCurrentTime = () => {
