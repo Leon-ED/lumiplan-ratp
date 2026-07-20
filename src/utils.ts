@@ -1,13 +1,16 @@
+import { useClock } from "./composables/useClock";
 import { Line, Mode } from "./types";
 
 export const getSecondesFromDate = (
   dateString: string,
-  allowNegativesValues: boolean = false,
+  allowNegativesValues = false,
 ): number => {
-  const now = new Date();
+  const { now } = useClock();
+
+  const current = now.value;
   const inputDate = new Date(dateString);
 
-  const target = new Date(now);
+  const target = new Date(current);
   target.setHours(
     inputDate.getHours(),
     inputDate.getMinutes(),
@@ -15,9 +18,9 @@ export const getSecondesFromDate = (
     inputDate.getMilliseconds(),
   );
 
-  const diffInSeconds = Math.floor((target.getTime() - now.getTime()) / 1000);
+  const diff = Math.floor((target.getTime() - current.getTime()) / 1000);
 
-  return allowNegativesValues ? diffInSeconds : Math.max(0, diffInSeconds);
+  return allowNegativesValues ? diff : Math.max(0, diff);
 };
 
 export const getMinutesFromDate = (dateString: string): number => {

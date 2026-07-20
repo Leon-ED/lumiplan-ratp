@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
+import { useClock } from "../../composables/useClock";
 
 const props = defineProps<{
   fullScreen: boolean;
-  modelValue: boolean; 
+  modelValue: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -15,10 +16,28 @@ const dialogRef = ref<HTMLDialogElement | null>(null);
 
 const localAutoPass = ref(props.modelValue);
 
-watch(() => props.modelValue, (newVal) => {
-  localAutoPass.value = newVal;
-});
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    localAutoPass.value = newVal;
+  },
+);
+const { setCurrentTime, now } = useClock();
+const simulatedTime = computed({
+  get() {
+    return `${String(now.value.getHours()).padStart(2, "0")}:${String(
+      now.value.getMinutes(),
+    ).padStart(2, "0")}`;
+  },
+  set(value: string) {
+    const [hours, minutes] = value.split(":").map(Number);
 
+    const date = new Date(now.value);
+    date.setHours(hours, minutes, 0, 0);
+
+    setCurrentTime(date);
+  },
+});
 watch(localAutoPass, (newVal) => {
   emit("update:modelValue", newVal);
 });
@@ -54,6 +73,16 @@ defineExpose({ open, close });
         <input type="checkbox" v-model="localAutoPass" />
         <span>Passage automatique des arrêts (basé sur l'heure)</span>
       </label>
+<label class="time-setting">
+  <span>Heure simulée</span>
+
+  <input
+    type="time"
+    v-model="simulatedTime"
+    step="60"
+    class="time-input"
+  />
+</label>
     </div>
   </dialog>
 </template>
@@ -115,6 +144,47 @@ dialog.custom-modal::backdrop {
 .setting-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
+  cursor: pointer;
+}
+.time-setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+.time-setting span {
+  font-size: 1rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.time-input {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  color: #212529;
+  transition: border-color .2s, box-shadow .2s;
+  cursor: pointer;
+}
+
+.time-input:hover {
+  border-color: #4a90e2;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, .15);
+}
+
+.time-input::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 </style>

@@ -2,6 +2,7 @@ import { ref, watch, Ref } from "vue";
 import { getSecondesFromDate } from "../utils";
 import { AudioManager } from "../audio";
 import { Desserte, Line, StopWithTime } from "../types";
+import { useClock } from "./useClock";
 
 export type ScreenState = "NO_DATA" | "NO_TRIP_DATA_AVAILABLE" | "FIRST_STOP" | "AT_STOP" | "NOT_AT_STOP" | "LAST_STOP" | "NOT_IN_SERVICE";
 
@@ -73,9 +74,9 @@ export function useScreenState(
     if (state.value === "FIRST_STOP") {
       forcedState.value = "NOT_AT_STOP";
       if (currentStop.value) {
-        const past = new Date();
+        const past = useClock().now.value;
         past.setSeconds(past.getSeconds() - 5);
-        currentStop.value.timeOfArrival = new Date().toISOString()
+        currentStop.value.timeOfArrival = useClock().now.value.toISOString();
         currentStop.value.timeOfDeparture = past.toISOString();
       }
       setTimeout(() => { desserte.value.stops.shift(); }, 2000);
@@ -87,9 +88,9 @@ export function useScreenState(
     } else if (state.value === "AT_STOP") {
       const currentIsTerminus = currentStop.value?.isTerminus;
       if (currentStop.value) {
-        const past = new Date();
+        const past = useClock().now.value;
         past.setSeconds(past.getSeconds() - 5);
-        currentStop.value.timeOfArrival = new Date().toISOString()
+        currentStop.value.timeOfArrival = useClock().now.value.toISOString(); 
         currentStop.value.timeOfDeparture = past.toISOString();
       }
 
