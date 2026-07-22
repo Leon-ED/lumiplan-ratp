@@ -12,7 +12,7 @@ const routes = [
   },
   {
     name: "Editor",
-    path: "/editor",
+    path: "/editor/:line?/:trip?",
     component: Editor,
   },
 ];

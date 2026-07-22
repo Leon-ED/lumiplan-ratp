@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import {
   Desserte,
   DesserteWithLine,
@@ -8,6 +8,7 @@ import {
   Mode,
   SaveFile,
   StopWithTime,
+  SaveInfoTrafic,
 } from "../types";
 import LineEditorModal from "../components/Editor/LineEditorModal.vue";
 import StopEditorModal from "../components/Editor/StopEditorModal.vue";
@@ -15,11 +16,15 @@ import EditorSidebar from "../components/Editor/EditorSidebar.vue";
 import ApiImportJourneyModal from "../components/Editor/ApiImportJourneyModal.vue";
 import EditorStopList from "../components/Editor/EditorStopList.vue";
 import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue";
-import { sortedLines } from "../utils";
 import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
-import { SaveInfoTrafic } from "../types"; // Assurez-vous d'importer le type
+import { sortedLines } from "../utils";
+import { Api } from "../api.ts";
+
 const messages = ref<SaveInfoTrafic[]>([]);
 const router = useRouter();
+const route = useRoute();
+
+const isLoading = ref(false);
 
 const defaultLine: Line = {
   id: "editor-made-line",
@@ -63,12 +68,8 @@ const selectedLineInModal = ref<Line | null>(null);
 const selectedStopInModal = ref<StopWithTime | null>(null);
 const lineModalRef = ref<InstanceType<typeof LineEditorModal> | null>(null);
 const stopModalRef = ref<InstanceType<typeof StopEditorModal> | null>(null);
-const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(
-  null,
-);
-const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(
-  null,
-);
+const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(null);
+const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(null);
 
 const sortedStops = computed(() => {
   return desserteWithLine.value.desserte.stops;
@@ -137,6 +138,7 @@ const addStop = () => {
   });
   normalizeStopFlags();
 };
+
 const addTimeToDate = (
   isoString: string,
   additionalSeconds: number,
@@ -147,6 +149,7 @@ const addTimeToDate = (
   console.log("New date after adding time:", date.toISOString());
   return date.toISOString();
 };
+
 const handleSelectBaseLine = (lineId: string) => {
   const selectedBaseLine = lines.value.find((l) => l.id === lineId);
   if (selectedBaseLine) {
@@ -253,6 +256,7 @@ const copyToClipboard = async () => {
 const openApiModal = () => {
   apiModalRef.value?.open();
 };
+
 const moveUpStop = (stop: StopWithTime) => {
   const index = desserteWithLine.value.desserte.stops.findIndex(
     (s) => s.stop.id === stop.stop.id,
@@ -263,6 +267,7 @@ const moveUpStop = (stop: StopWithTime) => {
     normalizeStopFlags();
   }
 };
+
 const moveDownStop = (stop: StopWithTime) => {
   const index = desserteWithLine.value.desserte.stops.findIndex(
     (s) => s.stop.id === stop.stop.id,
@@ -290,6 +295,7 @@ const downloadJson = () => {
     alert("Impossible de télécharger.");
   }
 };
+
 const AUTOSAVE_KEY = "lumiplan_editor_autosave_data";
 const isReadyForAutosave = ref(false);
 
@@ -305,6 +311,7 @@ const launchScreen = () => {
   });
   window.open(routeData.href, "_blank");
 };
+
 const deleteStop = (stop: StopWithTime) => {
   desserteWithLine.value.desserte.stops =
     desserteWithLine.value.desserte.stops.filter(
@@ -313,23 +320,42 @@ const deleteStop = (stop: StopWithTime) => {
   normalizeStopFlags();
 };
 
-onMounted(() => {
-  const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
-  if (autosaveData) {
+onMounted(async () => {
+  const lineId = route.query.line as string;
+  const tripId = route.query.trip as string;
+
+  if (lineId && tripId) {
+    isLoading.value = true;
     try {
-      const parsedData = JSON.parse(autosaveData) as SaveFile;
-      if (
-        parsedData?.header &&
-        Array.isArray(parsedData.lines) &&
-        parsedData.journey
-      ) {
-        autosaveModalRef.value?.open(parsedData);
+      const response = await Api.getJourney(tripId);
+      if (!response) {
+        return;
       }
-    } catch (e) {
-      console.error(
-        "Erreur lors de la lecture de la sauvegarde automatique.",
-        e,
-      );
+      handleApiImport(response);
+      handleSelectBaseLine(lineId);
+    } catch (error) {
+      console.error("Erreur réseau lors de la récupération du trip:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  } else {
+    const autosaveData = localStorage.getItem(AUTOSAVE_KEY);
+    if (autosaveData) {
+      try {
+        const parsedData = JSON.parse(autosaveData) as SaveFile;
+        if (
+          parsedData?.header &&
+          Array.isArray(parsedData.lines) &&
+          parsedData.journey
+        ) {
+          autosaveModalRef.value?.open(parsedData);
+        }
+      } catch (e) {
+        console.error(
+          "Erreur lors de la lecture de la sauvegarde automatique.",
+          e,
+        );
+      }
     }
   }
 
@@ -339,13 +365,14 @@ onMounted(() => {
 });
 
 watch(
-  () => [desserteWithLine.value, _lines.value, saveFileName.value],
+  () => [desserteWithLine.value, _lines.value, saveFileName.value, messages.value],
   () => {
     if (!isReadyForAutosave.value) return;
     localStorage.setItem(AUTOSAVE_KEY, getExportData());
   },
   { deep: true },
 );
+
 const deleteLine = (line: Line) => {
   _lines.value = _lines.value.filter((l) => l.id !== line.id);
 };
@@ -365,7 +392,14 @@ const deleteLine = (line: Line) => {
       @restore="handleAutosaveRestore"
     />
 
-    <div class="editor-layout">
+    <!-- Écran de chargement -->
+    <div v-if="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement du service depuis l'API...</p>
+    </div>
+
+    <!-- Interface Éditeur -->
+    <div v-else class="editor-layout">
       <header class="page-header">
         <div class="header-titles">
           <h1>Éditeur de Services</h1>
@@ -393,7 +427,6 @@ const deleteLine = (line: Line) => {
           @delete-line="deleteLine"
         />
 
-        <!-- NOUVEAU CONTENEUR pour la colonne de droite -->
         <div class="editor-main-column">
           <EditorStopList
             :desserteWithLine="desserteWithLine"
@@ -499,5 +532,38 @@ const deleteLine = (line: Line) => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+
+/* Spinner and loading states */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(0, 123, 255, 0.15);
+  border-bottom-color: #007bff;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

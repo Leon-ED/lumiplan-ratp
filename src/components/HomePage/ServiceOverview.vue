@@ -55,11 +55,18 @@
       <RouterLink
         :to="{
           name: 'DesserteDetails',
-          query: { line: line.id,trip: desserte.id },
-        }">
-      <div class="go-button">
-        GO
-      </div>
+          query: { line: line.id, trip: desserte.id },
+        }"
+      >
+        <div class="go-button">GO</div>
+      </RouterLink>
+      <RouterLink
+        :to="{
+          name: 'Editor',
+          query: { line: line.id, trip: desserte.id },
+        }"
+      >
+        <div class="edit-button">Éditer</div>
       </RouterLink>
     </div>
   </div>
@@ -75,10 +82,8 @@ const props = defineProps<{
   desserte: Desserte;
 }>();
 const status = computed(() => {
-  // If the first stop has the firstStop flag then
   const minutes = getMinutesFromDate(props.desserte.stops[0].timeOfArrival);
   if (props.desserte.stops[0].isFirstStop) {
-    // if minutes <= 0 then say "Départ imminent"
     if (minutes <= 0) {
       return "⌛️ Départ imminent de " + props.desserte.stops[0].stop.name;
     }
@@ -116,7 +121,7 @@ const status = computed(() => {
   margin: 0;
   margin-top: 1em;
 }
-a{
+a {
   height: fit-content;
 }
 
@@ -128,7 +133,6 @@ a{
 .skipped-stop {
   opacity: 0.5;
 }
-/* --- Visuel --- */
 .stop-visual {
   display: flex;
   flex-direction: column;
@@ -151,7 +155,7 @@ a{
   padding: 10px;
   border-radius: 5px;
   display: grid;
-  grid-template-columns: 80% 20%;
+  grid-template-columns: 75% 25%;
   background-color: #f9f9f9;
 }
 .desserte-overview-content {
@@ -161,8 +165,19 @@ a{
 }
 .go-to-screen {
   display: flex;
+  flex-direction: row;
+  gap: 10px;
   justify-content: center;
   padding-top: 20%;
+}
+.edit-button {
+  background-color: #dc9600;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
 }
 .go-button {
   background-color: #2cbf53;
@@ -173,14 +188,14 @@ a{
   cursor: pointer;
   user-select: none;
 }
-  a::visited {
+a::visited {
   text-decoration: none;
   color: white;
-  }
-  a{
-    text-decoration: none;
-    color: white;
-  }
+}
+a {
+  text-decoration: none;
+  color: white;
+}
 
 .dot {
   width: 12px;
