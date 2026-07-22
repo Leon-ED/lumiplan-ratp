@@ -41,6 +41,7 @@
 
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
+      :is-limited-service="desserte.isLimitedService"
       :line="line!"
       :is-at-stop="state === 'AT_STOP'"
       @click="emitEvent('toggle-full-screen')"
@@ -85,6 +86,7 @@
           />
           <TripUnavailable
             v-else-if="state === 'NO_TRIP_DATA_AVAILABLE'"
+            :is-limited-service="desserte?.isLimitedService ?? false"
             class="foreground-panel"
             :line="line!"
           />

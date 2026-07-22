@@ -19,6 +19,7 @@ export class Api {
       const journeyData: any = await response.json();
       const desserte: Desserte = {
         id: journeyData.journeyId,
+        isLimitedService:false,
         direction: journeyData.directionName,
         stops: journeyData.stops.map((stop: any) => ({
           stop: {
@@ -68,6 +69,7 @@ export class Api {
       for (const vehicle of vehiclesData.journeys) {
         const desserte: Desserte = {
           id: vehicle.journeyId,
+          isLimitedService: vehicle.isLimitedService,
           direction: vehicle.directionName,
           stops: vehicle.stops.map((stop: any) => ({
             stop: {

@@ -14,6 +14,7 @@ interface Props {
   size?: string;
   fontSize?: string;
   logoStyle?: string;
+  blink?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -176,6 +177,7 @@ const lineLogoComponent = computed(() => {
       "
       :data-line-id="cleanId(props.line.id)"
       :lineName="props.line.name"
+      :blink="props.blink"
       :height="props.size ? props.size : '100%'"
       :bgColor="props.line.color"
       :base-font-size="fontSize"
@@ -192,6 +194,7 @@ const lineLogoComponent = computed(() => {
         props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
       "
       :data-line-id="cleanId(props.line.id)"
+      :blink="props.blink"
       :lineName="props.line.name"
       :height="props.size ? props.size : '100%'"
       :bgColor="props.line.color"

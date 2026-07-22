@@ -6,7 +6,7 @@ export function useJourneyData(
   routeLineId: string | null,
   routeTripId: string | null,
 ) {
-  const fakeDesserte: Desserte = { direction: "", id: "", stops: [] };
+  const fakeDesserte: Desserte = { direction: "", id: "", stops: [], isLimitedService: false };
   const desserte = ref<Desserte>(fakeDesserte);
   const line = ref<Line | null>(null);
   const INFOS_TRAFFICMessages = ref<InfoTraffic[]>([]);

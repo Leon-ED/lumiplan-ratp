@@ -3,6 +3,7 @@ import { Line } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 defineProps<{
   line: Line;
+  isLimitedService: boolean;
 }>();
 </script>
 
@@ -12,7 +13,7 @@ defineProps<{
       <span>Bienvenue</span>
       <div class="second-line">
         <span>sur la ligne</span>
-        <LineLogo :line="line" class-name="line-logo" size="6.3cqw" />
+        <LineLogo :line="line" class-name="line-logo" size="6.3cqw" :blink="isLimitedService"/>
       </div>
     </div>
     <aside class="aside">

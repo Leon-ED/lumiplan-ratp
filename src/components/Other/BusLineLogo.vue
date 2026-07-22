@@ -9,7 +9,16 @@
     :class="classes"
   >
     <g clip-path="url(#clip0_28_16)">
+      <!-- Fond principal -->
       <rect width="3016" height="1939" :fill="bgColor" />
+      
+      <!-- Triangle de service partiel / clignotant -->
+      <polygon
+        v-if="blink"
+        points="0,1939 3016,0 3016,1939"
+        class="blink-triangle"
+      />
+
       <text
         x="50%"
         :y="wrappedLines.length > 1 ? '30%' : '50%'"
@@ -41,12 +50,14 @@ interface Props {
   baseFontSize?: string;
   bgColor: string;
   textColor: string;
+  blink?: boolean;
   style?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   baseFontSize: "1400",
   style: "RATP",
+  blink: false,
 });
 
 const style = computed(() => ({
@@ -58,7 +69,7 @@ const classes = computed(() => ({
   chars_3: props.lineName.length <= 3,
   chars_4: props.lineName.length === 4,
   more4chars: props.lineName.length > 4,
-  "idfm-style": props.style === "IDFM",
+  blink: props.blink,
 }));
 
 const getFontSize = (length: number): number => {
@@ -125,8 +136,18 @@ svg.more4chars text {
   overflow-wrap: break-word;
   text-overflow: ellipsis;
 }
-svg.idfm-style {
-  font-family: "IDFMMedium" !important;
-  border-radius: 10% !important;
+.blink-triangle {
+  fill: #ffffff;
+  fill-opacity: 0.7;
+  animation: blink-animation 2s infinite;
+}
+
+@keyframes blink-animation {
+  0%, 49.99% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
 }
 </style>

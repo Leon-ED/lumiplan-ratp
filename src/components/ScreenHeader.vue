@@ -5,7 +5,7 @@
       :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
       class="mode-picto"
     />
-    <LineLogo v-if="line" :line="line" class-name="picto" size="100%" />
+    <LineLogo v-if="line" :line="line" class-name="picto" size="100%" :blink="isLimitedService" />
 
     <TransitionGroup name="slide" tag="div" class="direction">
       <span v-if="isAtStop" class="direction-label" key="label">Direction</span>
@@ -25,6 +25,7 @@ import Clock from "./Other/Clock.vue";
 defineProps<{
   direction: string;
   line: Line;
+  isLimitedService: boolean;
   isAtStop: boolean;
 }>();
 

@@ -39,6 +39,7 @@ const exportToPDF = () => {
         <div class="print-direction">
           <LineLogo
             :line="desserteWithLine.line"
+            :blink="desserteWithLine.desserte.isLimitedService"
             class-name="line-logo"
             size="4rem"
           />
@@ -69,6 +70,7 @@ const exportToPDF = () => {
             >
               <LineLogo
                 :line="desserteWithLine.line"
+                :blink="desserteWithLine.desserte.isLimitedService"
                 class-name="line-logo"
                 size="2.5rem"
               />
@@ -102,6 +104,16 @@ const exportToPDF = () => {
             v-model="desserteWithLine.desserte.direction"
             placeholder="Ex: Gare de Lyon"
           />
+          
+          <!-- Ajout de la case à cocher Service Partiel -->
+          <label class="checkbox-label" for="is-limited-service">
+            <input
+              id="is-limited-service"
+              type="checkbox"
+              v-model="desserteWithLine.desserte.isLimitedService"
+            />
+            Service Partiel
+          </label>
         </div>
       </div>
 
@@ -195,12 +207,16 @@ const exportToPDF = () => {
 }
 .service-config {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Changé de center à flex-start pour aligner en haut avec la checkbox */
   gap: 10px;
 }
 @media (max-width: 600px) {
   .service-config {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+  .direction {
+    margin-left: 0 !important;
+    width: 100%;
   }
 }
 .field-group {
@@ -208,7 +224,7 @@ const exportToPDF = () => {
   flex-direction: column;
   gap: 8px;
 }
-.field-group label {
+.field-group label:not(.checkbox-label) {
   font-size: 0.9rem;
   font-weight: 600;
   color: #555;
@@ -229,6 +245,27 @@ input[type="text"] {
 input[type="text"]:focus {
   border-color: #007bff;
   background-color: #fff;
+}
+
+/* Nouveaux styles pour la checkbox */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 0.9rem;
+  font-weight: 500 !important;
+  color: #333;
+  cursor: pointer;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #007bff;
 }
 
 .operated-line-selector {
@@ -283,8 +320,8 @@ input[type="text"]:focus {
 }
 .direction {
   margin-left: auto;
+  min-width: 250px;
 }
-
 </style>
 
 <style lang="css">

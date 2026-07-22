@@ -24,6 +24,7 @@ export interface DesserteWithLine {
 export interface Desserte {
   id: string;
   direction: string;
+  isLimitedService: boolean;
   stops: StopWithTime[];
 }
 export interface InfoTraffic {
