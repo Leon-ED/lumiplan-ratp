@@ -255,18 +255,23 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(async () => {
   window.addEventListener("keydown", handleKeydown);
   if (route.query.loadSave) {
-   loadSaveModalRef.value?.loadAutosave();
+    loadSaveModalRef.value?.loadAutosave();
   }
   if (!isUsingLocalSave.value && route.query.line && route.query.trip) {
     isAutoPassStops.value = true;
     await fetchLineData();
     await fetchJourneyData();
   }
+  const safeFetchInfosTraffic = () => {
+    if (!isUsingLocalSave.value) {
+      fetchInfosTrafficMessages();
+    }
+  };
 
-  fetchInfosTrafficMessages();
   useIntervalFn(updateState, 1_000);
   scheduleNextRotation();
-  useIntervalFn(fetchInfosTrafficMessages, 3 * 60 * 1000, {
+
+  useIntervalFn(safeFetchInfosTraffic, 3 * 60 * 1000, {
     immediate: true,
   });
 });
@@ -322,7 +327,7 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   display: grid;
-  grid-template-rows: 6.25cqw 1fr; 
+  grid-template-rows: 6.25cqw 1fr;
   font-size: 3cqmin;
   container-type: inline-size;
   position: relative;

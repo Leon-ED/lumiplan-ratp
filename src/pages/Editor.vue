@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
-import { useRouter } from "vue-router"; 
+import { useRouter } from "vue-router";
 import {
   Desserte,
   DesserteWithLine,
@@ -14,10 +14,12 @@ import StopEditorModal from "../components/Editor/StopEditorModal.vue";
 import EditorSidebar from "../components/Editor/EditorSidebar.vue";
 import ApiImportJourneyModal from "../components/Editor/ApiImportJourneyModal.vue";
 import EditorStopList from "../components/Editor/EditorStopList.vue";
-import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue"; 
+import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue";
 import { sortedLines } from "../utils";
-
-const router = useRouter(); 
+import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
+import { SaveInfoTrafic } from "../types"; // Assurez-vous d'importer le type
+const messages = ref<SaveInfoTrafic[]>([]);
+const router = useRouter();
 
 const defaultLine: Line = {
   id: "editor-made-line",
@@ -47,8 +49,7 @@ const defaultDesserte: DesserteWithLine = {
   desserte: {
     id: "editor-made-journey",
     direction: "Ma direction",
-    stops: [
-    ],
+    stops: [],
   },
 };
 
@@ -61,13 +62,16 @@ const selectedLineInModal = ref<Line | null>(null);
 const selectedStopInModal = ref<StopWithTime | null>(null);
 const lineModalRef = ref<InstanceType<typeof LineEditorModal> | null>(null);
 const stopModalRef = ref<InstanceType<typeof StopEditorModal> | null>(null);
-const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(null);
-const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(null);
+const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(
+  null,
+);
+const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(
+  null,
+);
 
 const sortedStops = computed(() => {
   return desserteWithLine.value.desserte.stops;
 });
-
 
 const normalizeStopFlags = () => {
   const stops = desserteWithLine.value.desserte.stops;
@@ -78,9 +82,12 @@ const normalizeStopFlags = () => {
 
     if (index > 0) {
       const travelTime = Math.max(stop.travelTime || 60, 20);
-      stop.travelTime = travelTime; 
-      
-      stop.timeOfArrival = addTimeToDate(stops[index - 1].timeOfDeparture || new Date().toISOString(), travelTime);
+      stop.travelTime = travelTime;
+
+      stop.timeOfArrival = addTimeToDate(
+        stops[index - 1].timeOfDeparture || new Date().toISOString(),
+        travelTime,
+      );
       stop.timeOfDeparture = addTimeToDate(stop.timeOfArrival, 20);
     }
   });
@@ -110,9 +117,12 @@ const addLine = () =>
   });
 
 const addStop = () => {
-  const lastDate = desserteWithLine.value.desserte.stops.length > 0
-    ? desserteWithLine.value.desserte.stops[desserteWithLine.value.desserte.stops.length - 1].timeOfDeparture
-    : new Date().toISOString();
+  const lastDate =
+    desserteWithLine.value.desserte.stops.length > 0
+      ? desserteWithLine.value.desserte.stops[
+          desserteWithLine.value.desserte.stops.length - 1
+        ].timeOfDeparture
+      : new Date().toISOString();
 
   desserteWithLine.value.desserte.stops.push({
     ...defaultStop,
@@ -126,13 +136,16 @@ const addStop = () => {
   });
   normalizeStopFlags();
 };
-const addTimeToDate = (isoString: string, additionalSeconds: number): string => {
+const addTimeToDate = (
+  isoString: string,
+  additionalSeconds: number,
+): string => {
   console.log("Adding time:", additionalSeconds, "seconds to", isoString);
   const date = new Date(isoString);
   date.setSeconds(date.getSeconds() + additionalSeconds);
   console.log("New date after adding time:", date.toISOString());
   return date.toISOString();
-}
+};
 const handleSelectBaseLine = (lineId: string) => {
   const selectedBaseLine = lines.value.find((l) => l.id === lineId);
   if (selectedBaseLine) {
@@ -143,11 +156,12 @@ const handleSelectBaseLine = (lineId: string) => {
 const loadData = (parsedData: SaveFile, fallbackName: string) => {
   _lines.value = parsedData.lines;
   desserteWithLine.value = parsedData.journey;
+  messages.value = parsedData.messages || [];
   desserteWithLine.value.desserte.stops.forEach((stop: StopWithTime) => {
     stop.stop.connectedLines = lines.value.filter((line) =>
       stop.stop.connectedLines.some(
         (connectedLine) => connectedLine.id === line.id,
-      )
+      ),
     );
   });
   saveFileName.value = parsedData.header.name || fallbackName;
@@ -210,6 +224,7 @@ const getExportData = (): string =>
         name: saveFileName.value || "Sauvegarde",
       },
       lines: lines.value,
+      messages: messages.value,
       journey: {
         ...desserteWithLine.value,
         desserte: {
@@ -283,11 +298,17 @@ const handleAutosaveRestore = (parsedData: SaveFile) => {
 
 const launchScreen = () => {
   localStorage.setItem(AUTOSAVE_KEY, getExportData());
-  const routeData = router.resolve({ path: '/screen', query: { loadSave: 'true' } });
-  window.open(routeData.href, '_blank');
+  const routeData = router.resolve({
+    path: "/screen",
+    query: { loadSave: "true" },
+  });
+  window.open(routeData.href, "_blank");
 };
 const deleteStop = (stop: StopWithTime) => {
-  desserteWithLine.value.desserte.stops = desserteWithLine.value.desserte.stops.filter(s => s.stop.id !== stop.stop.id);
+  desserteWithLine.value.desserte.stops =
+    desserteWithLine.value.desserte.stops.filter(
+      (s) => s.stop.id !== stop.stop.id,
+    );
   normalizeStopFlags();
 };
 
@@ -304,7 +325,10 @@ onMounted(() => {
         autosaveModalRef.value?.open(parsedData);
       }
     } catch (e) {
-      console.error("Erreur lors de la lecture de la sauvegarde automatique.", e);
+      console.error(
+        "Erreur lors de la lecture de la sauvegarde automatique.",
+        e,
+      );
     }
   }
 
@@ -319,7 +343,7 @@ watch(
     if (!isReadyForAutosave.value) return;
     localStorage.setItem(AUTOSAVE_KEY, getExportData());
   },
-  { deep: true }
+  { deep: true },
 );
 const deleteLine = (line: Line) => {
   _lines.value = _lines.value.filter((l) => l.id !== line.id);
@@ -335,7 +359,10 @@ const deleteLine = (line: Line) => {
       :stop="selectedStopInModal"
     />
     <ApiImportJourneyModal ref="apiModalRef" @import="handleApiImport" />
-    <AutosaveRestoreModal ref="autosaveModalRef" @restore="handleAutosaveRestore" />
+    <AutosaveRestoreModal
+      ref="autosaveModalRef"
+      @restore="handleAutosaveRestore"
+    />
 
     <div class="editor-layout">
       <header class="page-header">
@@ -348,7 +375,6 @@ const deleteLine = (line: Line) => {
           Lancer l'écran
         </button>
       </header>
-
       <div class="editor-grid">
         <EditorSidebar
           :lines="lines"
@@ -366,18 +392,25 @@ const deleteLine = (line: Line) => {
           @delete-line="deleteLine"
         />
 
-        <EditorStopList
-          :desserteWithLine="desserteWithLine"
-          :sortedStops="sortedStops"
-          :allLines="lines"
-          @edit-operated-line="openLineEditorModal"
-          @add-stop="addStop"
-          @edit-stop="openStopEditorModal"
-          @delete-stop="deleteStop"
-          @select-base-line="handleSelectBaseLine"
-          @move-up="moveUpStop"
-          @move-down="moveDownStop"
-        />
+        <!-- NOUVEAU CONTENEUR pour la colonne de droite -->
+        <div class="editor-main-column">
+          <EditorStopList
+            :desserteWithLine="desserteWithLine"
+            :sortedStops="sortedStops"
+            :allLines="lines"
+            @edit-operated-line="openLineEditorModal"
+            @add-stop="addStop"
+            @edit-stop="openStopEditorModal"
+            @delete-stop="deleteStop"
+            @select-base-line="handleSelectBaseLine"
+            @move-up="moveUpStop"
+            @move-down="moveDownStop"
+          />
+          <EditorTrafficInfo
+            :messages="messages"
+            @update:messages="messages = $event"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -397,7 +430,7 @@ const deleteLine = (line: Line) => {
 }
 .page-header {
   margin-bottom: 32px;
-  display: flex; 
+  display: flex;
   justify-content: space-between;
   align-items: center;
 }
@@ -460,5 +493,10 @@ const deleteLine = (line: Line) => {
   .editor-grid {
     grid-template-columns: 1fr;
   }
+}
+.editor-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 </style>
