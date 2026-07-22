@@ -5,15 +5,16 @@ import { StopWithTime } from "../../types";
 import { useRotatedText } from "../../hooks/useRotatedText";
 import { NEXT_STOP_TEXTS, TERMINUS_TEXTS } from "../../translations";
 
-const props = defineProps<{ stops: StopWithTime[]; primaryColor: string }>();
+const props = defineProps<{ stops: StopWithTime[]; primaryColor: string;textColor: string }>();
 
 const terminusLabel = useRotatedText(TERMINUS_TEXTS);
 const nextStopLabel = useRotatedText(NEXT_STOP_TEXTS);
 
 const currentDescription = computed(() => {
-  if(props.stops.length === 0) return "";
-  const isTerminusScenario = props.stops[props.stops.length - 1].isTerminus && props.stops.length === 1;
-  
+  if (props.stops.length === 0) return "";
+  const isTerminusScenario =
+    props.stops[props.stops.length - 1].isTerminus && props.stops.length === 1;
+
   return isTerminusScenario ? terminusLabel.value : nextStopLabel.value;
 });
 
@@ -30,16 +31,26 @@ const getIndexForStop = (i: number) => {
   <div class="stops-list-container">
     <div class="next-stop-container" key="next-stop">
       <div class="next-stop-arrow-indicator">
-        <img
-          src="../../assets/img/down-arrow.png"
-          alt="arrow"
-          class="arrow-icon"
-        />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+        >
+          <path
+            d="M12 2V18M12 18L4 10M12 18L20 10"
+            :stroke="textColor"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </div>
-     <Transition name="text-translation-fade" mode="out-in">
-        <span 
-          :key="currentDescription" 
-          class="next-stop-description translation" 
+      <Transition name="text-translation-fade" mode="out-in">
+        <span
+          :key="currentDescription"
+          class="next-stop-description translation"
           v-html="currentDescription"
         ></span>
       </Transition>
@@ -74,8 +85,7 @@ const getIndexForStop = (i: number) => {
   flex-direction: column;
   justify-content: flex-start;
 
-  /* Largeur de la colonne de gauche contenant la ligne et les points */
-  --gutter-width: 6cqw; 
+  --gutter-width: 6cqw;
   --line-width: 2.2cqw;
 }
 
@@ -105,17 +115,17 @@ const getIndexForStop = (i: number) => {
 .stop-transition-move:nth-child(n + 3) {
   visibility: visible;
   transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-  transition-delay: .8s;
+  transition-delay: 0.8s;
 }
 
 .stops-list::before {
   content: "";
   position: absolute;
-  
+
   left: calc(var(--gutter-width) / 2);
   transform: translateX(-50%);
   width: var(--line-width);
-  
+
   top: -1000px;
   bottom: 0;
   height: 100000px;
@@ -125,9 +135,9 @@ const getIndexForStop = (i: number) => {
 
 .next-stop-container {
   position: relative;
-  margin-top: .5cqw;
+  margin-top: 0.5cqw;
   transition: opacity 0.5s ease;
-  display: flex; 
+  display: flex;
   align-items: center;
 }
 
@@ -135,13 +145,12 @@ const getIndexForStop = (i: number) => {
   width: var(--gutter-width);
   display: flex;
   z-index: 2;
-  justify-content: center; 
+  justify-content: center;
   flex-shrink: 0;
 }
 
 .arrow-icon {
   width: 1.3cqw;
-  fill: white;
   display: block;
 }
 
@@ -151,8 +160,10 @@ const getIndexForStop = (i: number) => {
   color: #212121;
   display: inline-block;
 }
-.stops-list-container:has(.stops-list .stop-transition-enter-active) .next-stop-container,
-.stops-list-container:has(.stops-list .stop-transition-leave-active) .next-stop-container {
+.stops-list-container:has(.stops-list .stop-transition-enter-active)
+  .next-stop-container,
+.stops-list-container:has(.stops-list .stop-transition-leave-active)
+  .next-stop-container {
   opacity: 0;
 }
 </style>

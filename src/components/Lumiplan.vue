@@ -57,6 +57,7 @@
           class="background-panel"
           :stops="desserte.stops"
           :primary-color="line?.color || '#000000'"
+          :text-color="line?.textColor || '#FFFFFF'"
         />
 
         <Transition name="slide-over">
