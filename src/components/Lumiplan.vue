@@ -55,7 +55,7 @@
         <StopList
           v-show="['FIRST_STOP', 'AT_STOP', 'NOT_AT_STOP'].includes(state)"
           class="background-panel"
-          :stops="desserte.stops"
+          :stops="displayedStops"
           :primary-color="line?.color || '#000000'"
           :text-color="line?.textColor || '#FFFFFF'"
         />
@@ -213,7 +213,14 @@ const handleSaveLoaded = (saveData: SaveFile) => {
   computeState();
   scheduleNextRotation();
 };
+const displayedStops = computed(() => {
+  const index = desserte.value.stops.findIndex(stop => stop.isTerminus);
+  if (index === -1) {
+    return desserte.value.stops;
+  }
 
+  return desserte.value.stops.slice(0, index + 1);
+});
 const updateState = () => {
   computeState();
 
