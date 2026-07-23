@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { DesserteWithLine, Line, StopWithTime } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 import EditorStopItem from "./EditorStopItem.vue";
 
-defineProps<{
+const props = defineProps<{
   desserteWithLine: DesserteWithLine;
   sortedStops: StopWithTime[];
   allLines: Line[];
@@ -18,7 +19,16 @@ const emit = defineEmits<{
   (e: "move-up", stop: StopWithTime): void;
   (e: "move-down", stop: StopWithTime): void;
 }>();
+const firstTerminusIndex = computed(() => {
+  return props.sortedStops.findIndex((stop) => stop.isTerminus);
+});
+const terminusCount = computed(() => {
+  return props.sortedStops.filter((stop) => stop.isTerminus).length;
+});
 
+const hasTooManyTerminuses = computed(() => {
+  return terminusCount.value > 2;
+});
 const onBaseLineChange = (event: Event) => {
   const select = event.target as HTMLSelectElement;
   emit("select-base-line", select.value);
@@ -44,11 +54,11 @@ const exportToPDF = () => {
             size="4rem"
           />
           <span class="origin">
-          {{
-            desserteWithLine.desserte.stops.length > 2
-              ? desserteWithLine.desserte.stops[0].stop.name
-              : ""
-          }}
+            {{
+              desserteWithLine.desserte.stops.length > 2
+                ? desserteWithLine.desserte.stops[0].stop.name
+                : ""
+            }}
           </span>
           <span class="print-arrow">➔</span>
           {{ desserteWithLine.desserte.direction || "Direction non définie" }}
@@ -104,7 +114,7 @@ const exportToPDF = () => {
             v-model="desserteWithLine.desserte.direction"
             placeholder="Ex: Gare de Lyon"
           />
-          
+
           <!-- Ajout de la case à cocher Service Partiel -->
           <label class="checkbox-label" for="is-limited-service">
             <input
@@ -122,20 +132,30 @@ const exportToPDF = () => {
       <div class="card-header">
         <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
         <div class="action-buttons no-print">
-          <button class="btn btn-outline" @click="exportToPDF">
-            PDF
-          </button>
+          <button class="btn btn-outline" @click="exportToPDF">PDF</button>
           <button class="btn btn-secondary" @click="emit('add-stop')">
             + Ajouter un arrêt
           </button>
         </div>
       </div>
-
+<div v-if="hasTooManyTerminuses" class="warning-alert no-print">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Vous avez défini {{ terminusCount }} terminus. Un service ne peut avoir au maximum qu'un seul terminus partiel et un terminus final.<br/> Terminus définis : {{ desserteWithLine.desserte.stops.filter(stop => stop.isTerminus).map(stop => stop.stop.name).join(', ') }}.
+      </div>
       <div class="thermometer-list">
         <EditorStopItem
           v-for="(stop, index) in sortedStops"
           :key="stop.stop.id"
           :is-first-stop="index === 0"
+          :is-last-stop="index === sortedStops.length - 1"
+          :is-after-partial-terminus="
+            firstTerminusIndex !== -1 && index > firstTerminusIndex
+          "
+          :partial-terminus-index="firstTerminusIndex"
           :stop="stop"
           :route="desserteWithLine.line"
           @edit-stop="emit('edit-stop', stop)"
@@ -346,7 +366,7 @@ input[type="text"]:focus {
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 20px; 
+    padding: 20px;
     box-shadow: none !important;
     border: none !important;
     background: white !important;
@@ -379,5 +399,25 @@ input[type="text"]:focus {
   .thermometer-list {
     page-break-inside: auto;
   }
+}
+/* Styles pour l'alerte des terminus */
+.warning-alert {
+  background-color: #fcf1f1;
+  color: #dc3545;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c2c7;
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+}
+
+.warning-alert svg {
+  flex-shrink: 0;
+  color: #dc3545;
 }
 </style>

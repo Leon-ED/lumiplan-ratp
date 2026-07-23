@@ -80,7 +80,6 @@ const normalizeStopFlags = () => {
   if (stops.length === 0) return;
   stops.forEach((stop, index) => {
     stop.isFirstStop = index === 0;
-    stop.isTerminus = index === stops.length - 1;
 
     if (index > 0) {
       const travelTime = Math.max(stop.travelTime || 60, 20);

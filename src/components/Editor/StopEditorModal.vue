@@ -20,14 +20,22 @@ const close = () => {
 
 const extractTime = (isoString: string) => {
   if (!isoString) return "12:00:00";
-  return isoString.includes('T') ? isoString.split('T')[1].substring(0, 8) : isoString;
+  return isoString.includes("T")
+    ? isoString.split("T")[1].substring(0, 8)
+    : isoString;
 };
 
-const updateTime = (field: 'timeOfArrival' | 'timeOfDeparture', timeValue: string) => {
+const updateTime = (
+  field: "timeOfArrival" | "timeOfDeparture",
+  timeValue: string,
+) => {
   if (!props.stop) return;
   const currentVal = props.stop[field];
-  const baseDate = currentVal && currentVal.includes('T') ? currentVal.split('T')[0] : new Date().toISOString().split('T')[0];
-  
+  const baseDate =
+    currentVal && currentVal.includes("T")
+      ? currentVal.split("T")[0]
+      : new Date().toISOString().split("T")[0];
+
   props.stop[field] = `${baseDate}T${timeValue}`;
 };
 
@@ -71,22 +79,32 @@ defineExpose({
         <template v-if="stop.isFirstStop">
           <div class="field-group">
             <label for="stop-time">Heure d'arrivée</label>
-            <input 
-              type="time" 
-              id="stop-time" 
-              step="1" 
+            <input
+              type="time"
+              id="stop-time"
+              step="1"
               :value="extractTime(stop.timeOfArrival)"
-              @input="updateTime('timeOfArrival', ($event.target as HTMLInputElement).value)" 
+              @input="
+                updateTime(
+                  'timeOfArrival',
+                  ($event.target as HTMLInputElement).value,
+                )
+              "
             />
           </div>
           <div class="field-group">
             <label for="stop-time-departure">Heure de départ</label>
-            <input 
-              type="time" 
-              id="stop-time-departure" 
-              step="1" 
+            <input
+              type="time"
+              id="stop-time-departure"
+              step="1"
               :value="extractTime(stop.timeOfDeparture)"
-              @input="updateTime('timeOfDeparture', ($event.target as HTMLInputElement).value)" 
+              @input="
+                updateTime(
+                  'timeOfDeparture',
+                  ($event.target as HTMLInputElement).value,
+                )
+              "
             />
           </div>
         </template>
@@ -94,12 +112,14 @@ defineExpose({
         <!-- Pour les autres arrêts : Temps de trajet -->
         <template v-else>
           <div class="field-group">
-            <label for="stop-travel-time">Temps de trajet depuis l'arrêt précédent (sec)</label>
-            <input 
-              type="number" 
-              id="stop-travel-time" 
-              v-model.number="stop.travelTime" 
-              min="20" 
+            <label for="stop-travel-time"
+              >Temps de trajet depuis l'arrêt précédent (sec)</label
+            >
+            <input
+              type="number"
+              id="stop-travel-time"
+              v-model.number="stop.travelTime"
+              min="20"
               placeholder="Ex: 60"
             />
           </div>
@@ -110,6 +130,10 @@ defineExpose({
         <label class="checkbox-item">
           <input type="checkbox" v-model="stop.stop.isAccessible" />
           <span>Accès UFR</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" v-model="stop.isTerminus" />
+          <span>Terminus partiel</span>
         </label>
         <label class="checkbox-item">
           <input type="checkbox" v-model="stop.stop.hasGapWhenSteppingOff" />
@@ -277,7 +301,7 @@ input[type="time"]:focus {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 160px; 
+  max-height: 160px;
   overflow-y: auto;
   border: 1px solid #ddd;
   border-radius: 8px;

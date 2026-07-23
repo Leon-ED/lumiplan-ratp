@@ -7,6 +7,9 @@ import { sortedLines } from "../../utils";
 const props = defineProps<{
   stop: StopWithTime;
   isFirstStop: boolean;
+  isLastStop: boolean;
+  isAfterPartialTerminus: boolean;
+  partialTerminusIndex: number;
   route: Line;
 }>();
 
@@ -59,7 +62,7 @@ const processedConnections = computed(() =>
   <div
     class="thermometer-stop"
     :class="{
-      'is-skipped': stop.isStopSkipped,
+      'is-skipped': stop.isStopSkipped || isAfterPartialTerminus,
       'is-terminus': stop.isTerminus,
     }"
   >
@@ -127,7 +130,6 @@ const processedConnections = computed(() =>
           @click.stop="emit('edit-stop', stop)"
           class="stop-name"
           :class="{
-            'strike-through': stop.isStopSkipped,
             'invalid-stop': !stop.stop.name,
           }"
         >
@@ -148,11 +150,23 @@ const processedConnections = computed(() =>
           <span v-if="stop.isFirstStop" class="badge terminus"
             >Montée uniquement</span
           >
-          <span v-if="stop.isStopSkipped" class="badge terminus no-print"
+          <span
+            v-if="stop.isStopSkipped || isAfterPartialTerminus && !stop.isTerminus"
+            class="badge terminus no-print"
             ><i>Arrêt non desservi </i></span
           >
-          <span v-if="stop.isTerminus" class="badge terminus"
+          <span
+            v-if="stop.isTerminus && isLastStop && !isAfterPartialTerminus"
+            class="badge terminus"
             >Descente uniquement</span
+          >
+          <span
+            v-if="stop.isTerminus && isLastStop && isAfterPartialTerminus"
+            class="badge terminus"
+            ><i>Terminus non desservi</i></span
+          >
+          <span v-if="stop.isTerminus && !isLastStop" class="badge terminus"
+            >Terminus partiel</span
           >
         </span>
         <button
@@ -266,7 +280,6 @@ button:disabled {
   padding: 4px 8px;
 }
 
-/* Position de la ligne verticale ajustée à 102px pour compenser les boutons de déplacement */
 .thermometer-stop:not(:last-child)::after {
   content: "";
   position: absolute;
@@ -350,10 +363,7 @@ button:disabled {
   color: #212529;
   cursor: pointer;
 }
-.strike-through {
-  text-decoration: line-through;
-  color: #adb5bd;
-}
+
 .stop-landmark {
   font-size: 0.9rem;
   color: #6c757d;
@@ -401,6 +411,12 @@ button:disabled {
 }
 .is-skipped .stop-time {
   color: #adb5bd;
+}
+.is-skipped .stop-name {
+  text-decoration: line-through !important;
+  color: #adb5bd !important;
+  background-color: transparent !important;
+  opacity: 0.7;
 }
 .invalid-stop {
   color: crimson;
