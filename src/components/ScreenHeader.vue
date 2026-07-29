@@ -5,7 +5,7 @@
       :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
       class="mode-picto"
     />
-    <LineLogo v-if="line" :line="line" class-name="picto" size="100%" :blink="isLimitedService" />
+    <LineLogo v-if="line" :line="line" class-name="picto" class="line-logo" :size="logoSize" :blink="isLimitedService" />
 
     <TransitionGroup name="slide" tag="div" class="direction">
       <span v-if="isAtStop" class="direction-label" key="label">Direction</span>
@@ -18,23 +18,35 @@
 </template>
 
 <script setup lang="ts">
-import { Line } from "../types";
+import { Line, Mode } from "../types";
 import LineLogo from "./Other/LineLogo.vue";
 import Clock from "./Other/Clock.vue";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   direction: string;
   line: Line;
   isLimitedService: boolean;
   isAtStop: boolean;
 }>();
-
+const logoSize = computed(() => {
+  if ([Mode.BUS,Mode.NOCTILIEN].includes(props.line.mode)) {
+    return "80%";
+  }
+  return "100%";
+ 
+});
 
 </script>
 
 <style lang="scss" scoped>
 .header:hover{
   cursor: pointer;
+
+}
+.line-logo {
+  margin-top:auto;
+  margin-bottom:auto;
 
 }
 .no-data-available header,
