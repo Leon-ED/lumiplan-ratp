@@ -107,6 +107,11 @@
             :connections="currentConnections"
             key="connections"
           />
+          <Landmark
+            v-else-if="currentSlate?.type === 'LANDMARK'"
+            :landmark="currentStop?.stop.landmarkName!"
+            key="landmark"
+          />
 
           <Messages
             :withArrow="
@@ -147,6 +152,7 @@ import { useSlates } from "../composables/useSlates";
 import { SaveFile } from "../types";
 import { getSecondesFromDate } from "../utils";
 import SettingsModal from "./Other/SettingsModal.vue";
+import Landmark from "./SidePanel/Landmark.vue";
 
 defineProps<{
   fullScreen: boolean;
@@ -198,6 +204,8 @@ const { shouldShowSidePanel, currentSlate, scheduleNextRotation } = useSlates(
   displayedInfosTraffic,
   specialSkippedStopMessage,
   isApproachingStop,
+  currentStop,
+
 );
 
 const loadSaveModalRef = ref<InstanceType<typeof LoadSaveModal> | null>(null);
