@@ -98,16 +98,17 @@ body,
   }
 }
 .blink-text{
-  animation: blink-text 2s infinite;
+  animation: blink 2s step-start infinite;
 }
-@keyframes blink-text {
-  0%,
-  49% {
+@keyframes blink {
+  0% {
     opacity: 1;
   }
-  50%,
+  50% {
+    opacity: .3;
+  }
   100% {
-    opacity: .5;
+    opacity: 1;
   }
 }
 .text-translation-fade-enter-active,

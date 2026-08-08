@@ -23,7 +23,7 @@ const time = computed(() =>
 
 <style scoped>
 .divider {
-  animation: blink 1s step-start infinite;
+  animation: blink 2s step-start infinite;
 }
 
 @keyframes blink {
