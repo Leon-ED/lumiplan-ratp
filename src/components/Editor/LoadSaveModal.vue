@@ -29,6 +29,10 @@ const triggerFileInput = () => fileInputRef.value?.click();
 const processJson = (jsonString: string) => {
   try {
     const parsedData = JSON.parse(jsonString) as SaveFile;
+      const index = parsedData.journey.desserte.stops.findIndex(stop => stop.isTerminus);
+  if (index !== -1) {
+    parsedData.journey.desserte.stops = parsedData.journey.desserte.stops.slice(0, index + 1);
+  }
     if (parsedData?.header && parsedData?.journey) {
       emit("load", parsedData);
       close();
