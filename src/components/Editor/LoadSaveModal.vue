@@ -29,18 +29,26 @@ const triggerFileInput = () => fileInputRef.value?.click();
 const processJson = (jsonString: string) => {
   try {
     const parsedData = JSON.parse(jsonString) as SaveFile;
-      const index = parsedData.journey.desserte.stops.findIndex(stop => stop.isTerminus);
-  if (index !== -1) {
-    parsedData.journey.desserte.stops = parsedData.journey.desserte.stops.slice(0, index + 1);
-  }
+    const index = parsedData.journey.desserte.stops.findIndex(
+      (stop) => stop.isTerminus,
+    );
+    if (index !== -1) {
+      parsedData.journey.desserte.stops =
+        parsedData.journey.desserte.stops.slice(0, index + 1);
+    }
+    parsedData.journey.desserte.stops[
+      parsedData.journey.desserte.stops.length - 1
+    ].isTerminus = true;
     if (parsedData?.header && parsedData?.journey) {
       emit("load", parsedData);
       close();
     } else {
-      errorMessage.value = "Le fichier ne correspond pas au format de sauvegarde attendu.";
+      errorMessage.value =
+        "Le fichier ne correspond pas au format de sauvegarde attendu.";
     }
   } catch (error) {
-    errorMessage.value = "Impossible de lire les données JSON. Format invalide.";
+    errorMessage.value =
+      "Impossible de lire les données JSON. Format invalide.";
   }
 };
 
@@ -76,7 +84,10 @@ const onDrop = (event: DragEvent) => {
   event.preventDefault();
   isDragging.value = false;
   const file = event.dataTransfer?.files[0];
-  if (file && (file.type === "application/json" || file.name.endsWith(".json"))) {
+  if (
+    file &&
+    (file.type === "application/json" || file.name.endsWith(".json"))
+  ) {
     const reader = new FileReader();
     reader.onload = (e) => processJson(e.target?.result as string);
     reader.readAsText(file);
@@ -106,8 +117,17 @@ defineExpose({ open, close, loadAutosave });
           @click="triggerFileInput"
         >
           <span class="drop-icon">📂</span>
-          <p>Glissez votre fichier de sauvegarde <strong>JSON</strong> ici<br />ou cliquez pour parcourir.</p>
-          <input type="file" accept=".json" ref="fileInputRef" @change="handleFileUpload" hidden />
+          <p>
+            Glissez votre fichier de sauvegarde
+            <strong>JSON</strong> ici<br />ou cliquez pour parcourir.
+          </p>
+          <input
+            type="file"
+            accept=".json"
+            ref="fileInputRef"
+            @change="handleFileUpload"
+            hidden
+          />
         </div>
 
         <div v-if="hasAutosave" class="autosave-section">
@@ -181,7 +201,8 @@ defineExpose({ open, close, loadAutosave });
   background-color: #f8f9fa;
   transition: all 0.2s ease;
 }
-.drop-zone:hover, .drop-zone.is-dragging {
+.drop-zone:hover,
+.drop-zone.is-dragging {
   background-color: #e7f5ff;
   border-color: #007bff;
 }

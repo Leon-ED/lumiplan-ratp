@@ -68,8 +68,12 @@ const selectedLineInModal = ref<Line | null>(null);
 const selectedStopInModal = ref<StopWithTime | null>(null);
 const lineModalRef = ref<InstanceType<typeof LineEditorModal> | null>(null);
 const stopModalRef = ref<InstanceType<typeof StopEditorModal> | null>(null);
-const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(null);
-const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(null);
+const apiModalRef = ref<InstanceType<typeof ApiImportJourneyModal> | null>(
+  null,
+);
+const autosaveModalRef = ref<InstanceType<typeof AutosaveRestoreModal> | null>(
+  null,
+);
 
 const sortedStops = computed(() => {
   return desserteWithLine.value.desserte.stops;
@@ -80,7 +84,6 @@ const normalizeStopFlags = () => {
   if (stops.length === 0) return;
   stops.forEach((stop, index) => {
     stop.isFirstStop = index === 0;
-
     if (index > 0) {
       const travelTime = Math.max(stop.travelTime || 60, 20);
       stop.travelTime = travelTime;
@@ -118,14 +121,17 @@ const addLine = () =>
   });
 
 const addStop = () => {
+  const stops = desserteWithLine.value.desserte.stops;
   const lastDate =
-    desserteWithLine.value.desserte.stops.length > 0
-      ? desserteWithLine.value.desserte.stops[
-          desserteWithLine.value.desserte.stops.length - 1
-        ].timeOfDeparture
+    stops.length > 0
+      ? stops[stops.length - 1].timeOfDeparture
       : new Date().toISOString();
 
-  desserteWithLine.value.desserte.stops.push({
+  if (stops.length > 0) {
+    stops[stops.length - 1].isTerminus = false;
+  }
+
+  stops.push({
     ...defaultStop,
     stop: {
       ...defaultStop.stop,
@@ -134,6 +140,7 @@ const addStop = () => {
     travelTime: 60,
     timeOfDeparture: addTimeToDate(lastDate, 60),
     timeOfArrival: addTimeToDate(lastDate, 75),
+    isTerminus: true, 
   });
   normalizeStopFlags();
 };
@@ -364,7 +371,12 @@ onMounted(async () => {
 });
 
 watch(
-  () => [desserteWithLine.value, _lines.value, saveFileName.value, messages.value],
+  () => [
+    desserteWithLine.value,
+    _lines.value,
+    saveFileName.value,
+    messages.value,
+  ],
   () => {
     if (!isReadyForAutosave.value) return;
     localStorage.setItem(AUTOSAVE_KEY, getExportData());
