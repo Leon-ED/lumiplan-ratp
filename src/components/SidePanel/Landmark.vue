@@ -64,6 +64,7 @@ defineProps<{
 }
 .landmark-name {
     border-top: .2cqw solid white;
+    color: white;
     font-weight: bold;
     font-size: 2.5cqw;
     font-style: italic;
