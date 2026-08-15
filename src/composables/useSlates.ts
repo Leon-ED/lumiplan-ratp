@@ -9,11 +9,7 @@ const SLATE_DURATIONS = {
   LANDMARK: 5000,
 };
 
-type SlateType =
-  | "CONNECTIONS"
-  | "TRAVEL_TIME"
-  | "INFOS_TRAFFIC"
-  | "LANDMARK";
+type SlateType = "CONNECTIONS" | "TRAVEL_TIME" | "INFOS_TRAFFIC" | "LANDMARK";
 
 interface Slate {
   type: SlateType;
@@ -64,10 +60,7 @@ export function useSlates(
   const shouldShowSidePanel = computed(() => {
     if (isPostStopLocked.value || isApproachingStop.value) return false;
 
-    if (
-      state.value === "NOT_AT_STOP" &&
-      availableSlates.value.length > 0
-    ) {
+    if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0) {
       return true;
     }
 
@@ -111,7 +104,9 @@ export function useSlates(
 
     const canFit = (duration: number) =>
       duration + SAFETY_BUFFER < timeBudget * 1000;
-    const hasLandmark = !!nextStop.value?.stop.landmarkName;
+    const hasLandmark =
+      !!nextStop.value?.stop.landmarkName?.trim() &&
+      !nextStop.value.isStopSkipped;
     if (hasLandmark) {
       if (currentConnections.value.length > 0) {
         slates.push({
@@ -147,10 +142,7 @@ export function useSlates(
       });
     }
 
-    if (
-      hasTrafficMessages &&
-      canFit(SLATE_DURATIONS.INFOS_TRAFFIC)
-    ) {
+    if (hasTrafficMessages && canFit(SLATE_DURATIONS.INFOS_TRAFFIC)) {
       slates.push({
         type: "INFOS_TRAFFIC",
         duration: SLATE_DURATIONS.INFOS_TRAFFIC,
@@ -161,7 +153,7 @@ export function useSlates(
   });
 
   const currentSlate = computed(() => {
-    if (availableSlates.value.length === 0){
+    if (availableSlates.value.length === 0) {
       return null;
     }
 
@@ -184,8 +176,7 @@ export function useSlates(
 
     if (availableSlates.value.length <= 1) return;
 
-    currentSlateDuration.value =
-      currentSlate.value?.duration || 10000;
+    currentSlateDuration.value = currentSlate.value?.duration || 10000;
 
     startSlateTimer();
   };
@@ -200,10 +191,7 @@ export function useSlates(
       stopStopDisplay();
       startStopDisplay();
 
-      if (
-        oldState === "AT_STOP" ||
-        oldState === "FIRST_STOP"
-      ) {
+      if (oldState === "AT_STOP" || oldState === "FIRST_STOP") {
         isPostStopLocked.value = true;
 
         stopPostStopLock();
