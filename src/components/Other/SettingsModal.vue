@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useClock } from "../../composables/useClock";
+import { AudioManager } from "../../audio";
 
 const props = defineProps<{
   fullScreen: boolean;
@@ -50,7 +51,6 @@ const open = () => {
 const close = () => {
   dialogRef.value?.close();
 };
-
 defineExpose({ open, close });
 </script>
 
@@ -69,21 +69,31 @@ defineExpose({ open, close });
         />
         <span>Mode plein écran</span>
       </label>
-
       <label class="setting-item">
         <input type="checkbox" v-model="localAutoPass" />
         <span>Passage automatique des arrêts (basé sur l'heure)</span>
       </label>
-<label class="time-setting">
-  <span>Heure simulée</span>
+      <label class="setting-item">
+        <input
+          type="checkbox"
+          :checked="AudioManager.areSoundsEnabled()"
+          @change="
+            (p: Event) =>
+              AudioManager.toggleSounds((p.target as HTMLInputElement).checked)
+          "
+        />
+        <span>Activer les effets sonores</span>
+      </label>
+      <label class="time-setting">
+        <span>Heure simulée</span>
 
-  <input
-    type="time"
-    v-model="simulatedTime"
-    step="60"
-    class="time-input"
-  />
-</label>
+        <input
+          type="time"
+          v-model="simulatedTime"
+          step="60"
+          class="time-input"
+        />
+      </label>
     </div>
   </dialog>
 </template>
@@ -171,7 +181,9 @@ dialog.custom-modal::backdrop {
   font-family: inherit;
   background: white;
   color: #212529;
-  transition: border-color .2s, box-shadow .2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 }
 
@@ -182,7 +194,7 @@ dialog.custom-modal::backdrop {
 .time-input:focus {
   outline: none;
   border-color: #1976d2;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, .15);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
 }
 
 .time-input::-webkit-calendar-picker-indicator {

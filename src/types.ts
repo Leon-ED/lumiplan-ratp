@@ -69,3 +69,8 @@ export interface SaveFile {
   journey: DesserteWithLine;
   messages: SaveInfoTrafic[];
 }
+export interface PassengerMessage {
+  bgColor: string;
+  message: string;
+  audio?: string;
+}

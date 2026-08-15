@@ -26,6 +26,7 @@
 
   <div
     class="screen"
+    :data-state="state"
     :class="{
       'no-data-available': ['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(
         state,
@@ -46,9 +47,10 @@
       :is-at-stop="state === 'AT_STOP'"
       @click="emitEvent('toggle-full-screen')"
     />
+
     <main
       :class="{
-        'split-view': shouldShowSidePanel,
+        'split-view': shouldShowSidePanel || isDisplayingPassengerMessage,
       }"
     >
       <div class="main-panel-wrapper">
@@ -96,8 +98,14 @@
 
       <div class="side-panel">
         <Transition name="slide" mode="out-in">
+          <PassengerMessage
+            v-if="isDisplayingPassengerMessage && currentPassengerMessage"
+            :message="currentPassengerMessage"
+            :key="'passenger-msg-' + currentPassengerMessage.message"
+          />
+
           <ArrivingToIn
-            v-if="currentSlate?.type === 'TRAVEL_TIME'"
+            v-else-if="currentSlate?.type === 'TRAVEL_TIME'"
             :stops-list="importantStops"
             key="travel-time"
           />
@@ -107,6 +115,7 @@
             :connections="currentConnections"
             key="connections"
           />
+
           <Landmark
             v-else-if="currentSlate?.type === 'LANDMARK'"
             :landmark="currentStop?.stop.landmarkName!"
@@ -126,6 +135,30 @@
       </div>
     </main>
   </div>
+  <div class="message-triggers">
+    <button
+      v-for="n in 10"
+      :key="n"
+      @click="triggerMessage(n - 1)"
+      :title="`Lancer l'annonce ${n}`"
+    >
+      {{ n === 10 ? 0 : n }}
+    </button>
+    <button
+      @click="
+        AudioManager.toggleSounds(
+          AudioManager.areSoundsEnabled() ? false : true,
+        )
+      "
+      :title="
+        AudioManager.areSoundsEnabled()
+          ? 'Désactiver les sons'
+          : 'Activer les sons'
+      "
+    >
+      {{ AudioManager.areSoundsEnabled() ? "🔇" : "🔊" }}
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -143,16 +176,18 @@ import TripUnavailable from "./MainPanel/TripUnavailable.vue";
 import ArrivingToIn from "./SidePanel/ArrivingToIn.vue";
 import LinesConnection from "./SidePanel/LinesConnection.vue";
 import Messages from "./SidePanel/Messages.vue";
+import Landmark from "./SidePanel/Landmark.vue";
 import LoadSaveModal from "./Editor/LoadSaveModal.vue";
+import SettingsModal from "./Other/SettingsModal.vue";
 
 import { useJourneyData } from "../composables/useJourneyData";
 import { useScreenState } from "../composables/useScreenState";
 import { useSlates } from "../composables/useSlates";
-
+import { usePassengerMessages } from "../composables/usePassengerMessages";
 import { SaveFile } from "../types";
 import { getSecondesFromDate } from "../utils";
-import SettingsModal from "./Other/SettingsModal.vue";
-import Landmark from "./SidePanel/Landmark.vue";
+import PassengerMessage from "./SidePanel/PassengerMessage.vue";
+import { AudioManager } from "../audio.ts";
 
 defineProps<{
   fullScreen: boolean;
@@ -205,9 +240,12 @@ const { shouldShowSidePanel, currentSlate, scheduleNextRotation } = useSlates(
   specialSkippedStopMessage,
   isApproachingStop,
   currentStop,
-
 );
-
+const {
+  currentPassengerMessage,
+  isDisplayingPassengerMessage,
+  triggerMessage,
+} = usePassengerMessages();
 const loadSaveModalRef = ref<InstanceType<typeof LoadSaveModal> | null>(null);
 const settingsModalRef = ref<InstanceType<typeof SettingsModal> | null>(null);
 
@@ -221,6 +259,7 @@ const handleSaveLoaded = (saveData: SaveFile) => {
   computeState();
   scheduleNextRotation();
 };
+
 const updateState = () => {
   computeState();
 
@@ -332,7 +371,6 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
-
 .screen {
   height: 100%;
   width: 100%;
@@ -384,6 +422,40 @@ main.split-view {
   position: relative;
   background-color: #f4eeea;
   border-left: 2px solid var(--ratp-beige-dark);
+}
+.message-triggers {
+  position: fixed;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+.message-triggers:hover {
+  opacity: 0.8;
+}
+
+.message-triggers button {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-triggers button:hover {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: white;
 }
 .slide-up-enter-active,
 .slide-up-leave-active {

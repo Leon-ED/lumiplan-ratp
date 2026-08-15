@@ -7,7 +7,7 @@ import { AudioManager } from "../../audio";
 const { stopWithTime, lineId } = defineProps<{ stopWithTime: StopWithTime, lineId:string }>();
 onMounted(() => {
   setTimeout(() => {
-    AudioManager.playStop(lineId, stopWithTime.stop.parentId ?? stopWithTime.stop.id);
+    AudioManager.playStopName(lineId, stopWithTime.stop.parentId ?? stopWithTime.stop.id, stopWithTime.isTerminus);
   }, 1_000);
 });
 </script>

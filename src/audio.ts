@@ -1,21 +1,77 @@
+import { ref } from "vue";
 import { cleanId } from "./utils";
+
+const initialSoundState =
+  new URLSearchParams(window.location.search).get("sounds") === "true";
+const isSoundEnabledRef = ref(initialSoundState);
 
 export class AudioManager {
   static SOUND_DIR = "/audio";
 
+  static isSoundEnabled = isSoundEnabledRef;
+
+  static toggleSounds = (enabled: boolean) => {
+    isSoundEnabledRef.value = enabled;
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("sounds", enabled ? "true" : "false");
+    window.history.replaceState({}, "", url.toString());
+  };
+
   static areSoundsEnabled = (): boolean => {
-    return false;
-    const result = new URLSearchParams(window.location.search).get("sounds") === "true";
-    console.info('La fonctionnalité son est' + (result ? ' activée' : ' désactivée'));
+    const result = isSoundEnabledRef.value;
+    console.info(
+      "La fonctionnalité son est" + (result ? " activée" : " désactivée"),
+    );
     return result;
   };
-  static playStop = (lineId: string, stopId: string) => {
+
+  static playSound = (path: string, playOnEnd?: () => void) => {
+    if (!this.areSoundsEnabled()) {
+      return;
+    }
+
+    if (!path.startsWith(this.SOUND_DIR)) {
+      path = this.SOUND_DIR + "/" + path;
+    }
+
+    const audio = new Audio(path);
+
+    let callbackCalled = false;
+    const handleEnd = () => {
+      if (!callbackCalled) {
+        callbackCalled = true;
+        if (playOnEnd) playOnEnd();
+      }
+    };
+
+    audio.addEventListener("ended", handleEnd);
+
+    audio.addEventListener("error", handleEnd);
+
+    audio.play().catch((err) => {
+      console.warn(`Impossible de lire l'audio (${path}) :`, err);
+      handleEnd();
+    });
+  };
+  static playStopName = (
+    lineId: string,
+    stopId: string,
+    isTerminus: boolean,
+  ) => {
     if (!this.areSoundsEnabled()) return;
     const path =
       this.SOUND_DIR + `/${cleanId(lineId)}/stops/${cleanId(stopId)}.mp3`;
-    const audio = new Audio(path);
-    audio.play();
+
+    if (isTerminus) {
+      this.playSound(path, () => {
+        this.playFinalStop();
+      });
+    } else {
+      this.playSound(path);
+    }
   };
+
   static playDirection = (lineId: string, directionStopId: string) => {
     if (!this.areSoundsEnabled()) return;
 
@@ -23,16 +79,11 @@ export class AudioManager {
       this.SOUND_DIR +
       `/${cleanId(lineId)}/directions/${cleanId(directionStopId)}.mp3`;
 
-    const audio = new Audio(path);
-
-    audio.play();
-    audio.play();
+    this.playSound(path);
   };
 
-  static playFinalStop() {
+  static playFinalStop = () => {
     if (!this.areSoundsEnabled()) return;
-    //TODO: Not implemented
-    return;
-    new Audio(this.SOUND_DIR + `/final_stop.mp3`).play();
-  }
+    this.playSound(this.SOUND_DIR + `/generic/terminus.mp3`);
+  };
 }
