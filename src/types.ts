@@ -72,5 +72,6 @@ export interface SaveFile {
 export interface PassengerMessage {
   bgColor: string;
   message: string;
+  subText?: string;
   audio?: string;
 }

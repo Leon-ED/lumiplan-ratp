@@ -57,6 +57,8 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
     bgColor: "#FD8204",
     message:
       "Terminus,<br/>tous les voyageurs sont invités à descendre,<br/>merci.",
+    subText:
+      "This bus terminates here. <br/> Endhaltestelle. <br/> Fin de recorrido.",
     audio: "generic/terminus.mp3",
   },
 ];
