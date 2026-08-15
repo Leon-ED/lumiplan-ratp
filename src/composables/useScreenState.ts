@@ -4,18 +4,25 @@ import { AudioManager } from "../audio";
 import { Desserte, Line, StopWithTime } from "../types";
 import { useClock } from "./useClock";
 
-export type ScreenState = "NO_DATA" | "NO_TRIP_DATA_AVAILABLE" | "FIRST_STOP" | "AT_STOP" | "NOT_AT_STOP" | "LAST_STOP" | "NOT_IN_SERVICE";
+export type ScreenState =
+  | "NO_DATA"
+  | "NO_TRIP_DATA_AVAILABLE"
+  | "FIRST_STOP"
+  | "AT_STOP"
+  | "NOT_AT_STOP"
+  | "LAST_STOP"
+  | "NOT_IN_SERVICE";
 
 export function useScreenState(
   desserte: Ref<Desserte>,
   line: Ref<Line | null>,
-  currentStop: Ref<StopWithTime | null>
+  currentStop: Ref<StopWithTime | null>,
 ) {
   const state = ref<ScreenState>("NO_DATA");
   const isAutoPassStops = ref(true);
   const forcedState = ref<ScreenState | null>(null);
   const currentSecondsToArrival = ref<number>(9999);
-  
+
   let departingAudioPlayed = false;
 
   const computeState = () => {
@@ -29,7 +36,9 @@ export function useScreenState(
     }
 
     if (currentStop.value) {
-      currentSecondsToArrival.value = getSecondesFromDate(currentStop.value.timeOfArrival);
+      currentSecondsToArrival.value = getSecondesFromDate(
+        currentStop.value.timeOfArrival,
+      );
     }
 
     if (!isAutoPassStops.value && forcedState.value !== null) {
@@ -37,7 +46,11 @@ export function useScreenState(
       return;
     }
 
-    if (currentStop.value && currentStop.value.isFirstStop && currentSecondsToArrival.value >= -5) {
+    if (
+      currentStop.value &&
+      currentStop.value.isFirstStop &&
+      currentSecondsToArrival.value >= -5
+    ) {
       state.value = "FIRST_STOP";
     } else if (
       currentStop.value &&
@@ -46,14 +59,16 @@ export function useScreenState(
       getSecondesFromDate(currentStop.value.timeOfDeparture, true) >= -2
     ) {
       state.value = "AT_STOP";
-    } else if (
-      currentStop.value &&
-      currentStop.value.isTerminus &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -60 &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) <= 0
-    ) {
-      state.value = "NOT_IN_SERVICE";
-    } else {
+    }
+    // else if (
+    //   currentStop.value &&
+    //   currentStop.value.isTerminus &&
+    //   getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -60 &&
+    //   getSecondesFromDate(currentStop.value.timeOfArrival, true) <= 0
+    // ) {
+    //   state.value = "NOT_IN_SERVICE";
+    // }
+    else {
       state.value = "NOT_AT_STOP";
     }
 
@@ -79,35 +94,48 @@ export function useScreenState(
         currentStop.value.timeOfArrival = useClock().now.value.toISOString();
         currentStop.value.timeOfDeparture = past.toISOString();
       }
-      setTimeout(() => { desserte.value.stops.shift(); }, 2000);
+      setTimeout(() => {
+        desserte.value.stops.shift();
+      }, 2000);
       return;
     }
 
     if (state.value === "NOT_AT_STOP") {
       forcedState.value = "AT_STOP";
     } else if (state.value === "AT_STOP") {
-      const currentIsTerminus = currentStop.value?.isTerminus;
+      // const currentIsTerminus = currentStop.value?.isTerminus;
       if (currentStop.value) {
         const past = useClock().now.value;
         past.setSeconds(past.getSeconds() - 5);
-        currentStop.value.timeOfArrival = useClock().now.value.toISOString(); 
+        currentStop.value.timeOfArrival = useClock().now.value.toISOString();
         currentStop.value.timeOfDeparture = past.toISOString();
       }
 
-      setTimeout(() => { desserte.value.stops.shift(); }, 2000);
+      setTimeout(() => {
+        desserte.value.stops.shift();
+      }, 2000);
 
-      if (currentIsTerminus || desserte.value.stops.length === 0) {
-        forcedState.value = "NOT_IN_SERVICE";
-      } else {
-        forcedState.value = "NOT_AT_STOP";
-      }
+      // if (currentIsTerminus || desserte.value.stops.length === 0) {
+      //   forcedState.value = "NOT_IN_SERVICE";
+      // }
+      // else {
+      forcedState.value = "NO_TRIP_DATA_AVAILABLE";
+      // }
     }
   };
 
   watch(state, (newState) => {
-    if (newState === "FIRST_STOP" && !departingAudioPlayed && line.value && desserte.value.stops.length > 0) {
+    if (
+      newState === "FIRST_STOP" &&
+      !departingAudioPlayed &&
+      line.value &&
+      desserte.value.stops.length > 0
+    ) {
       const finalStop = desserte.value.stops[desserte.value.stops.length - 1];
-      AudioManager.playDirection(line.value.id, finalStop.stop.parentId ?? finalStop.stop.id);
+      AudioManager.playDirection(
+        line.value.id,
+        finalStop.stop.parentId ?? finalStop.stop.id,
+      );
       departingAudioPlayed = true;
     }
   });
