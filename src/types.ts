@@ -11,7 +11,7 @@ export interface Stop {
 export interface StopWithTime {
   stop: Stop;
   timeOfArrival: string;
-  timeOfDeparture:string;
+  timeOfDeparture: string;
   isTerminus: boolean;
   isFirstStop: boolean;
   isStopSkipped: boolean;
@@ -74,4 +74,9 @@ export interface PassengerMessage {
   message: string;
   subText?: string;
   audio?: string;
+}
+export interface Article {
+  title: string;
+  text: string;
+  images: string[];
 }

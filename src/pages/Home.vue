@@ -9,6 +9,9 @@
         </p>
       </div>
       <div class="actions-container">
+        <button class="news-btn" @click="isModalOpen = true">
+          <i class="bi bi-bell-fill"></i> Nouveautés !
+        </button>
         <button class="editor-btn" @click="openEditor">
           <i class="bi bi-pencil-fill"></i> Éditeur
         </button>
@@ -113,90 +116,33 @@
 
     <footer class="page-footer">
       <div class="social-links">
-        <a
-          href="https://twitter.com/gwadz_"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-twitter"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334q.002-.211-.006-.422A6.7 6.7 0 0 0 16 3.542a6.7 6.7 0 0 1-1.889.518 3.3 3.3 0 0 0 1.447-1.817 6.5 6.5 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.32 9.32 0 0 1-6.767-3.429 3.29 3.29 0 0 0 1.018 4.382A3.3 3.3 0 0 1 .64 6.575v.045a3.29 3.29 0 0 0 2.632 3.218 3.2 3.2 0 0 1-.865.115 3 3 0 0 1-.614-.057 3.28 3.28 0 0 0 3.067 2.277A6.6 6.6 0 0 1 .78 13.58a6 6 0 0 1-.78-.045A9.34 9.34 0 0 0 5.026 15"
-            />
-          </svg>
-          Twitter
-        </a>
-        <a
-          href="https://discord.gg/tPyPnxVuxQ"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-discord"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"
-            /></svg
-          >Discord
-        </a>
-        <a
-          href="https://leon.gp"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-globe-europe-africa"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M3.668 2.501l-.288.646a.847.847 0 0 0 1.479.815l.245-.368a.81.81 0 0 1 1.034-.275.81.81 0 0 0 .724 0l.261-.13a1 1 0 0 1 .775-.05l.984.34q.118.04.243.054c.784.093.855.377.694.801-.155.41-.616.617-1.035.487l-.01-.003C8.274 4.663 7.748 4.5 6 4.5 4.8 4.5 3.5 5.62 3.5 7c0 1.96.826 2.166 1.696 2.382.46.115.935.233 1.304.618.449.467.393 1.181.339 1.877C6.755 12.96 6.674 14 8.5 14c1.75 0 3-3.5 3-4.5 0-.262.208-.468.444-.7.396-.392.87-.86.556-1.8-.097-.291-.396-.568-.641-.756-.174-.133-.207-.396-.052-.551a.33.33 0 0 1 .42-.042l1.085.724c.11.072.255.058.348-.035.15-.15.415-.083.489.117.16.43.445 1.05.849 1.357L15 8A7 7 0 1 1 3.668 2.501"
-            /></svg
-          >Autres projets
-        </a>
-        <a
-          href="/about"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-info-circle-fill"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"
-            />
-          </svg>
-          A propos
-        </a>
+        <a href="https://twitter.com/gwadz_" target="_blank" rel="noopener noreferrer" class="social-link">Twitter</a>
+        <a href="https://discord.gg/tPyPnxVuxQ" target="_blank" rel="noopener noreferrer" class="social-link">Discord</a>
+        <a href="https://leon.gp" target="_blank" rel="noopener noreferrer" class="social-link">Autres projets</a>
+        <a href="/about" target="_blank" rel="noopener noreferrer" class="social-link">A propos</a>
       </div>
       <p class="disclaimer">
         Ce site n'est en aucun cas affilié, soutenu ou validé par Île-de-France
         Mobilités, Lumiplan ou la RATP.
       </p>
     </footer>
+    <Teleport to="body">
+      <div class="modal-backdrop" v-if="isModalOpen" @click="isModalOpen = false">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h2>Nouveautés !</h2>
+            <button class="close-btn" @click="isModalOpen = false">&times;</button>
+          </div>
+          <div class="modal-body">
+            <article class="article-item" v-for="(article, index) in articles" :key="index">
+              <h3 class="article-title">{{ article.title }}</h3>
+              <p class="article-text">{{ article.text }}</p>
+              <img v-for="(image, imgIndex) in article.images" :key="imgIndex" :src="image" :alt="article.title" class="article-image" />
+            </article>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </main>
 </template>
 
@@ -208,6 +154,7 @@ import { Api } from "../api";
 import QuickMode from "../components/HomePage/QuickMode.vue";
 import LineLogo from "../components/Other/LineLogo.vue";
 import ServiceOverview from "../components/HomePage/ServiceOverview.vue";
+import { articles } from "../articles.ts";
 
 const selectedLine = ref<Line | null>(null);
 const selectedDesserte = ref<Desserte | null>(null);
@@ -215,6 +162,7 @@ const dessertes = ref<Desserte[]>([]);
 const _search = ref("");
 const lines = ref<Line[]>([]);
 
+const isModalOpen = ref(false);
 type DESSERTE_SEARCH_STATUS =
   | "idle"
   | "loading"
@@ -320,6 +268,7 @@ watchDebounced(
   { debounce: 300 },
 );
 </script>
+
 <style scoped>
 main {
   display: flex;
@@ -370,6 +319,31 @@ main {
 
 .actions-container {
   flex-shrink: 0;
+  display: flex;
+  gap: 0.8em; 
+}
+
+.news-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background-color: #fff0f5;
+  color: #c2185b;
+  border: 1px solid #f8bbd0;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.news-btn:hover {
+  background-color: #c2185b;
+  color: white;
+  box-shadow: 0 4px 8px rgba(194, 24, 91, 0.2);
+  transform: translateY(-2px);
 }
 
 .editor-btn {
@@ -393,6 +367,93 @@ main {
   color: white;
   box-shadow: 0 4px 8px rgba(44, 162, 123, 0.2);
   transform: translateY(-2px);
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: min(90%, 500px);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5em;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #1a1a1a;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2em;
+  line-height: 1;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 1.5em;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.article-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+
+.article-title {
+  margin: 0;
+  font-size: 1.3em;
+  color: #005fad;
+}
+
+.article-text {
+  margin: 0;
+  color: #4a4a4a;
+  line-height: 1.5;
+}
+
+.article-image {
+  width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+  max-height: 200px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 section {
@@ -426,10 +487,6 @@ section {
   box-shadow: 0 4px 12px rgba(0, 95, 173, 0.15);
 }
 
-.search-input::placeholder {
-  color: #a0a0a0;
-}
-
 .modes {
   display: flex;
   gap: 0.8em;
@@ -448,9 +505,7 @@ section {
 }
 
 .line {
-  transition:
-    transform 0.2s ease,
-    opacity 0.3s ease;
+  transition: transform 0.2s ease, opacity 0.3s ease;
   cursor: pointer;
 }
 
@@ -523,18 +578,12 @@ section {
   text-decoration: none;
   font-weight: 600;
   font-size: 1.05em;
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .social-link:hover {
   opacity: 0.7;
   transform: translateY(-2px);
-}
-
-.social-link .bi {
-  font-size: 1.2em;
 }
 
 .disclaimer {
@@ -581,6 +630,46 @@ section {
   .editor-btn:hover {
     background-color: #10b981;
     color: #111827;
+  }
+
+  .news-btn {
+    background-color: #4a001a;
+    color: #f48fb1;
+    border-color: #880e4f;
+  }
+
+  .news-btn:hover {
+    background-color: #f48fb1;
+    color: #121212;
+  }
+
+  .modal-content {
+    background-color: #1e1e1e;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #333;
+  }
+  
+  .modal-header h2 {
+    color: #ffffff;
+  }
+
+  .close-btn {
+    color: #a0a0a0;
+  }
+
+  .close-btn:hover {
+    color: #ffffff;
+  }
+
+  .article-title {
+    color: #60a5fa;
+  }
+
+  .article-text {
+    color: #d1d5db;
   }
 
   .section-title {
