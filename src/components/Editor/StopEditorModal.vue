@@ -64,12 +64,12 @@ defineExpose({
 
       <div class="row-fields">
         <div class="field-group">
-          <label for="stop-landmark">Sous-titre</label>
+          <label for="stop-landmark">Lieu d'intérêt</label>
           <input
             type="text"
             id="stop-landmark"
             v-model="stop.stop.landmarkName"
-            placeholder="Ex: Grande Arche"
+            placeholder="Musée, Stade, etc ..."
           />
         </div>
       </div>
