@@ -58,8 +58,8 @@ export function useSlates(
   );
 
   const shouldShowSidePanel = computed(() => {
-    if(state.value === "FIRST_STOP" ) {
-    return true;
+    if (state.value === "FIRST_STOP") {
+      return true;
     }
     if (isPostStopLocked.value || isApproachingStop.value) return false;
 
@@ -110,25 +110,13 @@ export function useSlates(
     const hasLandmark =
       !!nextStop.value?.stop.landmarkName?.trim() &&
       !nextStop.value.isStopSkipped;
-    if (hasLandmark) {
-      if (currentConnections.value.length > 0) {
-        slates.push({
-          type: "CONNECTIONS",
-          duration: SLATE_DURATIONS.CONNECTIONS,
-        });
-      }
-
-      if (canFit(SLATE_DURATIONS.LANDMARK)) {
-        slates.push({
-          type: "LANDMARK",
-          duration: SLATE_DURATIONS.LANDMARK,
-        });
-      }
-
-      return slates;
+    if (hasLandmark && canFit(SLATE_DURATIONS.LANDMARK)) {
+      slates.push({
+        type: "LANDMARK",
+        duration: SLATE_DURATIONS.LANDMARK,
+      });
     }
-
-    if (currentConnections.value.length > 0) {
+    if (currentConnections.value.length > 0 && canFit(SLATE_DURATIONS.CONNECTIONS)) {
       slates.push({
         type: "CONNECTIONS",
         duration: SLATE_DURATIONS.CONNECTIONS,
