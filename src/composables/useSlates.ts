@@ -25,6 +25,7 @@ export function useSlates(
   specialSkippedStopMessage: Ref<InfoTraffic | null>,
   isApproachingStop: Ref,
   nextStop: Ref<StopWithTime | null>,
+  isAutoPassStops: Ref,
 ) {
   const currentSlateIndex = ref(0);
   const currentSlateDuration = ref(10000);
@@ -106,7 +107,7 @@ export function useSlates(
     const SAFETY_BUFFER = 0.5;
 
     const canFit = (duration: number) =>
-      duration + SAFETY_BUFFER < timeBudget * 1000;
+      !isAutoPassStops.value || duration + SAFETY_BUFFER < timeBudget * 1000;
     const hasLandmark =
       !!nextStop.value?.stop.landmarkName?.trim() &&
       !nextStop.value.isStopSkipped;
@@ -116,7 +117,10 @@ export function useSlates(
         duration: SLATE_DURATIONS.LANDMARK,
       });
     }
-    if (currentConnections.value.length > 0 && canFit(SLATE_DURATIONS.CONNECTIONS)) {
+    if (
+      currentConnections.value.length > 0 &&
+      canFit(SLATE_DURATIONS.CONNECTIONS)
+    ) {
       slates.push({
         type: "CONNECTIONS",
         duration: SLATE_DURATIONS.CONNECTIONS,

@@ -6,7 +6,12 @@ export function useJourneyData(
   routeLineId: string | null,
   routeTripId: string | null,
 ) {
-  const fakeDesserte: Desserte = { direction: "", id: "", stops: [], isLimitedService: false };
+  const fakeDesserte: Desserte = {
+    direction: "",
+    id: "",
+    stops: [],
+    isLimitedService: false,
+  };
   const desserte = ref<Desserte>(fakeDesserte);
   const line = ref<Line | null>(null);
   const INFOS_TRAFFICMessages = ref<InfoTraffic[]>([]);
@@ -51,25 +56,41 @@ export function useJourneyData(
   const currentStop = computed(() =>
     desserte.value.stops.length > 0 ? desserte.value.stops[0] : null,
   );
-
   const importantStops = computed(() => {
     const stops = desserte.value.stops;
     if (!stops || stops.length === 0) return [];
+
+    const currentIndex = stops.findIndex(
+      (s) => s.stop.id === currentStop.value?.stop.id,
+    );
+
+    if (currentIndex === -1) return [];
+
     const validStops = stops.filter((s) => !s.isStopSkipped);
     if (validStops.length === 0) return [];
 
-    const terminus = validStops[validStops.length - 1];
+    const remainingStops = validStops.filter((s) => {
+      const index = stops.findIndex((stop) => stop.stop.id === s.stop.id);
+      return index > currentIndex;
+    });
+
+    if (remainingStops.length === 0) return [];
+
+    const terminus = remainingStops[remainingStops.length - 1];
+
     const getHeavyConnectionCount = (stop: Stop) => {
-      if (!stop) return 0;
       return stop.connectedLines.filter(
         (l: Line) =>
           l.mode !== Mode.BUS &&
           l.mode !== Mode.NOCTILIEN &&
-          l.id != routeLineId,
+          l.id !== routeLineId,
       ).length;
     };
 
-    const candidates = validStops.filter((s) => s.stop.id !== terminus.stop.id);
+    const candidates = remainingStops.filter(
+      (s) => s.stop.id !== terminus.stop.id,
+    );
+
     const topConnectedStops = [...candidates].sort(
       (a, b) =>
         getHeavyConnectionCount(b.stop) - getHeavyConnectionCount(a.stop),
@@ -78,14 +99,29 @@ export function useJourneyData(
     const bestTwo = topConnectedStops
       .filter((stop) => getHeavyConnectionCount(stop.stop) > 0)
       .slice(0, 2);
+
     const idsToKeep = new Set([
       terminus.stop.id,
       ...bestTwo.map((s) => s.stop.id),
     ]);
 
-    return validStops.filter((s) => idsToKeep.has(s.stop.id));
-  });
+    const important = remainingStops.filter((s) => idsToKeep.has(s.stop.id));
 
+    return important.map((importantStop) => {
+      const importantIndex = stops.findIndex(
+        (s) => s.stop.id === importantStop.stop.id,
+      );
+
+      const travelTime = stops
+        .slice(currentIndex, importantIndex)
+        .reduce((total, stop) => total + (stop.travelTime ?? 0), 0);
+
+      return {
+        ...importantStop,
+        travelTime,
+      };
+    });
+  });
   const currentConnections = computed(() => {
     return currentStop.value
       ? currentStop.value.stop.connectedLines.filter(
