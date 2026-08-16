@@ -27,6 +27,7 @@ export class Api {
             parentId: stop.stop.parentId,
             name: stop.stop.name,
             landmarkName: stop.stop.pointOfInterest,
+            subtitle: "",
             isAccessible: stop.stop.isAccessible,
             connectedLines: stop.stop.connectedLines.map((line: any) => ({
               id: line.id,
@@ -76,6 +77,7 @@ export class Api {
               id: stop.stop.id,
               name: stop.stop.name,
               landmarkName: stop.stop.pointOfInterest,
+              subtitle: "",
               isAccessible: stop.stop.isAccessible,
             },
             timeOfArrival: stop.timeOfArrival,

@@ -3,6 +3,7 @@ export interface Stop {
   parentId?: string;
   name: string;
   landmarkName?: string;
+  subtitle?: string;
   isAccessible: boolean;
   hasGapWhenSteppingOff: boolean;
   connectedLines: Line[];

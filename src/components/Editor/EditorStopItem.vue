@@ -151,7 +151,9 @@ const processedConnections = computed(() =>
             >Montée uniquement</span
           >
           <span
-            v-if="stop.isStopSkipped || isAfterPartialTerminus && !stop.isTerminus"
+            v-if="
+              stop.isStopSkipped || (isAfterPartialTerminus && !stop.isTerminus)
+            "
             class="badge terminus no-print"
             ><i>Arrêt non desservi </i></span
           >
@@ -218,7 +220,9 @@ const processedConnections = computed(() =>
           </svg>
         </button>
       </div>
-
+      <div class="stop-subtitle" v-if="stop.stop.subtitle">
+        {{ stop.stop.subtitle }}
+      </div>
       <div class="stop-landmark" v-if="stop.stop.landmarkName">
         {{ stop.stop.landmarkName }}
       </div>
@@ -363,10 +367,19 @@ button:disabled {
   color: #212529;
   cursor: pointer;
 }
+.stop-subtitle {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #495057;
+}
 
 .stop-landmark {
-  font-size: 0.9rem;
-  color: #6c757d;
+  font-weight: 600;
+  background-color: #6e491e;
+  font-size: 1rem;
+  color: white;
+  padding: 2px 6px;
+  width: fit-content;
   margin-top: 2px;
 }
 .badges {

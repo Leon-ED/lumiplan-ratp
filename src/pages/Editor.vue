@@ -38,6 +38,7 @@ const defaultStop: StopWithTime = {
     id: "editor-made-stop",
     name: "",
     landmarkName: "",
+    subtitle: "",
     isAccessible: false,
     hasGapWhenSteppingOff: false,
     connectedLines: [],
