@@ -49,15 +49,8 @@ interface Props {
   stopsList: StopWithTime[];
   isInManualMode: boolean;
 }
+defineProps<Props>();
 
-const props = defineProps<Props>();
-
-onMounted(() => {
-  console.log("ArrivingToIn mounted", {
-    stopsList: props.stopsList,
-    isInManualMode: props.isInManualMode,
-  });
-});
 </script>
 
 <style lang="css" scoped>
