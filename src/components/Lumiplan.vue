@@ -146,7 +146,13 @@
       </div>
     </main>
   </div>
-  <div class="message-triggers">
+  <div class="message-triggers" :class="{ 'toolbar-hidden': isToolbarHidden }">
+     <button
+    class="toolbar-toggle"
+    @click="toggleToolbar"
+  >
+    {{ isToolbarHidden ? "👁️" : "🚫" }}
+  </button>
     <button
       v-for="n in 10"
       :key="n"
@@ -210,7 +216,11 @@ const emitEvent = defineEmits<{
 }>();
 
 const route = useRoute();
+const isToolbarHidden = ref(false);
 
+const toggleToolbar = () => {
+  isToolbarHidden.value = !isToolbarHidden.value;
+};
 const {
   desserte,
   line,
@@ -435,8 +445,7 @@ main.split-view {
   position: relative;
   background-color: #f4eeea;
   border-left: 2px solid var(--ratp-beige-dark);
-}
-.message-triggers {
+}.message-triggers {
   position: fixed;
   bottom: 5px;
   left: 50%;
@@ -449,6 +458,22 @@ main.split-view {
 }
 
 .message-triggers:hover {
+  opacity: 0.8;
+}
+
+.message-triggers.toolbar-hidden {
+  opacity: 0;
+}
+
+.message-triggers.toolbar-hidden .toolbar-toggle {
+  opacity: 0.8;
+}
+
+.message-triggers.toolbar-hidden button {
+  pointer-events: auto;
+}
+
+.message-triggers.toolbar-hidden:hover {
   opacity: 0.8;
 }
 
