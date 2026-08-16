@@ -1,0 +1,156 @@
+{
+    "id": "/",
+    "start_url": "/?source=pwa",
+    "name": "Écran Lumiplan RATP",
+    "short_name": "Lumiplan",
+    "description": "Affichez la desserte en temps réel de n'importe quelle ligne d'Île-de-France ou créez votre propre écran bus personnalisé.",
+    "lang": "fr-FR",
+    "dir": "ltr",
+    "scope": "/",
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "display": "standalone",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui",
+        "browser"
+    ],
+    "orientation": "any",
+    "background_color": "#ffffff",
+    "theme_color": "#53acd9",
+    "categories": [
+        "transportation",
+        "utilities",
+        "travel"
+    ],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "/icons/192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/512x512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/waiting-departure.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "En attente du départ"
+        },
+        {
+            "src": "/screenshots/mobile-en-route.png",
+            "sizes": "996x1670",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Bus en route sur mobile"
+        },
+        {
+            "src": "/screenshots/mobile-at-stop.png",
+            "sizes": "996x1670",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Bus à l'arrêt sur mobile"
+        },
+        {
+            "src": "/screenshots/message.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Bus en route avec message"
+        },
+        {
+            "src": "/screenshots/at-stop.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Bus à l'arrêt"
+        },
+        {
+            "src": "/screenshots/fullscreen.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Mode plein écran"
+        },
+        {
+            "src": "/screenshots/editor.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Éditeur de service"
+        },
+        {
+            "src": "/screenshots/home.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Accueil de l'application"
+        },
+        {
+            "src": "/screenshots/line-editor.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Éditeur de ligne"
+        },
+        {
+            "src": "/screenshots/service.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Gestion des services"
+        },
+        {
+            "src": "/screenshots/stop-editor.png",
+            "sizes": "2810x1670",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Éditeur d'arrêt"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Écran en temps réel",
+            "short_name": "Temps réel",
+            "description": "Afficher les informations de desserte en temps réel",
+            "url": "/",
+            "icons": [
+                {
+                    "src": "/icons/192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Créer un écran",
+            "short_name": "Créer",
+            "description": "Créer votre propre écran bus personnalisé",
+            "url": "/editor",
+            "icons": [
+                {
+                    "src": "/icons/192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ]
+}

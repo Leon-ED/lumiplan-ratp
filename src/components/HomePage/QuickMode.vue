@@ -1,41 +1,53 @@
 <template>
-  <div class="quick-mode-btn" @click="onClick">
+  <button class="quick-mode-btn" @click="onClick">
     <span class="quick-mode-btn-text">{{ name }}</span>
-  </div>
+  </button>
 </template>
+
 <script setup lang="ts">
 defineProps<{
   onClick: () => void;
   name: string;
 }>();
 </script>
+
 <style scoped>
 .quick-mode-btn {
-  background-color: #005fad;
-  opacity: 0.7;
-  color: white;
-  padding: 0.2rem 0.3rem;
-  border-radius: 0.2rem;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  background-color: #f0f4f8;
+  color: #005fad;
+  border: 1px solid #cce0f5;
+  padding: 0.5rem 1rem;
+  border-radius: 999px; /* Forme de pilule */
   cursor: pointer;
-  display: inline-block;
-  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
+
 .quick-mode-btn:hover {
-  background-color: #005a9e;
+  background-color: #005fad;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 95, 173, 0.2);
 }
+
 .quick-mode-btn-text {
-  font-size: 0.8em;
-  font-weight: bold;
+  font-size: 0.9em;
+  font-weight: 600;
 }
+
 @media (prefers-color-scheme: dark) {
   .quick-mode-btn {
-    border: gray 0.5px solid;
-    opacity: 0.85;
+    background-color: #1e293b;
+    color: #60a5fa;
+    border: 1px solid #334155;
   }
+  
   .quick-mode-btn:hover {
-    background-color: #004880;
+    background-color: #2563eb;
+    color: white;
   }
 }
 </style>

@@ -1,15 +1,33 @@
 <template>
   <main>
+    <header class="page-header">
+      <div class="title-container">
+        <h1 class="main-title">Votre écran bus RATP</h1>
+        <p class="subtitle">
+          Affichez la desserte de n'importe quelle ligne ou créez celle de vos
+          rêves avec l'éditeur !
+        </p>
+      </div>
+      <div class="actions-container">
+        <button class="editor-btn" @click="openEditor">
+          <i class="bi bi-pencil-fill"></i> Éditeur
+        </button>
+      </div>
+    </header>
+
     <section class="search-section">
-      <label for="search-input">Rechercher une ligne</label>
+      <label for="search-input" class="section-title"
+        >Rechercher une ligne</label
+      >
       <input
         name="search-input"
         class="search-input"
         type="text"
         v-model="_search"
-        placeholder="RER A, Metro 5, T5, 393"
+        placeholder="Ex: RER A, Metro 5, T5, 393..."
       />
     </section>
+
     <section class="modes">
       <QuickMode
         v-for="mode in QUICK_MODES"
@@ -17,25 +35,28 @@
         :name="mode.name"
         :onClick="mode.callback"
       />
-      <QuickMode 
-      class="editor-link"
-        name="Éditeur"
-        :onClick="openEditor"
-      />
     </section>
-    <section>
-      <label for="search-input" v-if="lines.length !== 0"
-        >Sélectionner une ligne</label
+
+    <section class="results-section">
+      <div class="status-message" v-if="lines.length !== 0">
+        Sélectionner une ligne
+      </div>
+      <div
+        class="status-message loading"
+        v-if="linesSearchStatus === 'loading'"
       >
-      <label for="search-input" v-if="linesSearchStatus === 'loading'"
-        >Chargement des lignes...</label
+        Chargement des lignes...
+      </div>
+      <div
+        class="status-message error"
+        v-if="linesSearchStatus === 'no_results'"
       >
-      <label for="search-input" v-if="linesSearchStatus === 'no_results'"
-        >Aucune ligne n'a pu être trouvée pour cette recherche.</label
-      >
-      <label for="search-input" v-if="linesSearchStatus === 'error'"
-        >Erreur lors de la recherche des lignes. Veuillez réessayer plus tard.
-      </label>
+        Aucune ligne n'a pu être trouvée pour cette recherche.
+      </div>
+      <div class="status-message error" v-if="linesSearchStatus === 'error'">
+        Erreur lors de la recherche des lignes. Veuillez réessayer plus tard.
+      </div>
+
       <ul class="line-list">
         <li
           v-for="line in lines"
@@ -44,32 +65,44 @@
           class="line"
           :class="{ selected: selectedLine?.id === line.id }"
         >
-          <LineLogo :line="line" class-name="line-logo" size="3rem" />
+          <LineLogo :line="line" class-name="line-logo" size="3.5rem" />
         </li>
       </ul>
     </section>
-    <section>
-      <span v-if="desserteSearchStatus === 'loading'"
-        >Chargement des services de la ligne en cours ...</span
+
+    <section class="service-status">
+      <div
+        class="status-message loading"
+        v-if="desserteSearchStatus === 'loading'"
       >
-      <span v-if="desserteSearchStatus === 'error'"
-        >Erreur lors du chargement des services. Veuillez réessayer plus
-        tard.</span
+        Chargement des services de la ligne en cours...
+      </div>
+      <div class="status-message error" v-if="desserteSearchStatus === 'error'">
+        Erreur lors du chargement des services. Veuillez réessayer.
+      </div>
+      <div
+        class="status-message error"
+        v-if="desserteSearchStatus === 'no_results'"
       >
-      <span v-if="desserteSearchStatus === 'no_results'"
-        >Aucun service n'a pu être trouvé pour cette ligne.<br />
-        Elle ne dispose peut-être d'aucun service dans la fourchette
-        [-90min;+25min]</span
-      >
+        Aucun service n'a pu être trouvé pour cette ligne.<br />
+        <span class="sub-message"
+          >Elle ne dispose peut-être d'aucun service dans la fourchette
+          [-90min;+25min]</span
+        >
+      </div>
     </section>
 
     <section class="desserte-list" v-if="dessertes.length > 0 && selectedLine">
       <div class="desserte-list-header">
-        <span>Sélectionner un service pour la ligne </span>
+        <span class="section-title">Sélectionner un service</span>
         <LineLogo :line="selectedLine" class-name="line-logo" size="2rem" />
       </div>
       <ul class="service-list">
-        <li v-for="desserte in dessertes" @click="selectedDesserte = desserte">
+        <li
+          v-for="desserte in dessertes"
+          :key="desserte.id"
+          @click="selectedDesserte = desserte"
+        >
           <ServiceOverview
             :line="selectedLine"
             :desserte="desserte"
@@ -77,8 +110,96 @@
         </li>
       </ul>
     </section>
+
+    <footer class="page-footer">
+      <div class="social-links">
+        <a
+          href="https://twitter.com/gwadz_"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-twitter"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334q.002-.211-.006-.422A6.7 6.7 0 0 0 16 3.542a6.7 6.7 0 0 1-1.889.518 3.3 3.3 0 0 0 1.447-1.817 6.5 6.5 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.32 9.32 0 0 1-6.767-3.429 3.29 3.29 0 0 0 1.018 4.382A3.3 3.3 0 0 1 .64 6.575v.045a3.29 3.29 0 0 0 2.632 3.218 3.2 3.2 0 0 1-.865.115 3 3 0 0 1-.614-.057 3.28 3.28 0 0 0 3.067 2.277A6.6 6.6 0 0 1 .78 13.58a6 6 0 0 1-.78-.045A9.34 9.34 0 0 0 5.026 15"
+            />
+          </svg>
+          Twitter
+        </a>
+        <a
+          href="https://discord.gg/tPyPnxVuxQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-discord"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"
+            /></svg
+          >Discord
+        </a>
+        <a
+          href="https://leon.gp"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-globe-europe-africa"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M3.668 2.501l-.288.646a.847.847 0 0 0 1.479.815l.245-.368a.81.81 0 0 1 1.034-.275.81.81 0 0 0 .724 0l.261-.13a1 1 0 0 1 .775-.05l.984.34q.118.04.243.054c.784.093.855.377.694.801-.155.41-.616.617-1.035.487l-.01-.003C8.274 4.663 7.748 4.5 6 4.5 4.8 4.5 3.5 5.62 3.5 7c0 1.96.826 2.166 1.696 2.382.46.115.935.233 1.304.618.449.467.393 1.181.339 1.877C6.755 12.96 6.674 14 8.5 14c1.75 0 3-3.5 3-4.5 0-.262.208-.468.444-.7.396-.392.87-.86.556-1.8-.097-.291-.396-.568-.641-.756-.174-.133-.207-.396-.052-.551a.33.33 0 0 1 .42-.042l1.085.724c.11.072.255.058.348-.035.15-.15.415-.083.489.117.16.43.445 1.05.849 1.357L15 8A7 7 0 1 1 3.668 2.501"
+            /></svg
+          >Autres projets
+        </a>
+        <a
+          href="/about"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-info-circle-fill"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2"
+            />
+          </svg>
+          A propos
+        </a>
+      </div>
+      <p class="disclaimer">
+        Ce site n'est en aucun cas affilié, soutenu ou validé par Île-de-France
+        Mobilités, Lumiplan ou la RATP.
+      </p>
+    </footer>
   </main>
 </template>
+
 <script setup lang="ts">
 import { watchDebounced } from "@vueuse/core";
 import { ref } from "vue";
@@ -87,17 +208,23 @@ import { Api } from "../api";
 import QuickMode from "../components/HomePage/QuickMode.vue";
 import LineLogo from "../components/Other/LineLogo.vue";
 import ServiceOverview from "../components/HomePage/ServiceOverview.vue";
+
 const selectedLine = ref<Line | null>(null);
 const selectedDesserte = ref<Desserte | null>(null);
 const dessertes = ref<Desserte[]>([]);
 const _search = ref("");
 const lines = ref<Line[]>([]);
+
 type DESSERTE_SEARCH_STATUS =
   | "idle"
   | "loading"
   | "error"
   | "done"
   | "no_results";
+type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
+
+const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
+const linesSearchStatus = ref<LINES_SEARCH_STATUS>("idle");
 
 const QUICK_MODES = [
   {
@@ -137,14 +264,11 @@ const QUICK_MODES = [
     },
   },
 ];
- 
+
 const openEditor = () => {
-  window.open('/editor', '_blank');
+  window.open("/editor", "_blank");
 };
 
-type LINES_SEARCH_STATUS = "idle" | "loading" | "error" | "done" | "no_results";
-const desserteSearchStatus = ref<DESSERTE_SEARCH_STATUS>("idle");
-const linesSearchStatus = ref<LINES_SEARCH_STATUS>("idle");
 watchDebounced(
   _search,
   async () => {
@@ -166,14 +290,13 @@ watchDebounced(
       }
       linesSearchStatus.value = "done";
       lines.value = apiLines;
-      console.log("Fetched lines:", lines.value);
     } catch (error) {
       linesSearchStatus.value = "error";
-      console.error("Error fetching search results:", error);
     }
   },
   { debounce: 300 },
 );
+
 watchDebounced(
   selectedLine,
   async (newLine) => {
@@ -183,7 +306,6 @@ watchDebounced(
       dessertes.value = [];
       try {
         desserteSearchStatus.value = "loading";
-        console.log("Fetching vehicles for line:", newLine.id);
         const vehicles = await Api.getVehiclesOnLine(newLine.id);
         dessertes.value = vehicles;
         desserteSearchStatus.value = "done";
@@ -192,7 +314,6 @@ watchDebounced(
         }
       } catch (error) {
         desserteSearchStatus.value = "error";
-        console.error("Error fetching vehicles for line:", error);
       }
     }
   },
@@ -200,93 +321,315 @@ watchDebounced(
 );
 </script>
 <style scoped>
-.desserte-list-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  margin-bottom: 1em;
-}
-.modes {
-  display: flex;
-  gap: 0.5em;
-  flex-wrap: wrap;
-  margin-bottom: 1em;
-}
 main {
   display: flex;
-  container-type: inline-size;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1em;
+  padding: 2em 1em;
   box-sizing: border-box;
-  width: min(35em, 90%);
+  width: min(40em, 95%);
   margin: auto;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  min-height: 100vh;
 }
-input[type="text"] {
-  font-size: 1.3em;
-  border-radius: 0.2em;
-  box-shadow: unset;
+
+/* En-tête de page */
+.page-header {
   width: 100%;
-  box-sizing: border-box;
-  border-bottom-left-radius: 0;
-  padding: 0.5em 0.3em;
-  margin-top: 0.5em;
-  border: gray 0.5px solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1em;
+  margin-bottom: 2em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid #e0e0e0;
 }
-input,
-input::placeholder {
-  font-size: 0.6em;
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
 }
-input[type="text"]:focus {
-  outline: none;
+
+.main-title {
+  margin: 0;
+  font-size: 2em;
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
 }
-a {
-  text-decoration: none;
-  color: inherit;
+
+.subtitle {
+  margin: 0;
+  font-size: 0.95em;
+  color: #636e72;
+  line-height: 1.4;
 }
-li {
-  width: fit-content;
+
+.actions-container {
+  flex-shrink: 0;
 }
-.line-list li:hover {
+
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background-color: #e8f6f1;
+  color: #2ca27b;
+  border: 1px solid #b5e3d2;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
+
+.editor-btn:hover {
+  background-color: #2ca27b;
+  color: white;
+  box-shadow: 0 4px 8px rgba(44, 162, 123, 0.2);
+  transform: translateY(-2px);
+}
+
+section {
+  width: 100%;
+  margin-bottom: 2em;
+}
+
+.section-title {
+  display: block;
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 0.8em;
+  color: #333;
+}
+
+/* Recherche */
+.search-input {
+  width: 100%;
+  font-size: 1.2em;
+  padding: 0.8em 1.2em;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #005fad;
+  box-shadow: 0 4px 12px rgba(0, 95, 173, 0.15);
+}
+
+.search-input::placeholder {
+  color: #a0a0a0;
+}
+
+/* Modes rapides */
+.modes {
+  display: flex;
+  gap: 0.8em;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2.5em;
+}
+
+/* Lignes */
 .line-list {
   list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 1em;
+  justify-content: center;
+  gap: 1.2em;
 }
-/* target .line-list child if line-lisdt has only one child with .selected class */
+
+.line {
+  transition:
+    transform 0.2s ease,
+    opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.line:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
 .line-list:has(.selected) .line:not(.selected) {
-  opacity: 0.1;
+  opacity: 0.2;
+  transform: scale(0.95);
 }
+
+/* Services */
+.desserte-list-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-bottom: 1.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid #f0f0f0;
+}
+
 .service-list {
   list-style: none;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
 }
-.service-list li {
-  margin-bottom: 1em;
+
+/* Messages de statut */
+.status-message {
+  text-align: center;
+  padding: 1em;
+  color: #555;
+  font-weight: 500;
+}
+
+.status-message.error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+}
+
+.sub-message {
+  font-size: 0.85em;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+/* Pied de page */
+.page-footer {
   width: 100%;
+  margin-top: auto;
+  padding-top: 2em;
+  padding-bottom: 1em;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
 }
-section {
-  width: 100%;
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  margin-bottom: 1.2em;
 }
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: #005fad;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05em;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.social-link:hover {
+  opacity: 0.7;
+  transform: translateY(-2px);
+}
+
+.social-link .bi {
+  font-size: 1.2em;
+}
+
+.disclaimer {
+  font-size: 0.85em;
+  color: #888;
+  line-height: 1.5;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+/* Responsive pour les petits écrans */
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+  }
+  .actions-container {
+    align-self: flex-end;
+  }
+}
+
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   main {
     background-color: #121212;
-    color: white;
+    color: #e0e0e0;
   }
-  input[type="text"] {
+
+  .page-header {
+    border-bottom-color: #333;
+  }
+
+  .main-title {
+    color: #ffffff;
+  }
+
+  .subtitle {
+    color: #a0a0a0;
+  }
+
+  .editor-btn {
+    background-color: #064e3b;
+    color: #34d399;
+    border-color: #065f46;
+  }
+
+  .editor-btn:hover {
+    background-color: #10b981;
+    color: #111827;
+  }
+
+  .section-title {
+    color: #e0e0e0;
+  }
+
+  .search-input {
     background-color: #1e1e1e;
     color: white;
-    border: gray 0.5px solid;
+    border: 1px solid #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
-}
-.editor-link{
-background-color: rgb(44, 162, 123);
-margin-left: auto;
+
+  .search-input:focus {
+    border-color: #4da6ff;
+  }
+
+  .desserte-list-header {
+    border-bottom: 2px solid #333;
+  }
+
+  .status-message {
+    color: #bbb;
+  }
+
+  .status-message.error {
+    background-color: #3b1919;
+    color: #ff8a80;
+  }
+
+  .page-footer {
+    border-top-color: #333;
+  }
+
+  .social-link {
+    color: #60a5fa;
+  }
+
+  .disclaimer {
+    color: #777;
+  }
 }
 </style>
