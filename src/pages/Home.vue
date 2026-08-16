@@ -336,7 +336,6 @@ main {
   min-height: 100vh;
 }
 
-/* En-tête de page */
 .page-header {
   width: 100%;
   display: flex;
@@ -409,7 +408,6 @@ section {
   color: #333;
 }
 
-/* Recherche */
 .search-input {
   width: 100%;
   font-size: 1.2em;
@@ -432,7 +430,6 @@ section {
   color: #a0a0a0;
 }
 
-/* Modes rapides */
 .modes {
   display: flex;
   gap: 0.8em;
@@ -441,7 +438,6 @@ section {
   margin-bottom: 2.5em;
 }
 
-/* Lignes */
 .line-list {
   list-style: none;
   padding: 0;
@@ -467,7 +463,6 @@ section {
   transform: scale(0.95);
 }
 
-/* Services */
 .desserte-list-header {
   display: flex;
   align-items: center;
@@ -485,7 +480,6 @@ section {
   gap: 1.2em;
 }
 
-/* Messages de statut */
 .status-message {
   text-align: center;
   padding: 1em;
@@ -505,7 +499,6 @@ section {
   opacity: 0.8;
 }
 
-/* Pied de page */
 .page-footer {
   width: 100%;
   margin-top: auto;
@@ -552,7 +545,6 @@ section {
   margin: 0 auto;
 }
 
-/* Responsive pour les petits écrans */
 @media (max-width: 600px) {
   .page-header {
     flex-direction: column;
@@ -562,7 +554,6 @@ section {
   }
 }
 
-/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   main {
     background-color: #121212;

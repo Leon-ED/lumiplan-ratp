@@ -17,7 +17,7 @@ defineProps<{
   color: #005fad;
   border: 1px solid #cce0f5;
   padding: 0.5rem 1rem;
-  border-radius: 999px; /* Forme de pilule */
+  border-radius: 999px; 
   cursor: pointer;
   display: inline-flex;
   align-items: center;
