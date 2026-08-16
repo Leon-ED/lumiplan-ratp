@@ -118,6 +118,7 @@
           <ArrivingToIn
             v-else-if="currentSlate?.type === 'TRAVEL_TIME'"
             :stops-list="importantStops"
+            :is-in-manual-mode="!isAutoPassStops"
             key="travel-time"
           />
 
@@ -263,6 +264,7 @@ const { shouldShowSidePanel, currentSlate, scheduleNextRotation } = useSlates(
   specialSkippedStopMessage,
   isApproachingStop,
   currentStop,
+  isAutoPassStops
 );
 const {
   currentPassengerMessage,
