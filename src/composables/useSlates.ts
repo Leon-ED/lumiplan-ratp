@@ -58,6 +58,9 @@ export function useSlates(
   );
 
   const shouldShowSidePanel = computed(() => {
+    if(state.value === "FIRST_STOP" ) {
+    return true;
+    }
     if (isPostStopLocked.value || isApproachingStop.value) return false;
 
     if (state.value === "NOT_AT_STOP" && availableSlates.value.length > 0) {
