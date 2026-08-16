@@ -127,9 +127,9 @@
     ],
     "shortcuts": [
         {
-            "name": "Écran en temps réel",
-            "short_name": "Temps réel",
-            "description": "Afficher les informations de desserte en temps réel",
+            "name": "Accueil",
+            "short_name": "Accueil",
+            "description": "Ouvrir l'accueil",
             "url": "/",
             "icons": [
                 {
@@ -140,9 +140,9 @@
             ]
         },
         {
-            "name": "Créer un écran",
-            "short_name": "Créer",
-            "description": "Créer votre propre écran bus personnalisé",
+            "name": "Ouvrir l'éditeur",
+            "short_name": "Éditeur",
+            "description": "Ouvrir l'éditeur de lignes et de services",
             "url": "/editor",
             "icons": [
                 {
