@@ -135,6 +135,7 @@ const processedConnections = computed(() =>
         >
           {{ stop.stop.name || "Arrêt à paramétrer" }}
         </span>
+        <div class="icons">
         <span
           v-if="!stop.stop.isAccessible"
           class="badge accessible"
@@ -143,9 +144,22 @@ const processedConnections = computed(() =>
           <img
             class="non-accessible-stop"
             src="../../assets/img/non-accessible-stop.png"
-            alt="Arrêt non accessible aux usagers en fauteil roulant"
-            height="20em"
+            alt="Arrêt non accessible aux usagers en fauteuil roulant"
+            height="23em"
         /></span>
+          <span
+            v-if="stop.stop.hasGapWhenSteppingOff"
+            class="badge"
+            title="Attention à la marche à la descente du véhicule"
+          >
+            <img
+              class="non-accessible-stop"
+              src="../../assets/img/gap.png"
+              alt="Attention à la marche à la descente du véhicule"
+              height="25em"
+          /></span>
+        </div>
+
         <span class="badges">
           <span v-if="stop.isFirstStop" class="badge terminus"
             >Montée uniquement</span
@@ -295,7 +309,11 @@ button:disabled {
   transform: translateX(-50%);
   z-index: 1;
 }
-
+.icons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
 .is-terminus .stop-name {
   background-color: black;
   color: white;
