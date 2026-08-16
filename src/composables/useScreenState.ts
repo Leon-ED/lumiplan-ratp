@@ -103,24 +103,22 @@ export function useScreenState(
     if (state.value === "NOT_AT_STOP") {
       forcedState.value = "AT_STOP";
     } else if (state.value === "AT_STOP") {
-      // const currentIsTerminus = currentStop.value?.isTerminus;
+      const currentIsTerminus = currentStop.value?.isTerminus;
       if (currentStop.value) {
         const past = useClock().now.value;
         past.setSeconds(past.getSeconds() - 5);
         currentStop.value.timeOfArrival = useClock().now.value.toISOString();
         currentStop.value.timeOfDeparture = past.toISOString();
       }
-
       setTimeout(() => {
         desserte.value.stops.shift();
       }, 2000);
 
-      // if (currentIsTerminus || desserte.value.stops.length === 0) {
-      //   forcedState.value = "NOT_IN_SERVICE";
-      // }
-      // else {
-      forcedState.value = "NO_TRIP_DATA_AVAILABLE";
-      // }
+      if (currentIsTerminus || desserte.value.stops.length === 0) {
+        forcedState.value = "NO_TRIP_DATA_AVAILABLE";
+      } else {
+        forcedState.value = "NOT_AT_STOP";
+      }
     }
   };
 
