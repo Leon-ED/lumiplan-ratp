@@ -55,9 +55,14 @@ const limitedInfos = computed(() => {
 });
 
 const currentInfo = computed(() => {
-  return limitedInfos.value[currentIndex.value];
-});
+  if (!limitedInfos.value.length) {
+    return null;
+  }
 
+  return limitedInfos.value[
+    Math.min(currentIndex.value, limitedInfos.value.length - 1)
+  ];
+});
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
 const stopAutoPlay = () => {
@@ -83,11 +88,18 @@ const setCurrentIndex = (index: number) => {
   currentIndex.value = index;
   startAutoPlay();
 };
-
 watch(
   () => props.infosTraffic,
   () => {
-    if (currentIndex.value >= limitedInfos.value.length) {
+    const length = limitedInfos.value.length;
+
+    if (length === 0) {
+      currentIndex.value = 0;
+      stopAutoPlay();
+      return;
+    }
+
+    if (currentIndex.value >= length) {
       currentIndex.value = 0;
     }
 
@@ -98,7 +110,6 @@ watch(
     immediate: true,
   },
 );
-
 onUnmounted(() => {
   stopAutoPlay();
 });
@@ -127,12 +138,12 @@ onUnmounted(() => {
   width: 4cqw;
   height: 4cqw;
   margin-right: 1cqw;
-  margin-bottom: -2cqw;
+  margin-bottom: 1cqw;
   flex-shrink: 0;
 }
 
 .message-text {
-  display: inline-block;
+  display: block;
   font-size: 2.4cqw;
   font-family: "ParisineBold";
   color: #212121;
