@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SaveInfoTrafic } from "../../types";
-const MAX_MESSAGES = 1;
+const MAX_MESSAGES = 5;
 const props = defineProps<{
   messages: SaveInfoTrafic[];
 }>();
@@ -18,7 +18,11 @@ const addMessage = () => {
   }
 };
 
-const updateMessage = (index: number, key: keyof SaveInfoTrafic, value: string) => {
+const updateMessage = (
+  index: number,
+  key: keyof SaveInfoTrafic,
+  value: string,
+) => {
   const newMessages = [...props.messages];
   newMessages[index] = { ...newMessages[index], [key]: value };
   emit("update:messages", newMessages);
@@ -35,7 +39,10 @@ const removeMessage = (index: number) => {
   <section class="card traffic-card no-print">
     <div class="card-header">
       <h2>Informations trafic</h2>
-      <span class="message-count" :class="{ 'max-reached': messages.length >= MAX_MESSAGES }">
+      <span
+        class="message-count"
+        :class="{ 'max-reached': messages.length >= MAX_MESSAGES }"
+      >
         {{ messages.length }} / {{ MAX_MESSAGES }}
       </span>
     </div>
@@ -43,18 +50,24 @@ const removeMessage = (index: number) => {
     <div class="traffic-list" v-if="messages.length > 0">
       <div v-for="(msg, index) in messages" :key="index" class="traffic-item">
         <div class="traffic-item-header">
-          <button 
+          <button
             v-if="index > 0"
-            class="btn-delete" 
-            @click="removeMessage(index)" 
+            class="btn-delete"
+            @click="removeMessage(index)"
             title="Supprimer ce message additionnel"
           >
             ✕
           </button>
         </div>
-        <textarea 
-          :value="msg.message" 
-          @input="updateMessage(index, 'message', ($event.target as HTMLTextAreaElement).value)"
+        <textarea
+          :value="msg.message"
+          @input="
+            updateMessage(
+              index,
+              'message',
+              ($event.target as HTMLTextAreaElement).value,
+            )
+          "
           placeholder="Ex: En raison de travaux, l'arrêt n'est pas desservi..."
           class="message-input"
           rows="3"
@@ -64,8 +77,8 @@ const removeMessage = (index: number) => {
 
     <p v-else class="empty-state">Aucun message d'information trafic.</p>
 
-    <button 
-      class="btn btn-secondary add-btn" 
+    <button
+      class="btn btn-secondary add-btn"
       @click="addMessage"
       :disabled="messages.length >= MAX_MESSAGES"
     >
@@ -126,7 +139,7 @@ const removeMessage = (index: number) => {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  height: 32px; 
+  height: 32px;
 }
 .effect-label {
   font-size: 0.95rem;
