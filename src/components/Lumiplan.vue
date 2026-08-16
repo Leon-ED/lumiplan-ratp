@@ -50,7 +50,10 @@
 
     <main
       :class="{
-        'split-view': shouldShowSidePanel || isDisplayingPassengerMessage,
+        'split-view':
+          shouldShowSidePanel ||
+          isDisplayingPassengerMessage ||
+          ['FIRST_STOP', 'NO_TRIP_DATA_AVAILABLE', 'NO_DATA'].includes(state),
       }"
     >
       <div class="main-panel-wrapper">
@@ -103,7 +106,15 @@
             :message="currentPassengerMessage"
             :key="'passenger-msg-' + currentPassengerMessage.message"
           />
-
+          <NoData
+            v-else-if="['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(state)"
+            :key="state"
+          />
+          <DepartureTime
+            v-else-if="state === 'FIRST_STOP'"
+            :departure-date="currentStop?.timeOfDeparture!"
+            key="departure-time"
+          />
           <ArrivingToIn
             v-else-if="currentSlate?.type === 'TRAVEL_TIME'"
             :stops-list="importantStops"
@@ -188,6 +199,8 @@ import { SaveFile } from "../types";
 import { getSecondesFromDate } from "../utils";
 import PassengerMessage from "./SidePanel/PassengerMessage.vue";
 import { AudioManager } from "../audio.ts";
+import DepartureTime from "./SidePanel/DepartureTime.vue";
+import NoData from "./SidePanel/NoData.vue";
 
 defineProps<{
   fullScreen: boolean;
