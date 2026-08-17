@@ -148,12 +148,9 @@
     </main>
   </div>
   <div class="message-triggers" :class="{ 'toolbar-hidden': isToolbarHidden }">
-     <button
-    class="toolbar-toggle"
-    @click="toggleToolbar"
-  >
-    {{ isToolbarHidden ? "👁️" : "🚫" }}
-  </button>
+    <button class="toolbar-toggle-large" @click="toggleToolbar">
+      {{ isToolbarHidden ? "Afficher" : "Masquer" }}
+    </button>
     <button
       v-for="n in 10"
       :key="n"
@@ -264,7 +261,7 @@ const { shouldShowSidePanel, currentSlate, scheduleNextRotation } = useSlates(
   specialSkippedStopMessage,
   isApproachingStop,
   currentStop,
-  isAutoPassStops
+  isAutoPassStops,
 );
 const {
   currentPassengerMessage,
@@ -447,12 +444,18 @@ main.split-view {
   position: relative;
   background-color: #f4eeea;
   border-left: 2px solid var(--ratp-beige-dark);
-}.message-triggers {
+}
+.message-triggers {
   position: fixed;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
+  flex-wrap: wrap;
+  bottom: 5px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 10%;
+  left: 0;
+  display: flex;
+  justify-content: center;
   gap: 5px;
   opacity: 0.15;
   transition: opacity 0.3s ease;
@@ -491,6 +494,9 @@ main.split-view {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+button.toolbar-toggle-large {
+  width: fit-content !important;
 }
 
 .message-triggers button:hover {
