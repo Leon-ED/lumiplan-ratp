@@ -37,7 +37,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
 import { useRotatedText } from "../../hooks/useRotatedText";
 import { ETA_TEXTS } from "../../translations";
 import { StopWithTime } from "../../types";
