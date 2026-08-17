@@ -29,7 +29,7 @@ export function usePassengerMessages() {
 
     messageTimeout = setTimeout(() => {
       processNextMessage();
-    }, 10_000);
+    }, (currentMessage.value.duration || 10) * 1000);
   };
 
   const triggerMessage = (index: number) => {

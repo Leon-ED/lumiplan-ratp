@@ -74,6 +74,7 @@ export interface PassengerMessage {
   bgColor: string;
   message: string;
   subText?: string;
+  duration?: number;
   audio?: string;
 }
 export interface Article {

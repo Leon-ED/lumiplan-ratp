@@ -6,6 +6,7 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
     message:
       "Bienvenue sur les lignes<br/> Ile-de-France Mobilité<br/>exploitées par la RATP.",
     audio: "generic/welcome.mp3",
+    duration: 13,
   },
   {
     bgColor: "#82BC00",
@@ -30,6 +31,7 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
     message:
       "Ce bus ne peut accueillir<br/>que 2 poussettes<br/>dépliées.<br/>Merci de replier<br/>toutes les<br/>autres.",
     audio: "generic/strollers.mp3",
+    duration: 15,
   },
   {
     bgColor: "#FD8204",
@@ -47,6 +49,7 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
     bgColor: "#FD8204",
     message:
       "Merci de patienter.<br/>Nous stationnons quelques instants<br/>afin de maintenir une bonne régulation sur la ligne.",
+    duration: 15,
   },
   {
     bgColor: "#FD8204",
@@ -60,5 +63,6 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
     subText:
       "This bus terminates here. <br/> Endhaltestelle. <br/> Fin de recorrido.",
     audio: "generic/terminus.mp3",
+    duration: 20,
   },
 ];
