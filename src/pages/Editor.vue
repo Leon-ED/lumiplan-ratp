@@ -19,6 +19,7 @@ import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue"
 import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
 import { sortedLines } from "../utils";
 import { Api } from "../api.ts";
+import NewsModal from "../components/NewsModal.vue";
 
 const messages = ref<SaveInfoTrafic[]>([]);
 const router = useRouter();
@@ -305,6 +306,7 @@ const downloadJson = () => {
 
 const AUTOSAVE_KEY = "lumiplan_editor_autosave_data";
 const isReadyForAutosave = ref(false);
+const isNewsModalOpen = ref(false);
 
 const handleAutosaveRestore = (parsedData: SaveFile) => {
   loadData(parsedData, parsedData.header.name);
@@ -398,6 +400,7 @@ const deleteLine = (line: Line) => {
       :all-lines="lines"
       :stop="selectedStopInModal"
     />
+    <NewsModal v-if="isNewsModalOpen" @close="isNewsModalOpen = false" />
     <ApiImportJourneyModal ref="apiModalRef" @import="handleApiImport" />
     <AutosaveRestoreModal
       ref="autosaveModalRef"
@@ -409,18 +412,23 @@ const deleteLine = (line: Line) => {
       <div class="spinner"></div>
       <p>Chargement du service depuis l'API...</p>
     </div>
-
-    <!-- Interface Éditeur -->
     <div v-else class="editor-layout">
       <header class="page-header">
         <div class="header-titles">
           <h1>Éditeur de Services</h1>
           <p>Configurez vos lignes et les arrêts de votre service.</p>
         </div>
+        <div class="header-actions">
+         <button class="news-btn" @click="isNewsModalOpen = true">
+          <i class="bi bi-bell-fill"></i> Nouveautés !
+        </button>
         <button class="btn-launch-screen" @click="launchScreen">
           <span class="launch-icon">▶</span>
           Lancer l'écran
         </button>
+        </div>
+
+
       </header>
       <div class="editor-grid">
         <EditorSidebar
@@ -524,6 +532,37 @@ const deleteLine = (line: Line) => {
   grid-template-columns: 320px 1fr;
   gap: 32px;
   align-items: start;
+}
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.news-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background-color: #c2185b;
+  color: white;
+  box-shadow: 0 4px 8px rgba(194, 24, 91, 0.2);
+  border: 1px solid #c2185b;
+
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+    border-radius: 8px;
+  padding: 12px
+  ;
+  font-size: 1.1rem;
+
+}
+
+.news-btn:hover {
+  background-color: #fff0f5;
+  color: #c2185b;
+  border: 1px solid #f8bbd0;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 850px) {
