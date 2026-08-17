@@ -12,14 +12,16 @@
         src="../../assets/img/info.png"
         alt="messages icon"
         class="message-icon"
-      /><br />
+      />
       <Transition name="message-text" mode="out-in">
         <span
           v-if="currentInfo"
           :key="currentInfo.id ?? currentIndex"
           class="message-text"
         >
-          {{ currentInfo.title }} <br />
+          <template v-if="currentInfo.title">
+            {{ currentInfo.title }} <br />
+          </template>
           <template v-if="currentInfo.cause !== 'Cause inconnue'">
             {{ currentInfo.cause }}
           </template>
@@ -146,6 +148,7 @@ onUnmounted(() => {
   display: block;
   font-size: 2.4cqw;
   font-family: "ParisineBold";
+  line-break: break-word;
   color: #212121;
 }
 

@@ -72,6 +72,16 @@ const removeMessage = (index: number) => {
           class="message-input"
           rows="3"
         ></textarea>
+
+        <div
+          class="char-count"
+          :class="{
+            warning: msg.message.length >= 100 && msg.message.length < 110,
+            danger: msg.message.length >= 110,
+          }"
+        >
+          {{ msg.message.length }} / 110 caractères conseillés
+        </div>
       </div>
     </div>
 
@@ -124,6 +134,22 @@ const removeMessage = (index: number) => {
   flex-direction: column;
   gap: 16px;
   margin-bottom: 20px;
+}
+.char-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: -4px;
+}
+
+.char-count.warning {
+  color: #f0ad4e;
+  font-weight: 600;
+}
+
+.char-count.danger {
+  color: #dc3545;
+  font-weight: 600;
 }
 .traffic-item {
   background: #fafafa;
