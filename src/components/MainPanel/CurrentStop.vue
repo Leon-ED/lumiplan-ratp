@@ -16,12 +16,12 @@ onMounted(() => {
     <div class="current-stop-name">
       {{ cleanText(stopWithTime.stop.name) }}
     </div>
-    <!-- <div
-      class="current-stop-landmark-name"
-      v-if="stopWithTime.stop.landmarkName"
+    <div
+      class="current-stop-subtitle"
+      v-if="stopWithTime.stop.subtitle"
     >
-      {{ stopWithTime.stop.landmarkName }}
-    </div> -->
+      {{ stopWithTime.stop.subtitle }}
+    </div>
   </div>
 </template>
 
@@ -43,10 +43,19 @@ onMounted(() => {
   font-size: 9cqw;
   text-align: center;
   text-wrap:balance;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-/* .current-stop-landmark-name {
-  font-size: 2.5cqw;
-  padding: 1cqw;
-  background-color: var(--ratp-brown);
-} */
+.current-stop-subtitle{
+  font-size: 3cqw;
+  padding: .5cqw 1cqw;
+  width: 100%;
+  margin-top: auto;
+  text-align: center;
+  border-top: .3cqw solid white;
+  font-style: italic;
+}
 </style>
