@@ -19,7 +19,7 @@
       y="50%"
       text-anchor="middle"
       dominant-baseline="central"
-      :fill="textColor"
+      :fill="transparent ? textColor : 'black'"
       :font-size="getFontSize(lineName.length)"
       font-family="ParisineBold"
     >
