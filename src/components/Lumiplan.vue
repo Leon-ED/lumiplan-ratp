@@ -160,18 +160,18 @@
       {{ n === 10 ? 0 : n }}
     </button>
     <button
+      class="toolbar-toggle-large"
       @click="
         AudioManager.toggleSounds(
           AudioManager.areSoundsEnabled() ? false : true,
         )
       "
-      :title="
-        AudioManager.areSoundsEnabled()
-          ? 'Désactiver les sons'
-          : 'Activer les sons'
-      "
     >
-      {{ AudioManager.areSoundsEnabled() ? "🔇" : "🔊" }}
+      {{
+        AudioManager.areSoundsEnabled()
+          ? "Désactiver les sons"
+          : "Activer les sons"
+      }}
     </button>
   </div>
 </template>
