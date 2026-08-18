@@ -20,6 +20,7 @@ import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
 import { sortedLines } from "../utils";
 import { Api } from "../api.ts";
 import NewsModal from "../components/NewsModal.vue";
+import { DEFAULT_BG_COLORS } from "../colors.ts";
 
 const messages = ref<SaveInfoTrafic[]>([]);
 const router = useRouter();
@@ -28,10 +29,10 @@ const route = useRoute();
 const isLoading = ref(false);
 
 const defaultLine: Line = {
-  id: "editor-made-line",
+  id: crypto.randomUUID(),
   mode: Mode.BUS,
-  name: "TODO !",
-  color: "#4A6C1F",
+  name: "Ligne N°1",
+  color: DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
   textColor: "#FFFFFF",
 };
 const defaultStop: StopWithTime = {
@@ -116,12 +117,17 @@ const openStopEditorModal = (stop: StopWithTime) => {
   stopModalRef.value?.open();
 };
 
-const addLine = () =>
-  lines.value.push({
+const addLine = () => {
+  const newLine:Line = {
     ...defaultLine,
+    name: `Ligne n°${_lines.value.length + 1}`,
+    color:DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
     id: `editor-made-line-${crypto.randomUUID()}`,
-  });
-
+  };
+  lines.value.push(newLine);
+  selectedLineInModal.value = newLine;
+  lineModalRef.value?.open();
+};
 const addStop = () => {
   const stops = desserteWithLine.value.desserte.stops;
   const lastDate =
@@ -142,7 +148,7 @@ const addStop = () => {
     travelTime: 60,
     timeOfDeparture: addTimeToDate(lastDate, 60),
     timeOfArrival: addTimeToDate(lastDate, 75),
-    isTerminus: true, 
+    isTerminus: true,
   });
   normalizeStopFlags();
 };
@@ -394,7 +400,11 @@ const deleteLine = (line: Line) => {
 
 <template>
   <div class="page-wrapper">
-    <LineEditorModal ref="lineModalRef" :line="selectedLineInModal" :all-lines="lines" />
+    <LineEditorModal
+      ref="lineModalRef"
+      :line="selectedLineInModal"
+      :all-lines="lines"
+    />
     <StopEditorModal
       ref="stopModalRef"
       :all-lines="lines"
@@ -419,16 +429,14 @@ const deleteLine = (line: Line) => {
           <p>Configurez vos lignes et les arrêts de votre service.</p>
         </div>
         <div class="header-actions">
-         <button class="news-btn" @click="isNewsModalOpen = true">
-          <i class="bi bi-bell-fill"></i> Nouveautés !
-        </button>
-        <button class="btn-launch-screen" @click="launchScreen">
-          <span class="launch-icon">▶</span>
-          Lancer l'écran
-        </button>
+          <button class="news-btn" @click="isNewsModalOpen = true">
+            <i class="bi bi-bell-fill"></i> Nouveautés !
+          </button>
+          <button class="btn-launch-screen" @click="launchScreen">
+            <span class="launch-icon">▶</span>
+            Lancer l'écran
+          </button>
         </div>
-
-
       </header>
       <div class="editor-grid">
         <EditorSidebar
@@ -551,11 +559,9 @@ const deleteLine = (line: Line) => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-    border-radius: 8px;
-  padding: 12px
-  ;
+  border-radius: 8px;
+  padding: 12px;
   font-size: 1.1rem;
-
 }
 
 .news-btn:hover {

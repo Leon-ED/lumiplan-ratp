@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { Line, Mode } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
+import { DEFAULT_BG_COLORS, DEFAULT_TEXT_COLORS } from "../../colors.ts";
 
 const props = defineProps<{
   line: Line | null;
@@ -22,44 +23,6 @@ defineExpose({
   open,
 });
 
-const defaultTextColor = [
-  { name: "Blanc", hex: "#FFFFFF" },
-  { name: "Noir", hex: "#000000" },
-];
-
-const defaultBgColors = [
-  { name: "Bleu nuit", hex: "#00005b" },
-  { name: "Bleu foncé", hex: "#003a80" },
-  { name: "Bleu outremer", hex: "#0064b0" },
-  { name: "Bleu clair", hex: "#51afdf" },
-  { name: "Bleu canard", hex: "#003c5f" },
-  { name: "Pervenche", hex: "#82c8e6" },
-  { name: "Turquoise", hex: "#00a88f" },
-  { name: "Vert foncé", hex: "#00814f" },
-  { name: "Vert clair", hex: "#7ab829" },
-  { name: "Émeraude", hex: "#198250" },
-  { name: "Sapin", hex: "#00643c" },
-  { name: "Bambou", hex: "#96be00" },
-  { name: "Acacia", hex: "#d2d200" },
-  { name: "Jaune vif", hex: "#ffcd00" },
-  { name: "Jaune ocre", hex: "#dfb039" },
-  { name: "Mandarine", hex: "#ff7d00" },
-  { name: "Orange", hex: "#ed6e00" },
-  { name: "Rouge coquelicot", hex: "#e3051b" },
-  { name: "Rouge framboise", hex: "#d33c56" },
-  { name: "Saumon", hex: "#ff645a" },
-  { name: "Rose", hex: "#fd8db6" },
-  { name: "Magenta", hex: "#cc1971" },
-  { name: "Fuchsia", hex: "#dc5ab4" },
-  { name: "Lilas", hex: "#c085b6" },
-  { name: "Violet", hex: "#6e32c9" },
-  { name: "Marron", hex: "#8d5e2a" },
-  { name: "Olive clair", hex: "#a4b72b" },
-  { name: "Olive foncé", hex: "#6f8021" },
-  { name: "Perle", hex: "#f0dcd2" },
-  { name: "Élysée", hex: "#6e645a" },
-  { name: "Noir", hex: "#000000" },
-];
 
 const compatibleLines = computed(() => {
   if (!props.line) return [];
@@ -172,7 +135,7 @@ const handleLinkedLineChange = () => {
 
             <datalist id="default-colors">
               <option
-                v-for="color in defaultBgColors"
+                v-for="color in DEFAULT_BG_COLORS"
                 :key="color.hex"
                 :value="color.hex"
               >
@@ -195,7 +158,7 @@ const handleLinkedLineChange = () => {
 
           <datalist id="default-text-colors">
             <option
-              v-for="color in defaultTextColor"
+              v-for="color in DEFAULT_TEXT_COLORS"
               :key="color.hex"
               :value="color.hex"
             >
