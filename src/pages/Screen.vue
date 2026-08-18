@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import Lumiplan from '../components/Lumiplan.vue';
 import FitBox from '../components/FitBox.vue';
-import { ref } from 'vue';
+import { onDeactivated, onUnmounted, ref } from 'vue';
+import { AudioManager } from '../audio.ts';
 const ratio = ref<number|string>('32/9');
+onDeactivated(() => {
+  AudioManager.stopAll();
+});
+
+onUnmounted(() => {
+  AudioManager.stopAll();
+});
 </script>
 <template>
   <div class="content">

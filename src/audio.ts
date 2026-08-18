@@ -3,6 +3,7 @@ import { cleanId } from "./utils";
 
 const initialSoundState =
   new URLSearchParams(window.location.search).get("sounds") === "true";
+
 const isSoundEnabledRef = ref(initialSoundState);
 
 export class AudioManager {
@@ -10,8 +11,14 @@ export class AudioManager {
 
   static isSoundEnabled = isSoundEnabledRef;
 
+  private static activeAudios = new Set<HTMLAudioElement>();
+
   static toggleSounds = (enabled: boolean) => {
     isSoundEnabledRef.value = enabled;
+
+    if (!enabled) {
+      this.stopAll();
+    }
 
     const url = new URL(window.location.href);
     url.searchParams.set("sounds", enabled ? "true" : "false");
@@ -19,11 +26,7 @@ export class AudioManager {
   };
 
   static areSoundsEnabled = (): boolean => {
-    const result = isSoundEnabledRef.value;
-    console.info(
-      "La fonctionnalité son est" + (result ? " activée" : " désactivée"),
-    );
-    return result;
+    return isSoundEnabledRef.value;
   };
 
   static playSound = (path: string, playOnEnd?: () => void) => {
@@ -37,16 +40,28 @@ export class AudioManager {
 
     const audio = new Audio(path);
 
+    this.activeAudios.add(audio);
+
     let callbackCalled = false;
+
+    const cleanup = () => {
+      this.activeAudios.delete(audio);
+      audio.removeEventListener("ended", handleEnd);
+      audio.removeEventListener("error", handleEnd);
+    };
+
     const handleEnd = () => {
       if (!callbackCalled) {
         callbackCalled = true;
-        if (playOnEnd) playOnEnd();
+        cleanup();
+
+        if (playOnEnd) {
+          playOnEnd();
+        }
       }
     };
 
     audio.addEventListener("ended", handleEnd);
-
     audio.addEventListener("error", handleEnd);
 
     audio.play().catch((err) => {
@@ -54,14 +69,27 @@ export class AudioManager {
       handleEnd();
     });
   };
+
+  static stopAll = () => {
+    for (const audio of this.activeAudios) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = "";
+    }
+
+    this.activeAudios.clear();
+  };
+
   static playStopName = (
     lineId: string,
     stopId: string,
     isTerminus: boolean,
   ) => {
     if (!this.areSoundsEnabled()) return;
+
     const path =
-      this.SOUND_DIR + `/${cleanId(lineId)}/stops/${cleanId(stopId)}.mp3`;
+      this.SOUND_DIR +
+      `/${cleanId(lineId)}/stops/${cleanId(stopId)}.mp3`;
 
     if (isTerminus) {
       this.playSound(path, () => {
@@ -72,7 +100,10 @@ export class AudioManager {
     }
   };
 
-  static playDirection = (lineId: string, directionStopId: string) => {
+  static playDirection = (
+    lineId: string,
+    directionStopId: string,
+  ) => {
     if (!this.areSoundsEnabled()) return;
 
     const path =
@@ -84,6 +115,9 @@ export class AudioManager {
 
   static playFinalStop = () => {
     if (!this.areSoundsEnabled()) return;
-    this.playSound(this.SOUND_DIR + `/generic/terminus.mp3`);
+
+    this.playSound(
+      this.SOUND_DIR + `/generic/terminus.mp3`,
+    );
   };
 }
