@@ -146,7 +146,7 @@ const handleLinkedLineChange = () => {
         </div>
 
         <div class="field-group">
-          <label for="line-secondary-color"> Couleur secondaire </label>
+          <label for="line-secondary-color"> Couleur du texte </label>
 
           <input
             type="color"
