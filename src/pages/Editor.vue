@@ -32,7 +32,8 @@ const defaultLine: Line = {
   id: crypto.randomUUID(),
   mode: Mode.BUS,
   name: "Ligne N°1",
-  color: DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
+  color:
+    DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
   textColor: "#FFFFFF",
 };
 const defaultStop: StopWithTime = {
@@ -66,7 +67,8 @@ const _lines = ref<Line[]>([defaultDesserte.line]);
 const lines = computed(() => sortedLines(_lines.value));
 const desserteWithLine = ref<DesserteWithLine>(defaultDesserte);
 const saveFileName = ref<string>("Ma Desserte");
-
+const copySuccess = ref(false);
+const downloadSuccess = ref(false);
 const selectedLineInModal = ref<Line | null>(null);
 const selectedStopInModal = ref<StopWithTime | null>(null);
 const lineModalRef = ref<InstanceType<typeof LineEditorModal> | null>(null);
@@ -118,10 +120,12 @@ const openStopEditorModal = (stop: StopWithTime) => {
 };
 
 const addLine = () => {
-  const newLine:Line = {
+  const newLine: Line = {
     ...defaultLine,
     name: `Ligne n°${_lines.value.length + 1}`,
-    color:DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
+    color:
+      DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)]
+        .hex,
     id: `editor-made-line-${crypto.randomUUID()}`,
   };
   lines.value.push(newLine);
@@ -170,11 +174,20 @@ const handleSelectBaseLine = (lineId: string) => {
     desserteWithLine.value.line = selectedBaseLine;
   }
 };
-
 const loadData = (parsedData: SaveFile, fallbackName: string) => {
   _lines.value = parsedData.lines;
   desserteWithLine.value = parsedData.journey;
   messages.value = parsedData.messages || [];
+
+  const baseLine = _lines.value.find(
+    (l) => l.id === desserteWithLine.value.line.id,
+  );
+  if (baseLine) {
+    desserteWithLine.value.line = baseLine;
+  } else {
+    _lines.value.push(desserteWithLine.value.line);
+  }
+
   desserteWithLine.value.desserte.stops.forEach((stop: StopWithTime) => {
     stop.stop.connectedLines = lines.value.filter((line) =>
       stop.stop.connectedLines.some(
@@ -185,6 +198,38 @@ const loadData = (parsedData: SaveFile, fallbackName: string) => {
   saveFileName.value = parsedData.header.name || fallbackName;
 };
 
+const handleApiImport = (journey: Desserte) => {
+  const uniqueLines = new Map<string, Line>();
+
+  journey.stops.forEach((s) => {
+    s.stop.connectedLines.forEach((l) => {
+      if (!uniqueLines.has(l.id)) {
+        uniqueLines.set(l.id, l);
+      }
+    });
+  });
+  journey.stops.forEach((s) => {
+    s.stop.connectedLines = s.stop.connectedLines.map(
+      (l) => uniqueLines.get(l.id) as Line,
+    );
+  });
+
+  desserteWithLine.value.desserte = journey;
+  _lines.value = Array.from(uniqueLines.values());
+
+  const existingBase = _lines.value.find(
+    (l) => l.id === desserteWithLine.value.line.id,
+  );
+  if (existingBase) {
+    desserteWithLine.value.line = existingBase;
+  } else if (_lines.value.length > 0) {
+    desserteWithLine.value.line = _lines.value[0];
+  } else {
+    _lines.value.push(desserteWithLine.value.line);
+  }
+
+  saveFileName.value = `Import_${journey.id}`;
+};
 const applyImportedData = (jsonString: string) => {
   try {
     const parsedData = JSON.parse(jsonString) as SaveFile;
@@ -208,30 +253,6 @@ const applyImportedData = (jsonString: string) => {
     alert("Impossible de lire les données JSON.");
   }
 };
-
-const handleApiImport = (journey: Desserte) => {
-  const uniqueLines = new Map<string, Line>();
-
-  journey.stops.forEach((s) => {
-    s.stop.connectedLines.forEach((l) => {
-      if (!uniqueLines.has(l.id)) {
-        uniqueLines.set(l.id, l);
-      }
-    });
-  });
-  journey.stops.forEach((s) => {
-    s.stop.connectedLines = s.stop.connectedLines.map(
-      (l) => uniqueLines.get(l.id) as Line,
-    );
-  });
-
-  desserteWithLine.value.desserte = journey;
-  _lines.value = Array.from(uniqueLines.values());
-  saveFileName.value = `Import_${journey.id}`;
-};
-
-const copySuccess = ref(false);
-const downloadSuccess = ref(false);
 
 const getExportData = (): string =>
   JSON.stringify(
