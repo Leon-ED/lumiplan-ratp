@@ -7,11 +7,13 @@ import { cleanId } from "../../utils";
 import TrainLogo from "./TrainLogo.vue";
 import MetroLogo from "./MetroLogo.vue";
 import TramLogo from "./TramLogo.vue";
+import BusRemplacementLineLogo from "./BusRemplacementLineLogo.vue";
 
 interface Props {
   line: Line;
   className: string;
   size?: string;
+  transparent?: boolean;
   fontSize?: string;
   logoStyle?: string;
   blink?: boolean;
@@ -117,11 +119,11 @@ const isLineSpecial = computed(() => {
     "C01853",
     "C02404",
   ];
+
   return (
     specialNames.includes(
       props.line.name.toLocaleUpperCase().replace(/\s/g, ""),
-    ) ||
-    specialIds.includes(cleanId(props.line.id))
+    ) || specialIds.includes(cleanId(props.line.id))
   );
 });
 const computeBackupImgLink = computed(() => {
@@ -131,7 +133,7 @@ const computeNormalImgLink = computed(() => {
   return "/lines/" + cleanId(cleanId(props.line.id)) + ".svg";
 });
 const lineLogoComponent = computed(() => {
-  if(isLineSpecial.value) {
+  if (isLineSpecial.value) {
     return null;
   }
   if ([Mode.RER, Mode.TRANSILIEN].includes(props.line.mode)) {
@@ -153,6 +155,7 @@ const lineLogoComponent = computed(() => {
       :line-name="line.name"
       :bg-color="line.color"
       :text-color="line.textColor"
+      :transparent="props.transparent"
       :height="props.size ? props.size : '100%'"
     />
   </div>
@@ -183,6 +186,26 @@ const lineLogoComponent = computed(() => {
       :base-font-size="fontSize"
       :textColor="props.line.textColor"
       :style="props.logoStyle"
+    />
+  </div>
+  <div
+    v-else-if="
+      [Mode.BUS_REMPLACEMENT].includes(props.line.mode) && props.line.linkedLine
+    "
+    :class="props.className"
+  >
+    <BusRemplacementLineLogo
+      :data-line-mode-and-name="
+        props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
+      "
+      :data-line-id="cleanId(props.line.id)"
+      :lineName="props.line.name"
+      :height="props.size ? props.size : '100%'"
+      :bgColor="props.line.color"
+      :base-font-size="fontSize"
+      :textColor="props.line.textColor"
+      :style="props.logoStyle"
+      :replacedLine="props.line.linkedLine"
     />
   </div>
   <div

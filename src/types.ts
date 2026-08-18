@@ -39,6 +39,7 @@ export interface InfoTraffic {
 }
 export enum Mode {
   BUS = "BUS",
+  BUS_REMPLACEMENT = "BUS_REMPLACEMENT",
   NOCTILIEN = "NOCTILIEN",
   TRAM = "TRAM",
   METRO = "METRO",
@@ -53,6 +54,7 @@ export interface Line {
   color: string;
   textColor: string;
   mode: Mode;
+  linkedLine?: Line;
 }
 
 export interface SaveFileHeader {
@@ -81,4 +83,37 @@ export interface Article {
   title: string;
   text: string;
   images: string[];
+}
+
+export interface VehicleJourney {
+  id: string;
+  routeId: string;
+  directionId: string;
+  headsign: string;
+  shortName: string;
+  originStop: DestinationStop;
+  destinationStop: DestinationStop;
+  areBikesAllowed: boolean;
+  isWheelchairAccessible: boolean;
+  stopTimes: StopTime[];
+}
+
+export interface DestinationStop {
+  stopRef: string;
+  stopName: string;
+  transportationModes: any[];
+}
+
+export interface StopTime {
+  stopPoint: DestinationStop;
+  arrivalTime: string;
+  departureTime: string;
+  order: number;
+  status: Status;
+}
+
+export enum Status {
+  FirstStop = "first_stop",
+  LastStop = "last_stop",
+  NormalStop = "normal_stop",
 }

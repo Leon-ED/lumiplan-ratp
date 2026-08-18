@@ -100,7 +100,7 @@ const exportToPDF = () => {
                 {{ desserteWithLine.line.name }} (Actuelle)
               </option>
               <option v-for="line in allLines" :key="line.id" :value="line.id">
-                {{ line.mode }} {{ line.name }}
+                {{ line.mode.replace('_', ' ').replace('REMPLACEMENT','') }} {{ line.name }}
               </option>
             </select>
           </div>

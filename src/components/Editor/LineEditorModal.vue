@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Line, Mode } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 
-defineProps<{
+const props = defineProps<{
   line: Line | null;
+  allLines: Line[];
 }>();
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
@@ -31,22 +32,22 @@ const defaultBgColors = [
   { name: "Bleu foncé", hex: "#003a80" },
   { name: "Bleu outremer", hex: "#0064b0" },
   { name: "Bleu clair", hex: "#51afdf" },
-  { name: "Bleu canard", hex: "#003c5f" }, 
-  { name: "Pervenche", hex: "#82c8e6" }, 
+  { name: "Bleu canard", hex: "#003c5f" },
+  { name: "Pervenche", hex: "#82c8e6" },
   { name: "Turquoise", hex: "#00a88f" },
   { name: "Vert foncé", hex: "#00814f" },
   { name: "Vert clair", hex: "#7ab829" },
   { name: "Émeraude", hex: "#198250" },
   { name: "Sapin", hex: "#00643c" },
-  { name: "Bambou", hex: "#96be00" }, 
-  { name: "Acacia", hex: "#d2d200" }, 
+  { name: "Bambou", hex: "#96be00" },
+  { name: "Acacia", hex: "#d2d200" },
   { name: "Jaune vif", hex: "#ffcd00" },
   { name: "Jaune ocre", hex: "#dfb039" },
-  { name: "Mandarine", hex: "#ff7d00" }, 
+  { name: "Mandarine", hex: "#ff7d00" },
   { name: "Orange", hex: "#ed6e00" },
   { name: "Rouge coquelicot", hex: "#e3051b" },
   { name: "Rouge framboise", hex: "#d33c56" },
-  { name: "Saumon", hex: "#ff645a" }, 
+  { name: "Saumon", hex: "#ff645a" },
   { name: "Rose", hex: "#fd8db6" },
   { name: "Magenta", hex: "#cc1971" },
   { name: "Fuchsia", hex: "#dc5ab4" },
@@ -55,23 +56,75 @@ const defaultBgColors = [
   { name: "Marron", hex: "#8d5e2a" },
   { name: "Olive clair", hex: "#a4b72b" },
   { name: "Olive foncé", hex: "#6f8021" },
-  { name: "Perle", hex: "#f0dcd2" }, 
-  { name: "Élysée", hex: "#6e645a" }, 
+  { name: "Perle", hex: "#f0dcd2" },
+  { name: "Élysée", hex: "#6e645a" },
   { name: "Noir", hex: "#000000" },
 ];
+
+const compatibleLines = computed(() => {
+  if (!props.line) return [];
+
+  return props.allLines.filter(
+    (otherLine) =>
+      ![
+        Mode.NOCTILIEN,
+        Mode.BUS_REMPLACEMENT,
+        Mode.BUS,
+        Mode.TER,
+      ].includes(otherLine.mode) && otherLine.id !== props.line?.id,
+  );
+});
+
+const updateColorsFromLinkedLine = (linkedLine: Line | null | undefined) => {
+  if (!props.line || !linkedLine) return;
+
+  props.line.color = linkedLine.color;
+  props.line.textColor = linkedLine.textColor;
+};
+
+watch(
+  () => props.line?.mode,
+  (mode) => {
+    if (!props.line || mode !== Mode.BUS_REMPLACEMENT) return;
+
+    const firstLine = compatibleLines.value[0];
+
+    if (!firstLine) return;
+
+    props.line.linkedLine = firstLine;
+
+    updateColorsFromLinkedLine(firstLine);
+  },
+  { immediate: true },
+);
+
+watch(
+  () => props.line?.linkedLine,
+  (linkedLine) => {
+    updateColorsFromLinkedLine(linkedLine);
+  },
+);
 </script>
 
 <template>
   <dialog class="line-edition" ref="dialogRef">
     <header class="dialog-header">
       <h3>Modifier la ligne</h3>
-      <button class="close-btn" @click="close" title="Fermer">✕</button>
+
+      <button class="close-btn" @click="close" title="Fermer">
+        ✕
+      </button>
     </header>
 
     <div class="line-edition_fields" v-if="line">
       <div class="field-group">
         <label for="line-mode">Mode de transport</label>
-        <select name="line-mode" id="line-mode" v-model="line.mode">
+
+        <select
+          name="line-mode"
+          id="line-mode"
+          v-model="line.mode"
+        >
           <option :value="Mode.RER">RER</option>
           <option :value="Mode.TRANSILIEN">Transilien</option>
           <option :value="Mode.METRO">Métro</option>
@@ -79,11 +132,38 @@ const defaultBgColors = [
           <option :value="Mode.CABLE">Téléphérique</option>
           <option :value="Mode.BUS">Bus</option>
           <option :value="Mode.NOCTILIEN">Noctilien</option>
+          <option :value="Mode.BUS_REMPLACEMENT">
+            Bus de remplacement
+          </option>
+        </select>
+      </div>
+
+      <div
+        class="field-group"
+        v-if="line.mode === Mode.BUS_REMPLACEMENT"
+      >
+        <label for="line-linked-line">
+          Remplace la ligne
+        </label>
+
+        <select
+          name="line-linked-line"
+          id="line-linked-line"
+          v-model="line.linkedLine"
+        >
+          <option
+            v-for="otherLine in compatibleLines"
+            :key="otherLine.id"
+            :value="otherLine"
+          >
+            {{ otherLine.mode }} {{ otherLine.name }}
+          </option>
         </select>
       </div>
 
       <div class="field-group">
         <label for="line-name">Nom de la ligne</label>
+
         <input
           type="text"
           name="line-name"
@@ -95,7 +175,10 @@ const defaultBgColors = [
 
       <div class="color-row">
         <div class="field-group">
-          <label for="line-color">Couleur principale</label>
+          <label for="line-color">
+            Couleur principale
+          </label>
+
           <div>
             <input
               type="color"
@@ -116,8 +199,12 @@ const defaultBgColors = [
             </datalist>
           </div>
         </div>
+
         <div class="field-group">
-          <label for="line-secondary-color">Couleur secondaire</label>
+          <label for="line-secondary-color">
+            Couleur secondaire
+          </label>
+
           <input
             type="color"
             name="line-secondary-color"
@@ -125,6 +212,7 @@ const defaultBgColors = [
             v-model="line.textColor"
             list="default-text-colors"
           />
+
           <datalist id="default-text-colors">
             <option
               v-for="color in defaultTextColor"
@@ -139,7 +227,11 @@ const defaultBgColors = [
     </div>
 
     <div class="line-edition_render" v-if="line">
-      <LineLogo :line="line" class-name="line-logo" size="5rem" />
+      <LineLogo
+        :line="line"
+        class-name="line-logo"
+        size="5rem"
+      />
     </div>
   </dialog>
 </template>
@@ -159,7 +251,7 @@ dialog.line-edition {
 
 dialog.line-edition::backdrop {
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px); 
+  backdrop-filter: blur(4px);
 }
 
 .dialog-header {
@@ -274,3 +366,4 @@ input[type="color"]::-webkit-color-swatch {
   border: 1px dashed #ccc;
 }
 </style>
+```

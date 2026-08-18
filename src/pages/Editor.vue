@@ -394,7 +394,7 @@ const deleteLine = (line: Line) => {
 
 <template>
   <div class="page-wrapper">
-    <LineEditorModal ref="lineModalRef" :line="selectedLineInModal" />
+    <LineEditorModal ref="lineModalRef" :line="selectedLineInModal" :all-lines="lines" />
     <StopEditorModal
       ref="stopModalRef"
       :all-lines="lines"

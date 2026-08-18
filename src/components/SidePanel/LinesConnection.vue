@@ -8,7 +8,11 @@
     <div class="line-connection">
       <div class="header">
         <Transition name="text-translation-fade" mode="out-in">
-          <span class="translation" v-html="translation" :key="translation"></span>
+          <span
+            class="translation"
+            v-html="translation"
+            :key="translation"
+          ></span>
         </Transition>
       </div>
 
@@ -65,6 +69,9 @@ const linesByMode = computed(() => {
       return;
     }
     if (line.mode === Mode.NOCTILIEN) {
+      line.mode = Mode.BUS;
+    }
+    if (line.mode === Mode.BUS_REMPLACEMENT) {
       line.mode = Mode.BUS;
     }
     if (!grouped[line.mode]) {
@@ -146,7 +153,7 @@ const linesByMode = computed(() => {
   opacity: 0;
   transform: translateX(100%);
   z-index: 1; /* triangle derrière */
-  animation: slide-from-behind .4s ease-out 1.17s forwards;
+  animation: slide-from-behind 0.4s ease-out 1.17s forwards;
   display: none;
 }
 
