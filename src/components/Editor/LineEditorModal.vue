@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { Line, Mode } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 
@@ -66,12 +66,9 @@ const compatibleLines = computed(() => {
 
   return props.allLines.filter(
     (otherLine) =>
-      ![
-        Mode.NOCTILIEN,
-        Mode.BUS_REMPLACEMENT,
-        Mode.BUS,
-        Mode.TER,
-      ].includes(otherLine.mode) && otherLine.id !== props.line?.id,
+      ![Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS, Mode.TER].includes(
+        otherLine.mode,
+      ) && otherLine.id !== props.line?.id,
   );
 });
 
@@ -82,28 +79,22 @@ const updateColorsFromLinkedLine = (linkedLine: Line | null | undefined) => {
   props.line.textColor = linkedLine.textColor;
 };
 
-watch(
-  () => props.line?.mode,
-  (mode) => {
-    if (!props.line || mode !== Mode.BUS_REMPLACEMENT) return;
+const handleModeChange = () => {
+  if (!props.line) return;
 
+  if (props.line.mode === Mode.BUS_REMPLACEMENT && !props.line.linkedLine) {
     const firstLine = compatibleLines.value[0];
 
-    if (!firstLine) return;
+    if (firstLine) {
+      props.line.linkedLine = firstLine;
+      updateColorsFromLinkedLine(firstLine);
+    }
+  }
+};
 
-    props.line.linkedLine = firstLine;
-
-    updateColorsFromLinkedLine(firstLine);
-  },
-  { immediate: true },
-);
-
-watch(
-  () => props.line?.linkedLine,
-  (linkedLine) => {
-    updateColorsFromLinkedLine(linkedLine);
-  },
-);
+const handleLinkedLineChange = () => {
+  updateColorsFromLinkedLine(props.line?.linkedLine);
+};
 </script>
 
 <template>
@@ -111,19 +102,18 @@ watch(
     <header class="dialog-header">
       <h3>Modifier la ligne</h3>
 
-      <button class="close-btn" @click="close" title="Fermer">
-        ✕
-      </button>
+      <button class="close-btn" @click="close" title="Fermer">✕</button>
     </header>
 
     <div class="line-edition_fields" v-if="line">
       <div class="field-group">
         <label for="line-mode">Mode de transport</label>
 
-        <select
-          name="line-mode"
-          id="line-mode"
+        <select 
+          name="line-mode" 
+          id="line-mode" 
           v-model="line.mode"
+          @change="handleModeChange"
         >
           <option :value="Mode.RER">RER</option>
           <option :value="Mode.TRANSILIEN">Transilien</option>
@@ -132,24 +122,18 @@ watch(
           <option :value="Mode.CABLE">Téléphérique</option>
           <option :value="Mode.BUS">Bus</option>
           <option :value="Mode.NOCTILIEN">Noctilien</option>
-          <option :value="Mode.BUS_REMPLACEMENT">
-            Bus de remplacement
-          </option>
+          <option :value="Mode.BUS_REMPLACEMENT">Bus de remplacement</option>
         </select>
       </div>
 
-      <div
-        class="field-group"
-        v-if="line.mode === Mode.BUS_REMPLACEMENT"
-      >
-        <label for="line-linked-line">
-          Remplace la ligne
-        </label>
+      <div class="field-group" v-if="line.mode === Mode.BUS_REMPLACEMENT">
+        <label for="line-linked-line"> Remplace la ligne </label>
 
         <select
           name="line-linked-line"
           id="line-linked-line"
           v-model="line.linkedLine"
+          @change="handleLinkedLineChange"
         >
           <option
             v-for="otherLine in compatibleLines"
@@ -175,9 +159,7 @@ watch(
 
       <div class="color-row">
         <div class="field-group">
-          <label for="line-color">
-            Couleur principale
-          </label>
+          <label for="line-color"> Couleur principale </label>
 
           <div>
             <input
@@ -201,9 +183,7 @@ watch(
         </div>
 
         <div class="field-group">
-          <label for="line-secondary-color">
-            Couleur secondaire
-          </label>
+          <label for="line-secondary-color"> Couleur secondaire </label>
 
           <input
             type="color"
@@ -227,11 +207,7 @@ watch(
     </div>
 
     <div class="line-edition_render" v-if="line">
-      <LineLogo
-        :line="line"
-        class-name="line-logo"
-        size="5rem"
-      />
+      <LineLogo :line="line" class-name="line-logo" size="5rem" />
     </div>
   </dialog>
 </template>
@@ -366,4 +342,3 @@ input[type="color"]::-webkit-color-swatch {
   border: 1px dashed #ccc;
 }
 </style>
-```
