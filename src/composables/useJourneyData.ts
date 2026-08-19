@@ -1,6 +1,7 @@
 import { ref, computed } from "vue";
 import { Api } from "../api";
 import { Desserte, InfoTraffic, Line, Mode, Stop, SaveFile } from "../types";
+import { cleanId } from "../utils";
 
 export function useJourneyData(
   routeLineId: string | null,
@@ -125,7 +126,7 @@ export function useJourneyData(
   const currentConnections = computed(() => {
     return currentStop.value
       ? currentStop.value.stop.connectedLines.filter(
-          (l: Line) => l.id !== line.value?.id,
+          (l: Line) => cleanId(l.id) !== cleanId(line.value?.id ?? ""),
         )
       : [];
   });
@@ -137,7 +138,7 @@ export function useJourneyData(
     desserte.value.stops.forEach((ds) => {
       ds.stop.connectedLines.forEach((l) => {
         if (
-          l.id !== line.value?.id &&
+          cleanId(l.id) !== cleanId(line.value?.id ?? "") &&
           !linesIdsSet.has(l.id) &&
           whitelistedModes.includes(l.mode)
         ) {

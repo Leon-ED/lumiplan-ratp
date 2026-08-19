@@ -289,7 +289,7 @@ const updateState = () => {
     isAutoPassStops.value &&
     currentStop.value &&
     ((currentStop.value.isTerminus &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) < -20) ||
+      getSecondesFromDate(currentStop.value.timeOfArrival, true) < -30) ||
       (!currentStop.value.isTerminus &&
         getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -3))
   ) {
