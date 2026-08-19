@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { DesserteWithLine, Line, StopWithTime } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 import EditorStopItem from "./EditorStopItem.vue";
@@ -19,6 +19,7 @@ const emit = defineEmits<{
   (e: "move-up", stop: StopWithTime): void;
   (e: "move-down", stop: StopWithTime): void;
 }>();
+
 const firstTerminusIndex = computed(() => {
   return props.sortedStops.findIndex((stop) => stop.isTerminus);
 });
@@ -29,6 +30,7 @@ const terminusCount = computed(() => {
 const hasTooManyTerminuses = computed(() => {
   return terminusCount.value > 2;
 });
+
 const onBaseLineChange = (event: Event) => {
   const select = event.target as HTMLSelectElement;
   emit("select-base-line", select.value);
@@ -36,6 +38,63 @@ const onBaseLineChange = (event: Event) => {
 
 const exportToPDF = () => {
   window.print();
+};
+
+// État pour le bouton de calcul OSRM
+const isCalculating = ref(false);
+
+const calculateTravelTimes = async () => {
+  const stops = props.sortedStops;
+  
+  if (stops.length < 2) {
+    alert("Il faut au moins 2 arrêts pour calculer les temps de parcours.");
+    return;
+  }
+
+  // Vérification de la présence des coordonnées pour tous les arrêts
+  const missingCoords = stops.some((s) => !s.stop.lat || !s.stop.lon);
+  if (missingCoords) {
+    alert(
+      "Certains arrêts n'ont pas de coordonnées (latitude/longitude) renseignées.\nVeuillez les éditer avant de lancer le calcul."
+    );
+    return;
+  }
+
+  isCalculating.value = true;
+
+  try {
+    // Format requis par OSRM: {longitude},{latitude};{longitude},{latitude}...
+    const coordinatesString = stops
+      .map((s) => `${s.stop.lon},${s.stop.lat}`)
+      .join(";");
+
+    // Appel au service Route de OSRM (overview=false pour alléger la réponse car on ne veut que les durées)
+    const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesString}?overview=false`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+      const legs = data.routes[0].legs;
+      
+      // OSRM renvoie N-1 legs pour N coordonnées
+      // legs[i] correspond au trajet entre l'arrêt i et l'arrêt i+1
+      for (let i = 0; i < legs.length; i++) {
+        // Mise à jour du temps de trajet du prochain arrêt
+        const nextStop = stops[i + 1];
+        nextStop.travelTime = Math.round(legs[i].duration); // durée renvoyée en secondes
+      }
+      
+      alert("Temps de parcours calculés et appliqués avec succès !");
+    } else {
+      alert("Erreur lors du calcul OSRM : " + (data.message || data.code));
+    }
+  } catch (error) {
+    console.error("Erreur appel OSRM:", error);
+    alert("Erreur réseau ou impossibilité de joindre l'API OSRM.");
+  } finally {
+    isCalculating.value = false;
+  }
 };
 </script>
 
@@ -132,13 +191,21 @@ const exportToPDF = () => {
       <div class="card-header">
         <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
         <div class="action-buttons no-print">
+          <button 
+            class="btn btn-outline" 
+            @click="calculateTravelTimes"
+            :disabled="isCalculating"
+            :title="'Calcule le temps de parcours entre chaque arrêt via OSRM'"
+          >
+            {{ isCalculating ? 'Calcul en cours...' : 'Calculer les temps (OSRM)' }}
+          </button>
           <button class="btn btn-outline" @click="exportToPDF">PDF</button>
           <button class="btn btn-secondary" @click="emit('add-stop')">
             + Ajouter un arrêt
           </button>
         </div>
       </div>
-<div v-if="hasTooManyTerminuses" class="warning-alert no-print">
+      <div v-if="hasTooManyTerminuses" class="warning-alert no-print">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
           <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -209,11 +276,15 @@ const exportToPDF = () => {
   border: none;
   transition: all 0.2s ease;
 }
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .btn-secondary {
   background-color: #f0f0f0;
   color: #333;
 }
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background-color: #e0e0e0;
 }
 .btn-outline {
@@ -221,7 +292,7 @@ const exportToPDF = () => {
   color: #495057;
   border: 1px solid #ced4da;
 }
-.btn-outline:hover {
+.btn-outline:hover:not(:disabled) {
   background-color: #f8f9fa;
   border-color: #adb5bd;
 }

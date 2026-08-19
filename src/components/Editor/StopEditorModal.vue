@@ -39,6 +39,32 @@ const updateTime = (
   props.stop[field] = `${baseDate}T${timeValue}`;
 };
 
+// Fonction pour intercepter le "coller" de coordonnées GPS
+const handleCoordinatesPaste = (event: ClipboardEvent) => {
+  if (!props.stop) return;
+
+  const pastedText = event.clipboardData?.getData("text");
+  if (!pastedText) return;
+
+  // Expression régulière pour extraire deux nombres décimaux séparés par une virgule et/ou un espace
+  const match = pastedText
+    .trim()
+    .match(/^(-?\d+(?:\.\d+)?)(?:\s*,\s*|\s+)(-?\d+(?:\.\d+)?)$/);
+
+  if (match) {
+    // Si la chaîne correspond au format "lat, lon", on empêche le collage classique
+    event.preventDefault();
+
+    const lat = parseFloat(match[1]);
+    const lon = parseFloat(match[2]);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      props.stop.stop.lat = lat;
+      props.stop.stop.lon = lon;
+    }
+  }
+};
+
 defineExpose({
   open,
 });
@@ -85,6 +111,42 @@ defineExpose({
         </div>
       </div>
 
+      <div class="row-fields">
+        <div class="field-group">
+          <label for="stop-lat">Latitude</label>
+          <input
+            type="number"
+            step="any"
+            id="stop-lat"
+            v-model.number="stop.stop.lat"
+            @paste="handleCoordinatesPaste"
+            placeholder="Ex: 48.8566"
+          />
+        </div>
+        <div class="field-group">
+          <label for="stop-lon">Longitude</label>
+          <input
+            type="number"
+            step="any"
+            id="stop-lon"
+            v-model.number="stop.stop.lon"
+            @paste="handleCoordinatesPaste"
+            placeholder="Ex: 2.3522"
+          />
+        </div>
+      </div>
+      <div class="row-fields">
+        <div class="field-group">
+          <label for="stop-radius">Rayon de déclenchement (en m)</label>
+          <input
+            type="number"
+            step="any"
+            id="stop-radius"
+            v-model.number="stop.stop.radius"
+            placeholder="Ex: 48.8566"
+          />
+        </div>
+      </div>
       <div class="row-fields">
         <template v-if="stop.isFirstStop">
           <div class="field-group">
@@ -275,7 +337,8 @@ input[type="number"] {
 }
 
 input[type="text"]:focus,
-input[type="time"]:focus {
+input[type="time"]:focus,
+input[type="number"]:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
   background-color: #fff;

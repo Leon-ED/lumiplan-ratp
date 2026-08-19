@@ -7,6 +7,9 @@ export interface Stop {
   isAccessible: boolean;
   hasGapWhenSteppingOff: boolean;
   connectedLines: Line[];
+  lat?: number;
+  lon?: number;
+  radius?: number;
 }
 
 export interface StopWithTime {

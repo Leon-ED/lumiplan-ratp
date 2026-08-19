@@ -2,27 +2,33 @@
 import { computed, ref, watch } from "vue";
 import { useClock } from "../../composables/useClock";
 import { AudioManager } from "../../audio";
+import type { ProgressionMode } from "../../composables/useScreenState";
 
 const props = defineProps<{
   fullScreen: boolean;
-  modelValue: boolean;
+  progressionMode: ProgressionMode;
 }>();
 
 const emit = defineEmits<{
   (e: "toggle-full-screen"): void;
-  (e: "update:modelValue", value: boolean): void;
+  (e: "update:progressionMode", value: ProgressionMode): void;
 }>();
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
-const localAutoPass = ref(props.modelValue);
+const localProgressionMode = ref<ProgressionMode>(props.progressionMode);
 
 watch(
-  () => props.modelValue,
+  () => props.progressionMode,
   (newVal) => {
-    localAutoPass.value = newVal;
+    localProgressionMode.value = newVal;
   },
 );
+
+watch(localProgressionMode, (newVal) => {
+  emit("update:progressionMode", newVal);
+});
+
 const { setCurrentTime, now } = useClock();
 const simulatedTime = computed({
   get() {
@@ -39,9 +45,6 @@ const simulatedTime = computed({
 
     setCurrentTime(date);
   },
-});
-watch(localAutoPass, (newVal) => {
-  emit("update:modelValue", newVal);
 });
 
 const open = () => {
@@ -69,10 +72,17 @@ defineExpose({ open, close });
         />
         <span>Mode plein écran</span>
       </label>
-      <label class="setting-item">
-        <input type="checkbox" v-model="localAutoPass" />
-        <span>Passage automatique des arrêts (basé sur l'heure)</span>
-      </label>
+
+      <!-- Sélecteur du mode de progression GPS / Horaire / Manuel -->
+      <div class="setting-item mode-selector">
+        <span>Mode de passage des arrêts :</span>
+        <select v-model="localProgressionMode" class="select-input">
+          <option value="TIME">Automatique (basé sur l'horaire)</option>
+          <option value="GPS">Géolocalisation (Auto via GPS)</option>
+          <option value="MANUAL">Manuel (au clic)</option>
+        </select>
+      </div>
+
       <label class="setting-item">
         <input
           type="checkbox"
@@ -157,6 +167,32 @@ dialog.custom-modal::backdrop {
   height: 18px;
   cursor: pointer;
 }
+
+/* Styles du sélecteur Mode GPS/Temps/Manuel */
+.mode-selector {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: default;
+}
+.select-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: #212529;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.select-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+}
+
 .time-setting {
   display: flex;
   justify-content: space-between;

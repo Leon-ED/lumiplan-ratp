@@ -1,4 +1,4 @@
-import { ref, watch, Ref } from "vue";
+import { ref, watch, computed, onUnmounted, Ref } from "vue";
 import { getSecondesFromDate } from "../utils";
 import { AudioManager } from "../audio";
 import { Desserte, Line, StopWithTime } from "../types";
@@ -13,17 +13,215 @@ export type ScreenState =
   | "LAST_STOP"
   | "NOT_IN_SERVICE";
 
+export type ProgressionMode = "TIME" | "MANUAL" | "GPS";
+
+const getDistanceFromLatLonInM = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) => {
+  const R = 6371e3; 
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 export function useScreenState(
   desserte: Ref<Desserte>,
   line: Ref<Line | null>,
   currentStop: Ref<StopWithTime | null>,
 ) {
   const state = ref<ScreenState>("NO_DATA");
-  const isAutoPassStops = ref(true);
+
+  const progressionMode = ref<ProgressionMode>("TIME");
+
+  const isAutoPassStops = computed({
+    get: () => progressionMode.value === "TIME",
+    set: (val: boolean) => {
+      progressionMode.value = val ? "TIME" : "MANUAL";
+    },
+  });
+
   const forcedState = ref<ScreenState | null>(null);
   const currentSecondsToArrival = ref<number>(9999);
 
   let departingAudioPlayed = false;
+
+  const currentLocation = ref<{ lat: number; lon: number } | null>(null);
+  const hasReachedCurrentStop = ref(false);
+  const hasInitialGpsSnapDone = ref(false);
+  const pendingSkippedStopId = ref<string | null>(null); 
+  let geoWatchId: number | null = null;
+
+  watch(progressionMode, (newMode) => {
+    if (newMode === "GPS") {
+      hasInitialGpsSnapDone.value = false;
+      pendingSkippedStopId.value = null;
+
+      if ("geolocation" in navigator) {
+        geoWatchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            currentLocation.value = {
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+            };
+          },
+          (err) => {
+            console.warn("Erreur ou perte du signal GPS:", err);
+            state.value = "NO_TRIP_DATA_AVAILABLE";
+            currentLocation.value = null;
+            hasInitialGpsSnapDone.value = false;
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 5000,
+          },
+        );
+      } else {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+        progressionMode.value = "MANUAL";
+      }
+    } else {
+      if (geoWatchId !== null) {
+        navigator.geolocation.clearWatch(geoWatchId);
+        geoWatchId = null;
+      }
+      currentLocation.value = null;
+    }
+  });
+
+  onUnmounted(() => {
+    if (geoWatchId !== null) navigator.geolocation.clearWatch(geoWatchId);
+  });
+
+  watch(currentLocation, (loc) => {
+    if (progressionMode.value !== "GPS") return;
+    if (!loc) return; 
+
+    if (desserte.value.stops.length === 0) {
+      state.value = "NO_TRIP_DATA_AVAILABLE";
+      return;
+    }
+
+    if (!hasInitialGpsSnapDone.value) {
+      let closestIndex = -1;
+      let minDistance = Infinity;
+
+      for (let i = 0; i < desserte.value.stops.length; i++) {
+        const s = desserte.value.stops[i];
+        if (s.stop.lat && s.stop.lon) {
+          const d = getDistanceFromLatLonInM(loc.lat, loc.lon, s.stop.lat, s.stop.lon);
+          if (d < minDistance) {
+            minDistance = d;
+            closestIndex = i;
+          }
+        }
+      }
+
+      if (closestIndex > 0) {
+        desserte.value.stops.splice(0, closestIndex);
+      }
+      
+      hasInitialGpsSnapDone.value = true;
+      hasReachedCurrentStop.value = false;
+      pendingSkippedStopId.value = null;
+    }
+
+    const activeStop = desserte.value.stops[0];
+    if (!activeStop || !activeStop.stop.lat || !activeStop.stop.lon) return;
+
+    const distanceToActive = getDistanceFromLatLonInM(
+      loc.lat,
+      loc.lon,
+      activeStop.stop.lat,
+      activeStop.stop.lon,
+    );
+    
+    const enterRadius = activeStop.stop.radius || 150;
+    const leaveRadius = enterRadius + 50; 
+
+    if (hasReachedCurrentStop.value && !activeStop.isStopSkipped) {
+      if (distanceToActive > leaveRadius) {
+        state.value = "NOT_AT_STOP";
+        hasReachedCurrentStop.value = false;
+
+        if (activeStop.isTerminus) {
+          desserte.value.stops.shift();
+          state.value = "NO_TRIP_DATA_AVAILABLE";
+        } else {
+          const departingId = activeStop.stop.id;
+          setTimeout(() => {
+            if (desserte.value.stops[0]?.stop.id === departingId) {
+              desserte.value.stops.shift();
+            }
+          }, 2000);
+        }
+      } else {
+        const targetState = activeStop.isFirstStop ? "FIRST_STOP" : "AT_STOP";
+        if (state.value !== targetState) {
+          state.value = targetState;
+        }
+      }
+      return;
+    }
+
+    let inRadiusIndex = -1;
+    for (let i = 0; i < desserte.value.stops.length; i++) {
+      const s = desserte.value.stops[i];
+      if (s.stop.lat && s.stop.lon) {
+        const d = getDistanceFromLatLonInM(loc.lat, loc.lon, s.stop.lat, s.stop.lon);
+        const r = s.stop.radius || 150;
+        if (d <= r) {
+          inRadiusIndex = i;
+          break;
+        }
+      }
+    }
+    if (inRadiusIndex !== -1) {
+      if (inRadiusIndex > 0) {
+        desserte.value.stops.splice(0, inRadiusIndex);
+      }
+      
+      const newActiveStop = desserte.value.stops[0];
+      
+      if (newActiveStop.isStopSkipped) {
+        if (state.value !== "NOT_AT_STOP") state.value = "NOT_AT_STOP";
+        if (pendingSkippedStopId.value !== newActiveStop.stop.id) {
+          const targetId = newActiveStop.stop.id;
+          pendingSkippedStopId.value = targetId;
+          
+          setTimeout(() => {
+            if (desserte.value.stops[0]?.stop.id === targetId) {
+              desserte.value.stops.shift();
+            }
+            if (pendingSkippedStopId.value === targetId) {
+              pendingSkippedStopId.value = null;
+            }
+          }, 2000);
+        }
+      } else {
+        hasReachedCurrentStop.value = true;
+        pendingSkippedStopId.value = null; 
+        const targetState = newActiveStop.isFirstStop ? "FIRST_STOP" : "AT_STOP";
+        if (state.value !== targetState) {
+          state.value = targetState;
+        }
+      }
+    } else {
+      if (state.value !== "NOT_AT_STOP") {
+        state.value = "NOT_AT_STOP";
+      }
+    }
+  });
 
   const computeState = () => {
     if (!line.value) {
@@ -41,7 +239,11 @@ export function useScreenState(
       );
     }
 
-    if (!isAutoPassStops.value && forcedState.value !== null) {
+    if (progressionMode.value === "GPS") {
+      return;
+    }
+
+    if (progressionMode.value === "MANUAL" && forcedState.value !== null) {
       state.value = forcedState.value;
       return;
     }
@@ -71,13 +273,13 @@ export function useScreenState(
       state.value = "NOT_AT_STOP";
     }
 
-    if (!isAutoPassStops.value && forcedState.value === null) {
+    if (progressionMode.value === "MANUAL" && forcedState.value === null) {
       forcedState.value = state.value;
     }
   };
 
   const skipNextStop = () => {
-    if (isAutoPassStops.value) return;
+    if (progressionMode.value !== "MANUAL") return;
     if (desserte.value.stops.length === 0) return;
 
     if (currentStop.value?.isStopSkipped) {
@@ -101,8 +303,7 @@ export function useScreenState(
 
     if (state.value === "NOT_AT_STOP") {
       forcedState.value = "AT_STOP";
-    }
-    if (state.value === "AT_STOP") {
+    } else if (state.value === "AT_STOP") {
       const currentIsTerminus = currentStop.value?.isTerminus;
 
       if (currentStop.value) {
@@ -148,6 +349,7 @@ export function useScreenState(
 
   return {
     state,
+    progressionMode,
     isAutoPassStops,
     forcedState,
     currentSecondsToArrival,

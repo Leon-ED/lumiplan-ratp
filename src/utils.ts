@@ -1,5 +1,5 @@
 import { useClock } from "./composables/useClock";
-import { Desserte, Line, Mode, Status, VehicleJourney } from "./types";
+import { Line, Mode, Status, VehicleJourney } from "./types";
 
 export const getSecondesFromDate = (
   dateString: string,
