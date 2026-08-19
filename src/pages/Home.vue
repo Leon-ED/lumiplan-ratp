@@ -184,7 +184,7 @@
 <script setup lang="ts">
 import { watchDebounced } from "@vueuse/core";
 import { ref, computed } from "vue";
-import { Desserte, Line, VehicleJourney } from "../types";
+import {  Line, VehicleJourney } from "../types";
 import { Api } from "../api";
 import QuickMode from "../components/HomePage/QuickMode.vue";
 import LineLogo from "../components/Other/LineLogo.vue";
@@ -193,7 +193,7 @@ import { articles } from "../articles.ts";
 import NewsModal from "../components/NewsModal.vue";
 
 const selectedLine = ref<Line | null>(null);
-const selectedDesserte = ref<Desserte | null>(null);
+const selectedDesserte = ref<VehicleJourney | null>(null);
 const dessertes = ref<VehicleJourney[]>([]);
 const _search = ref("");
 const lines = ref<Line[]>([]);
@@ -289,7 +289,7 @@ watchDebounced(
     dessertes.value = [];
     lines.value = [];
     selectedLine.value = null;
-    serviceFilter.value = ""; 
+    serviceFilter.value = "";
     if (_search.value.trim() === "") {
       linesSearchStatus.value = "idle";
       return;
