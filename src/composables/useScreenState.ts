@@ -59,14 +59,12 @@ export function useScreenState(
       ((!currentStop.value.isTerminus &&
         getSecondesFromDate(currentStop.value.timeOfDeparture, true) >= -2) ||
         (currentStop.value.isTerminus &&
-          getSecondesFromDate(currentStop.value.timeOfDeparture, true) >= -30))
+          getSecondesFromDate(currentStop.value.timeOfDeparture, true) >= -45))
     ) {
       state.value = "AT_STOP";
     } else if (
-      currentStop.value &&
-      currentStop.value.isTerminus &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) >= -60 &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) <= 0
+      currentStop.value?.isTerminus &&
+      getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -45
     ) {
       state.value = "NO_TRIP_DATA_AVAILABLE";
     } else {

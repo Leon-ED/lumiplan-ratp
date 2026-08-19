@@ -100,9 +100,28 @@
         <span class="section-title">Sélectionner un service</span>
         <LineLogo :line="selectedLine" class-name="line-logo" size="2rem" />
       </div>
+
+      <!-- Nouvelle barre de recherche pour les services -->
+      <div class="service-filter-container">
+        <input
+          type="text"
+          v-model="serviceFilter"
+          list="terminus-list"
+          class="search-input service-filter-input"
+          placeholder="Filtrer par terminus, mission..."
+        />
+        <datalist id="terminus-list">
+          <option
+            v-for="option in terminusOptions"
+            :key="option"
+            :value="option"
+          ></option>
+        </datalist>
+      </div>
+
       <ul class="service-list">
         <li
-          v-for="desserte in dessertes"
+          v-for="desserte in filteredDessertes"
           :key="desserte.id"
           @click="selectedDesserte = desserte"
         >
@@ -112,28 +131,60 @@
           ></ServiceOverview>
         </li>
       </ul>
+
+      <div v-if="filteredDessertes.length === 0" class="status-message">
+        Aucun service ne correspond à votre recherche.
+      </div>
     </section>
 
     <footer class="page-footer">
       <div class="social-links">
-        <a href="https://twitter.com/gwadz_" target="_blank" rel="noopener noreferrer" class="social-link">Twitter</a>
-        <a href="https://discord.gg/tPyPnxVuxQ" target="_blank" rel="noopener noreferrer" class="social-link">Discord</a>
-        <a href="https://leon.gp" target="_blank" rel="noopener noreferrer" class="social-link">Autres projets</a>
-        <a href="/about" target="_blank" rel="noopener noreferrer" class="social-link">A propos</a>
+        <a
+          href="https://twitter.com/gwadz_"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          >Twitter</a
+        >
+        <a
+          href="https://discord.gg/tPyPnxVuxQ"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          >Discord</a
+        >
+        <a
+          href="https://leon.gp"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          >Autres projets</a
+        >
+        <a
+          href="/about"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+          >A propos</a
+        >
       </div>
       <p class="disclaimer">
         Ce site n'est en aucun cas affilié, soutenu ou validé par Île-de-France
         Mobilités, Lumiplan ou la RATP.
       </p>
     </footer>
-    <NewsModal v-if="isModalOpen" :articles="articles" @close="isModalOpen = false" />
+    <NewsModal
+      v-if="isModalOpen"
+      :articles="articles"
+      @close="isModalOpen = false"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
 import { watchDebounced } from "@vueuse/core";
-import { ref } from "vue";
-import { Desserte, Line } from "../types";
+import { ref, computed } from "vue";
+import { Desserte, Line, VehicleJourney } from "../types";
 import { Api } from "../api";
 import QuickMode from "../components/HomePage/QuickMode.vue";
 import LineLogo from "../components/Other/LineLogo.vue";
@@ -143,9 +194,12 @@ import NewsModal from "../components/NewsModal.vue";
 
 const selectedLine = ref<Line | null>(null);
 const selectedDesserte = ref<Desserte | null>(null);
-const dessertes = ref<Desserte[]>([]);
+const dessertes = ref<VehicleJourney[]>([]);
 const _search = ref("");
 const lines = ref<Line[]>([]);
+
+// Filtre des services
+const serviceFilter = ref("");
 
 const isModalOpen = ref(false);
 type DESSERTE_SEARCH_STATUS =
@@ -202,6 +256,31 @@ const openEditor = () => {
   window.open("/editor", "_blank");
 };
 
+const terminusOptions = computed(() => {
+  const options = new Set<string>();
+  dessertes.value.forEach((d) => {
+    if (d.destinationStop?.stopName) options.add(d.destinationStop.stopName);
+  });
+  return Array.from(options).sort();
+});
+
+const filteredDessertes = computed(() => {
+  if (!serviceFilter.value.trim()) return dessertes.value;
+
+  const searchLower = serviceFilter.value.toLowerCase().trim();
+  return dessertes.value.filter((d) => {
+    const destination = d.destinationStop?.stopName?.toLowerCase() || "";
+    const headsign = d.headsign?.toLowerCase() || "";
+    const shortName = d.shortName?.toLowerCase() || "";
+
+    return (
+      destination.includes(searchLower) ||
+      headsign.includes(searchLower) ||
+      shortName.includes(searchLower)
+    );
+  });
+});
+
 watchDebounced(
   _search,
   async () => {
@@ -210,6 +289,7 @@ watchDebounced(
     dessertes.value = [];
     lines.value = [];
     selectedLine.value = null;
+    serviceFilter.value = ""; 
     if (_search.value.trim() === "") {
       linesSearchStatus.value = "idle";
       return;
@@ -234,6 +314,7 @@ watchDebounced(
   selectedLine,
   async (newLine) => {
     desserteSearchStatus.value = "idle";
+    serviceFilter.value = ""; // Réinitialiser le filtre quand on change de ligne
     if (newLine) {
       selectedDesserte.value = null;
       dessertes.value = [];
@@ -305,7 +386,7 @@ main {
 .actions-container {
   flex-shrink: 0;
   display: flex;
-  gap: 0.8em; 
+  gap: 0.8em;
 }
 
 .news-btn {
@@ -354,7 +435,6 @@ main {
   transform: translateY(-2px);
 }
 
-
 section {
   width: 100%;
   margin-bottom: 2em;
@@ -386,6 +466,16 @@ section {
   box-shadow: 0 4px 12px rgba(0, 95, 173, 0.15);
 }
 
+/* Nouveaux styles pour le champ de filtre */
+.service-filter-container {
+  margin-bottom: 1.5em;
+}
+
+.service-filter-input {
+  font-size: 1rem;
+  padding: 0.6em 1em;
+}
+
 .modes {
   display: flex;
   gap: 0.8em;
@@ -404,7 +494,9 @@ section {
 }
 
 .line {
-  transition: transform 0.2s ease, opacity 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.3s ease;
   cursor: pointer;
 }
 
@@ -421,7 +513,7 @@ section {
   display: flex;
   align-items: center;
   gap: 0.8em;
-  margin-bottom: 1.5em;
+  margin-bottom: 1.2em;
   padding-bottom: 0.5em;
   border-bottom: 2px solid #f0f0f0;
 }
@@ -477,7 +569,9 @@ section {
   text-decoration: none;
   font-weight: 600;
   font-size: 1.05em;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .social-link:hover {
@@ -550,7 +644,7 @@ section {
   .modal-header {
     border-bottom: 1px solid #333;
   }
-  
+
   .modal-header h2 {
     color: #ffffff;
   }
