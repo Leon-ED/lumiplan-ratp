@@ -1,5 +1,5 @@
 import { useClock } from "./composables/useClock";
-import { Line, Mode } from "./types";
+import { Desserte, Line, Mode, Status, VehicleJourney } from "./types";
 
 export const getSecondesFromDate = (
   dateString: string,
@@ -75,5 +75,75 @@ export const sortedLines = (lines: Line[]): Line[] => {
       return a.name.localeCompare(b.name);
     }
     return aIndex - bIndex;
+  });
+};
+export const sortVehicleJourneys = (
+  journeys: VehicleJourney[],
+): VehicleJourney[] => {
+  const now = new Date().getTime();
+
+  return [...journeys].sort((a, b) => {
+    const getInfo = (journey: VehicleJourney) => {
+      const stops = journey.stopTimes ?? [];
+
+      if (stops.length === 0) {
+        return {
+          group: 3,
+          departureTime: Infinity,
+          remainingStops: 0,
+        };
+      }
+
+      const firstStop = stops[0];
+      const departureTime = new Date(firstStop.departureTime).getTime();
+
+      const remainingStops = stops.filter((stop) => {
+        const stopTime = new Date(stop.departureTime).getTime();
+
+        return stop.status !== Status.SkippedStop && stopTime >= now;
+      }).length;
+
+      const notStarted =
+        firstStop.status === Status.FirstStop && departureTime >= now;
+
+      if (notStarted) {
+        return {
+          group: 0,
+          departureTime,
+          remainingStops,
+        };
+      }
+
+      if (remainingStops <= 2) {
+        return {
+          group: 2,
+          departureTime,
+          remainingStops,
+        };
+      }
+
+      return {
+        group: 1,
+        departureTime,
+        remainingStops,
+      };
+    };
+
+    const infoA = getInfo(a);
+    const infoB = getInfo(b);
+
+    if (infoA.group !== infoB.group) {
+      return infoA.group - infoB.group;
+    }
+
+    if (infoA.group === 0) {
+      return infoA.departureTime - infoB.departureTime;
+    }
+
+    if (infoA.group === 1) {
+      return infoB.remainingStops - infoA.remainingStops;
+    }
+
+    return 0;
   });
 };

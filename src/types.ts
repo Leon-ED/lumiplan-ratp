@@ -115,5 +115,6 @@ export interface StopTime {
 export enum Status {
   FirstStop = "first_stop",
   LastStop = "last_stop",
+  SkippedStop = "skipped_stop",
   NormalStop = "normal_stop",
 }

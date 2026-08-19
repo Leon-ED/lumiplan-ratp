@@ -6,7 +6,7 @@ import {
   VehicleJourney,
 } from "./types";
 import { Converter } from "./converter";
-import { cleanId } from "./utils";
+import { cleanId, sortVehicleJourneys } from "./utils";
 
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
@@ -40,8 +40,7 @@ export class Api {
               landmarkName: "",
               subtitle: "",
               isAccessible: true,
-              connectedLines: stop.stopPoint.lines
-              .map((line: any) => ({
+              connectedLines: stop.stopPoint.lines.map((line: any) => ({
                 id: line.ref,
                 name: line.shortName,
                 color: line.color,
@@ -52,9 +51,9 @@ export class Api {
             timeOfArrival: stop.arrivalTime,
             timeOfDeparture: stop.departureTime,
             travelTime: 120,
-            isTerminus: stop.status === 'last_stop',
-            isFirstStop: stop.status === 'first_stop',
-            isStopSkipped: stop.status === 'skipped_stop',
+            isTerminus: stop.status === "last_stop",
+            isFirstStop: stop.status === "first_stop",
+            isStopSkipped: stop.status === "skipped_stop",
           }))
           .filter((stop: StopWithTime) => {
             const stopDate = new Date(stop.timeOfDeparture);
@@ -81,7 +80,7 @@ export class Api {
       );
     }
     const vehiclesData: any = await response.json();
-    return vehiclesData;
+    return sortVehicleJourneys(vehiclesData);
     // try {
     //   const vehiclesData: any = await response.json();
     //   return vehiclesData;
