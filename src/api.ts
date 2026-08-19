@@ -10,7 +10,7 @@ import { cleanId } from "./utils";
 
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
-  static apiBaseUrlV2 = "https://localhost:8000/api/idfm/";
+  static apiBaseUrlV2 = "https://ecrans-api.gwadz.fr/v2/api/idfm/";
 
   static async getJourney(
     journeyId: string,
