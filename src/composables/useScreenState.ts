@@ -147,7 +147,7 @@ export function useScreenState(
     );
     
     const enterRadius = activeStop.stop.radius || 150;
-    const leaveRadius = enterRadius + 50; 
+    const leaveRadius = enterRadius; 
 
     if (hasReachedCurrentStop.value && !activeStop.isStopSkipped) {
       if (distanceToActive > leaveRadius) {

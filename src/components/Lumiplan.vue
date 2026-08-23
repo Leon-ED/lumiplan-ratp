@@ -8,8 +8,6 @@
       @toggle-full-screen="emitEvent('toggle-full-screen')"
     />
   </Teleport>
-
-  <!-- Panneau de debug GPS en haut à gauche -->
   <div class="debug-gps-panel">
     <h4>Distances GPS</h4>
     <div v-if="userLocation">
@@ -20,9 +18,7 @@
         </li>
       </ul>
     </div>
-    <div v-else class="waiting-gps">
-      En attente du signal GPS...
-    </div>
+    <div v-else class="waiting-gps">En attente du signal GPS...</div>
   </div>
 
   <button
@@ -239,8 +235,13 @@ const toggleToolbar = () => {
 const userLocation = ref<{ lat: number; lon: number } | null>(null);
 let debugGeoWatchId: number | null = null;
 
-const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371e3; 
+const getDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) => {
+  const R = 6371e3;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
@@ -274,12 +275,12 @@ const stopsDistances = computed(() => {
     const lat = s.stop.lat;
     const lon = s.stop.lon;
     if (!lat || !lon) return { name: s.stop.name, distance: "N/A" };
-    
+
     const dist = getDistance(
       userLocation.value!.lat,
       userLocation.value!.lon,
       lat,
-      lon
+      lon,
     );
     return { name: s.stop.name, distance: `${dist}m` };
   });
@@ -377,7 +378,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeydown);
-  
   if ("geolocation" in navigator) {
     debugGeoWatchId = navigator.geolocation.watchPosition(
       (pos) => {
@@ -387,7 +387,7 @@ onMounted(async () => {
         };
       },
       (err) => console.warn("Erreur GPS (Debug):", err),
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
   }
 
@@ -431,13 +431,13 @@ onUnmounted(() => {
   background-color: rgba(0, 0, 0, 0.75);
   color: #00ff00;
   padding: 12px;
+  overflow-y: scroll;
+
   border-radius: 8px;
   font-family: monospace;
   font-size: 14px;
-  max-height: 50vh;
+  max-height: 20vh;
   width: 250px;
-  overflow-y: auto;
-  pointer-events: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   border: 1px solid #333;
 }
@@ -449,6 +449,9 @@ onUnmounted(() => {
   padding-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+.debug-gps-panel:hover {
+  opacity: 1;
 }
 .debug-gps-panel ul {
   list-style: none;

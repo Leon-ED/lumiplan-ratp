@@ -11,6 +11,7 @@ import { cleanId, sortVehicleJourneys } from "./utils";
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
   static apiBaseUrlV2 = "https://ecrans-api.gwadz.fr/v2/api/idfm/";
+  // static apiBaseUrlV2 = "https://localhost:8000/api/idfm/";
 
   static async getJourney(
     journeyId: string,
@@ -30,14 +31,18 @@ export class Api {
       const desserte: Desserte = {
         id: journeyData.id,
         isLimitedService: false,
+        geometry: journeyData.shape,
         direction: journeyData.destinationStop.stopName || journeyData.headsign,
         stops: journeyData.stopTimes
-          .map((stop: any) => ({
+          .map((stop: any, index: number) => ({
             stop: {
               id: stop.stopPoint.stopRef,
               parentId: stop.stopPoint.stopRef,
               name: stop.stopPoint.stopName,
               landmarkName: "",
+              lat: stop.stopPoint.lat,
+              lon: stop.stopPoint.lon,
+              radius: 80,
               subtitle: "",
               isAccessible: true,
               connectedLines: stop.stopPoint.lines.map((line: any) => ({
@@ -50,7 +55,13 @@ export class Api {
             },
             timeOfArrival: stop.arrivalTime,
             timeOfDeparture: stop.departureTime,
-            travelTime: 120,
+            travelTime: journeyData.stopTimes[index - 1]
+              ? (new Date(journeyData.stopTimes[index].arrivalTime).getTime() -
+                  new Date(
+                    journeyData.stopTimes[index - 1].departureTime,
+                  ).getTime()) /
+                1000
+              : undefined,
             isTerminus: stop.status === "last_stop",
             isFirstStop: stop.status === "first_stop",
             isStopSkipped: stop.status === "skipped_stop",
@@ -60,6 +71,7 @@ export class Api {
             return !removePastStops || stopDate >= now;
           }),
       };
+      console.log(desserte.stops[0].stop.lon);
       console.log("Fetched journey data:", desserte);
       return desserte;
     } catch (error) {

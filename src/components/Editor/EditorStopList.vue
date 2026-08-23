@@ -40,7 +40,6 @@ const exportToPDF = () => {
   window.print();
 };
 
-// État pour le bouton de calcul OSRM
 const isCalculating = ref(false);
 
 const calculateTravelTimes = async () => {
@@ -51,7 +50,6 @@ const calculateTravelTimes = async () => {
     return;
   }
 
-  // Vérification de la présence des coordonnées pour tous les arrêts
   const missingCoords = stops.some((s) => !s.stop.lat || !s.stop.lon);
   if (missingCoords) {
     alert(
@@ -63,26 +61,21 @@ const calculateTravelTimes = async () => {
   isCalculating.value = true;
 
   try {
-    // Format requis par OSRM: {longitude},{latitude};{longitude},{latitude}...
     const coordinatesString = stops
       .map((s) => `${s.stop.lon},${s.stop.lat}`)
       .join(";");
 
-    // Appel au service Route de OSRM (overview=false pour alléger la réponse car on ne veut que les durées)
-    const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesString}?overview=false`;
+    const url = `https://signal.eu.org/osm/eu/route/v1/train/${coordinatesString}?overview=full&geometries=geojson&steps=false`;
 
     const response = await fetch(url);
     const data = await response.json();
-
+    props.desserteWithLine.desserte.geometry = data.routes[0].geometry;
     if (data.code === "Ok" && data.routes && data.routes.length > 0) {
       const legs = data.routes[0].legs;
       
-      // OSRM renvoie N-1 legs pour N coordonnées
-      // legs[i] correspond au trajet entre l'arrêt i et l'arrêt i+1
       for (let i = 0; i < legs.length; i++) {
-        // Mise à jour du temps de trajet du prochain arrêt
         const nextStop = stops[i + 1];
-        nextStop.travelTime = Math.round(legs[i].duration); // durée renvoyée en secondes
+        nextStop.travelTime = Math.round(legs[i].duration); 
       }
       
       alert("Temps de parcours calculés et appliqués avec succès !");

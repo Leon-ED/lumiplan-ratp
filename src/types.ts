@@ -29,6 +29,7 @@ export interface Desserte {
   id: string;
   direction: string;
   isLimitedService: boolean;
+  geometry?: any;
   stops: StopWithTime[];
 }
 export interface InfoTraffic {

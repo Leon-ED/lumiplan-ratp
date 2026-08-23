@@ -161,10 +161,8 @@ const addTimeToDate = (
   isoString: string,
   additionalSeconds: number,
 ): string => {
-  console.log("Adding time:", additionalSeconds, "seconds to", isoString);
   const date = new Date(isoString);
   date.setSeconds(date.getSeconds() + additionalSeconds);
-  console.log("New date after adding time:", date.toISOString());
   return date.toISOString();
 };
 

@@ -42,8 +42,8 @@ onUnmounted(() => {
 
 const stopNameClass = computed(() => {
   return {
-    "stop-name-long": props.stop.stop.name.length >= 21,
-    "stop-name-very-long": props.stop.stop.name.length >= 29,
+    "stop-name-long": cleanText(props.stop.stop.name).length >= 21,
+    "stop-name-very-long": cleanText(props.stop.stop.name).length >= 29,
   };
 });
 
