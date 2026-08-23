@@ -62,16 +62,15 @@ const linesByMode = computed(() => {
     Mode.BUS,
     Mode.BUS,
     Mode.NOCTILIEN,
+    Mode.BUS_REMPLACEMENT,
+    Mode.BUS_AEROPORT,
   ];
   props.connections.forEach((line) => {
     if (line.id === (params.line as string)) {
       console.log("skip line", line.id);
       return;
     }
-    if (line.mode === Mode.NOCTILIEN) {
-      line.mode = Mode.BUS;
-    }
-    if (line.mode === Mode.BUS_REMPLACEMENT) {
+    if ([Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS_AEROPORT].includes(line.mode)) {
       line.mode = Mode.BUS;
     }
     if (!grouped[line.mode]) {

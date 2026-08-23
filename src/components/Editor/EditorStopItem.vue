@@ -23,7 +23,7 @@ const emit = defineEmits<{
 const processConnections = (lines: Line[]) => {
   const busLines = lines.filter(
     (l) =>
-      (l.mode === Mode.BUS || l.mode === Mode.NOCTILIEN || l.mode=== Mode.BUS_REMPLACEMENT) &&
+      (l.mode === Mode.BUS || l.mode === Mode.NOCTILIEN || l.mode=== Mode.BUS_REMPLACEMENT || l.mode === Mode.BUS_AEROPORT) &&
       l.id !== props.route.id,
   );
   const terLines = lines.filter((l) => l.mode === Mode.TER);
@@ -32,6 +32,7 @@ const processConnections = (lines: Line[]) => {
       l.mode !== Mode.BUS &&
       l.mode !== Mode.NOCTILIEN &&
       l.mode !== Mode.BUS_REMPLACEMENT &&
+      l.mode !== Mode.BUS_AEROPORT &&
       l.mode !== Mode.TER &&
       l.id !== props.route.id,
   );

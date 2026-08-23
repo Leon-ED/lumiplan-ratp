@@ -84,6 +84,8 @@ export function useJourneyData(
         (l: Line) =>
           l.mode !== Mode.BUS &&
           l.mode !== Mode.NOCTILIEN &&
+          l.mode !== Mode.BUS_REMPLACEMENT &&
+          l.mode !== Mode.BUS_AEROPORT &&
           l.id !== routeLineId,
       ).length;
     };

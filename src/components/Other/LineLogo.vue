@@ -171,7 +171,7 @@ const lineLogoComponent = computed(() => {
     :style="style"
   />
   <div
-    v-else-if="[Mode.BUS].includes(props.line.mode)"
+    v-else-if="[Mode.BUS,Mode.BUS_AEROPORT].includes(props.line.mode)"
     :class="props.className"
   >
     <BusLineLogo
