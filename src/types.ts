@@ -21,6 +21,7 @@ export interface StopWithTime {
   isStopSkipped: boolean;
   travelTime?: number;
 }
+export type ProgressionMode = "TIME" | "MANUAL" | "GPS";
 export interface DesserteWithLine {
   line: Line;
   desserte: Desserte;

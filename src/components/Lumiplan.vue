@@ -1,14 +1,9 @@
 <template>
   <Teleport to="body">
     <LoadSaveModal ref="loadSaveModalRef" @load="handleSaveLoaded" />
-    <SettingsModal
-      ref="settingsModalRef"
-      :full-screen="fullScreen"
-      v-model:progressionMode="progressionMode"
-      @toggle-full-screen="emitEvent('toggle-full-screen')"
-    />
+    <SettingsModal ref="settingsModalRef" />
   </Teleport>
-  <div class="debug-gps-panel">
+  <div v-if="isGpsMode && isGpsDebugEnabled" class="debug-gps-panel">
     <h4>Distances GPS</h4>
     <div v-if="userLocation">
       <ul>
@@ -57,7 +52,7 @@
       :is-limited-service="desserte.isLimitedService"
       :line="line!"
       :is-at-stop="state === 'AT_STOP'"
-      @click="emitEvent('toggle-full-screen')"
+      @click="toggleFullScreen"
     />
 
     <main
@@ -211,19 +206,14 @@ import { useJourneyData } from "../composables/useJourneyData";
 import { useScreenState } from "../composables/useScreenState";
 import { useSlates } from "../composables/useSlates";
 import { usePassengerMessages } from "../composables/usePassengerMessages";
+import { useSettings } from "../composables/useSettings";
+import { useDevicePosition } from "../composables/useDevicePosition";
 import { SaveFile } from "../types";
 import { getSecondesFromDate } from "../utils";
 import PassengerMessage from "./SidePanel/PassengerMessage.vue";
 import { AudioManager } from "../audio.ts";
 import DepartureTime from "./SidePanel/DepartureTime.vue";
 import NoData from "./SidePanel/NoData.vue";
-
-defineProps<{
-  fullScreen: boolean;
-}>();
-const emitEvent = defineEmits<{
-  (e: "toggle-full-screen"): void;
-}>();
 
 const route = useRoute();
 const isToolbarHidden = ref(false);
@@ -232,8 +222,14 @@ const toggleToolbar = () => {
   isToolbarHidden.value = !isToolbarHidden.value;
 };
 
-const userLocation = ref<{ lat: number; lon: number } | null>(null);
-let debugGeoWatchId: number | null = null;
+const {
+  isFullScreen: fullScreen,
+  toggleFullScreen,
+  progressionMode,
+  isGpsMode,
+  isGpsDebugEnabled,
+} = useSettings();
+const { position: userLocation } = useDevicePosition();
 
 const getDistance = (
   lat1: number,
@@ -288,7 +284,6 @@ const stopsDistances = computed(() => {
 
 const {
   state,
-  progressionMode,
   isAutoPassStops,
   forcedState,
   currentSecondsToArrival,
@@ -378,19 +373,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 onMounted(async () => {
   window.addEventListener("keydown", handleKeydown);
-  if ("geolocation" in navigator) {
-    debugGeoWatchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        userLocation.value = {
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-        };
-      },
-      (err) => console.warn("Erreur GPS (Debug):", err),
-      { enableHighAccuracy: true },
-    );
-  }
-
   if (route.query.loadSave) {
     loadSaveModalRef.value?.loadAutosave();
   }
@@ -415,9 +397,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", handleKeydown);
-  if (debugGeoWatchId !== null) {
-    navigator.geolocation.clearWatch(debugGeoWatchId);
-  }
 });
 </script>
 
