@@ -80,7 +80,7 @@ export const sortedLines = (lines: Line[]): Line[] => {
 export const sortVehicleJourneys = (
   journeys: VehicleJourney[],
 ): VehicleJourney[] => {
-  const now = new Date().getTime();
+  const now = Date.now();
 
   return [...journeys].sort((a, b) => {
     const getInfo = (journey: VehicleJourney) => {
@@ -100,13 +100,17 @@ export const sortVehicleJourneys = (
       const remainingStops = stops.filter((stop) => {
         const stopTime = new Date(stop.departureTime).getTime();
 
-        return stop.status !== Status.SkippedStop && stopTime >= now;
+        return (
+          stop.status !== Status.SkippedStop &&
+          stopTime >= now
+        );
       }).length;
 
-      const notStarted =
-        firstStop.status === Status.FirstStop && departureTime >= now;
+      const notStarted = departureTime > now;
 
-      if (notStarted) {
+      const inProgress = !notStarted && remainingStops > 2;
+
+      if (inProgress) {
         return {
           group: 0,
           departureTime,
@@ -114,16 +118,16 @@ export const sortVehicleJourneys = (
         };
       }
 
-      if (remainingStops <= 2) {
+      if (notStarted) {
         return {
-          group: 2,
+          group: 1,
           departureTime,
           remainingStops,
         };
       }
 
       return {
-        group: 1,
+        group: 2,
         departureTime,
         remainingStops,
       };
@@ -137,11 +141,11 @@ export const sortVehicleJourneys = (
     }
 
     if (infoA.group === 0) {
-      return infoA.departureTime - infoB.departureTime;
+      return infoB.remainingStops - infoA.remainingStops;
     }
 
     if (infoA.group === 1) {
-      return infoB.remainingStops - infoA.remainingStops;
+      return infoA.departureTime - infoB.departureTime;
     }
 
     return 0;

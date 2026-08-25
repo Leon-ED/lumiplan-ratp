@@ -17,8 +17,13 @@
           </span>
         </div>
 
-        <span class="provenance">
-          En provenance de : {{ desserte.originStop.stopName }}
+        <span
+          v-if="
+            desserte.stopTimes.length > 0 && isPassed(desserte.stopTimes[0])
+          "
+          class="provenance"
+        >
+          Origine: {{ desserte.originStop.stopName }}
         </span>
         <span class="status">{{ status }}</span>
       </div>
@@ -136,7 +141,11 @@ const props = defineProps<{
 const badgesList = computed(() => {
   const list = [];
 
-  if (props.desserte.headsign && props.desserte.headsign.length <= 6 && !props.desserte.shortName.startsWith(props.desserte.headsign)){
+  if (
+    props.desserte.headsign &&
+    props.desserte.headsign.length <= 6 &&
+    !props.desserte.shortName.startsWith(props.desserte.headsign)
+  ) {
     list.push(props.desserte.headsign);
   }
   if (props.desserte.shortName && props.desserte.shortName.length <= 6) {
@@ -235,6 +244,7 @@ const status = computed(() => {
 .direction-container {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 

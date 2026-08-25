@@ -64,7 +64,7 @@
         <li
           v-for="line in lines"
           :key="line.id"
-          @click="selectedLine = line"
+          @click="dessertes=[];selectedLine = line; desserteSearchStatus = 'loading'"
           class="line"
           :class="{ selected: selectedLine?.id === line.id }"
         >
