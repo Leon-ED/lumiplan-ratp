@@ -1,8 +1,10 @@
-import { ref, watch, computed, onUnmounted, Ref } from "vue";
+import { ref, watch, computed, Ref } from "vue";
 import { getSecondesFromDate } from "../utils";
 import { AudioManager } from "../audio";
 import { Desserte, Line, StopWithTime } from "../types";
 import { useClock } from "./useClock";
+import { useSettings } from "./useSettings";
+import { useDevicePosition } from "./useDevicePosition";
 
 export type ScreenState =
   | "NO_DATA"
@@ -12,8 +14,6 @@ export type ScreenState =
   | "NOT_AT_STOP"
   | "LAST_STOP"
   | "NOT_IN_SERVICE";
-
-export type ProgressionMode = "TIME" | "MANUAL" | "GPS";
 
 const getDistanceFromLatLonInM = (
   lat1: number,
@@ -41,7 +41,7 @@ export function useScreenState(
 ) {
   const state = ref<ScreenState>("NO_DATA");
 
-  const progressionMode = ref<ProgressionMode>("TIME");
+  const { progressionMode } = useSettings();
 
   const isAutoPassStops = computed({
     get: () => progressionMode.value === "TIME",
@@ -55,52 +55,29 @@ export function useScreenState(
 
   let departingAudioPlayed = false;
 
-  const currentLocation = ref<{ lat: number; lon: number } | null>(null);
+  const { position: currentLocation, error: gpsError } = useDevicePosition();
   const hasReachedCurrentStop = ref(false);
   const hasInitialGpsSnapDone = ref(false);
-  const pendingSkippedStopId = ref<string | null>(null); 
-  let geoWatchId: number | null = null;
+  const pendingSkippedStopId = ref<string | null>(null);
 
   watch(progressionMode, (newMode) => {
     if (newMode === "GPS") {
       hasInitialGpsSnapDone.value = false;
+      hasReachedCurrentStop.value = false;
       pendingSkippedStopId.value = null;
-
-      if ("geolocation" in navigator) {
-        geoWatchId = navigator.geolocation.watchPosition(
-          (pos) => {
-            currentLocation.value = {
-              lat: pos.coords.latitude,
-              lon: pos.coords.longitude,
-            };
-          },
-          (err) => {
-            console.warn("Erreur ou perte du signal GPS:", err);
-            state.value = "NO_TRIP_DATA_AVAILABLE";
-            currentLocation.value = null;
-            hasInitialGpsSnapDone.value = false;
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 5000,
-          },
-        );
-      } else {
-        alert("La géolocalisation n'est pas supportée par ce navigateur.");
-        progressionMode.value = "MANUAL";
-      }
     } else {
-      if (geoWatchId !== null) {
-        navigator.geolocation.clearWatch(geoWatchId);
-        geoWatchId = null;
-      }
-      currentLocation.value = null;
+      hasReachedCurrentStop.value = false;
+      pendingSkippedStopId.value = null;
     }
   });
 
-  onUnmounted(() => {
-    if (geoWatchId !== null) navigator.geolocation.clearWatch(geoWatchId);
+  watch(gpsError, (newError) => {
+    if (progressionMode.value !== "GPS") return;
+    if (!newError) return;
+
+    console.warn("Erreur ou perte du signal GPS:", newError);
+    state.value = "NO_TRIP_DATA_AVAILABLE";
+    hasInitialGpsSnapDone.value = false;
   });
 
   watch(currentLocation, (loc) => {

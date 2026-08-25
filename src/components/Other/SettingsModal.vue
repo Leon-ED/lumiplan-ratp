@@ -1,51 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useClock } from "../../composables/useClock";
-import { AudioManager } from "../../audio";
-import type { ProgressionMode } from "../../composables/useScreenState";
-
-const props = defineProps<{
-  fullScreen: boolean;
-  progressionMode: ProgressionMode;
-}>();
-
-const emit = defineEmits<{
-  (e: "toggle-full-screen"): void;
-  (e: "update:progressionMode", value: ProgressionMode): void;
-}>();
+import { ref } from "vue";
+import { useSettings } from "../../composables/useSettings";
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
-const localProgressionMode = ref<ProgressionMode>(props.progressionMode);
-
-watch(
-  () => props.progressionMode,
-  (newVal) => {
-    localProgressionMode.value = newVal;
-  },
-);
-
-watch(localProgressionMode, (newVal) => {
-  emit("update:progressionMode", newVal);
-});
-
-const { setCurrentTime, now } = useClock();
-const simulatedTime = computed({
-  get() {
-    return `${String(now.value.getHours()).padStart(2, "0")}:${String(
-      now.value.getMinutes(),
-    ).padStart(2, "0")}`;
-  },
-  set(value: string) {
-    if (!value) return;
-    const [hours, minutes] = value.split(":").map(Number);
-    if (Number.isNaN(hours) || Number.isNaN(minutes)) return;
-    const date = new Date(now.value);
-    date.setHours(hours, minutes, 0, 0);
-
-    setCurrentTime(date);
-  },
-});
+const {
+  isFullScreen,
+  toggleFullScreen,
+  progressionMode,
+  isGpsMode,
+  isGpsDebugEnabled,
+  setGpsDebugEnabled,
+  areSoundsEnabled,
+  setSoundsEnabled,
+  simulatedTime,
+} = useSettings();
 
 const open = () => {
   dialogRef.value?.showModal();
@@ -67,29 +36,40 @@ defineExpose({ open, close });
       <label class="setting-item">
         <input
           type="checkbox"
-          :checked="fullScreen"
-          @change="emit('toggle-full-screen')"
+          :checked="isFullScreen"
+          @change="toggleFullScreen"
         />
         <span>Mode plein écran</span>
       </label>
 
-      <!-- Sélecteur du mode de progression GPS / Horaire / Manuel -->
       <div class="setting-item mode-selector">
         <span>Mode de passage des arrêts :</span>
-        <select v-model="localProgressionMode" class="select-input">
+        <select v-model="progressionMode" class="select-input">
           <option value="TIME">Automatique (basé sur l'horaire)</option>
           <option value="GPS">Géolocalisation (Auto via GPS)</option>
           <option value="MANUAL">Manuel (au clic)</option>
         </select>
       </div>
 
+      <label v-if="isGpsMode" class="setting-item">
+        <input
+          type="checkbox"
+          :checked="isGpsDebugEnabled"
+          @change="
+            (p: Event) =>
+              setGpsDebugEnabled((p.target as HTMLInputElement).checked)
+          "
+        />
+        <span>Activer débug GPS</span>
+      </label>
+
       <label class="setting-item">
         <input
           type="checkbox"
-          :checked="AudioManager.areSoundsEnabled()"
+          :checked="areSoundsEnabled"
           @change="
             (p: Event) =>
-              AudioManager.toggleSounds((p.target as HTMLInputElement).checked)
+              setSoundsEnabled((p.target as HTMLInputElement).checked)
           "
         />
         <span>Activer les effets sonores</span>
