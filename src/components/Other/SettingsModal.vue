@@ -14,6 +14,8 @@ const {
   areSoundsEnabled,
   setSoundsEnabled,
   simulatedTime,
+  toggleShowAllLines,
+  showAllLinesEnabled,
 } = useSettings();
 
 const open = () => {
@@ -62,7 +64,14 @@ defineExpose({ open, close });
         />
         <span>Activer débug GPS</span>
       </label>
-
+      <label class="setting-item">
+        <input
+          type="checkbox"
+          :checked="showAllLinesEnabled"
+          @change="toggleShowAllLines()"
+        />
+        <span>Afficher toutes les correspondances</span>
+      </label>
       <label class="setting-item">
         <input
           type="checkbox"
@@ -72,7 +81,7 @@ defineExpose({ open, close });
               setSoundsEnabled((p.target as HTMLInputElement).checked)
           "
         />
-        <span>Activer les effets sonores</span>
+        <span>Activer les sons</span>
       </label>
       <label class="time-setting">
         <span>Heure simulée</span>
@@ -165,7 +174,9 @@ dialog.custom-modal::backdrop {
   color: #212529;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .select-input:focus {
   outline: none;

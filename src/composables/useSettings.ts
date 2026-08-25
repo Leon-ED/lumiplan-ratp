@@ -6,6 +6,7 @@ import type { ProgressionMode } from "../types";
 
 const isFullScreen = ref(false);
 const progressionMode = ref<ProgressionMode>("TIME");
+const showAllLines = ref(false);
 const isGpsDebugEnabled = ref(false);
 let isInitialized = false;
 
@@ -34,6 +35,10 @@ export function useSettings() {
   const toggleFullScreen = () => {
     isFullScreen.value = !isFullScreen.value;
   };
+  const toggleShowAllLines = () => {
+    showAllLines.value = !showAllLines.value;
+  }
+  const showAllLinesEnabled = computed(() => showAllLines.value);
 
   const setProgressionMode = (mode: ProgressionMode) => {
     progressionMode.value = mode;
@@ -84,5 +89,7 @@ export function useSettings() {
     areSoundsEnabled: AudioManager.isSoundEnabled,
     setSoundsEnabled,
     simulatedTime,
+    showAllLinesEnabled,
+    toggleShowAllLines,
   };
 }

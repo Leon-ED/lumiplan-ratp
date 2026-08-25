@@ -47,11 +47,11 @@ export class Api {
               isAccessible: true,
               connectedLines: stop.stopPoint.lines.map((line: any) => ({
                 id: line.ref,
-                name: line.shortName,
+                name: line.name,
                 color: line.color,
                 textColor: line.textColor,
                 mode: Converter.convertLineMode(line.type, line.name),
-              })),
+              }))
             },
             timeOfArrival: stop.arrivalTime,
             timeOfDeparture: stop.departureTime,

@@ -23,8 +23,8 @@ export class Converter {
         return Mode.NOCTILIEN;
     }
 
-    if (normalizedMode === "bus_remplacement") {
-      return Mode.BUS;
+    if (normalizedMode === "bus_remplacement" || normalizedLineName.includes("remplacement ")) {
+      return Mode.BUS_REMPLACEMENT;
     }
 
     if (normalizedMode === "telepherique") {
@@ -48,7 +48,7 @@ export class Converter {
     }
 
     if (normalizedMode === "bus") {
-      if (/^N\d{3}$/.test(normalizedLineName)) {
+      if (/^N\d{2,3}$/.test(normalizedLineName)) {
         return Mode.NOCTILIEN;
       }
 
