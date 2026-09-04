@@ -23,15 +23,18 @@ defineExpose({
   open,
 });
 
-
 const compatibleLines = computed(() => {
   if (!props.line) return [];
 
   return props.allLines.filter(
     (otherLine) =>
-      ![Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS, Mode.TER, Mode.BUS_AEROPORT].includes(
-        otherLine.mode,
-      ) && otherLine.id !== props.line?.id,
+      ![
+        Mode.NOCTILIEN,
+        Mode.BUS_REMPLACEMENT,
+        Mode.BUS,
+        Mode.TER,
+        Mode.BUS_AEROPORT,
+      ].includes(otherLine.mode) && otherLine.id !== props.line?.id,
   );
 });
 
@@ -72,9 +75,9 @@ const handleLinkedLineChange = () => {
       <div class="field-group">
         <label for="line-mode">Mode de transport</label>
 
-        <select 
-          name="line-mode" 
-          id="line-mode" 
+        <select
+          name="line-mode"
+          id="line-mode"
           v-model="line.mode"
           @change="handleModeChange"
         >
@@ -170,6 +173,7 @@ const handleLinkedLineChange = () => {
     </div>
 
     <div class="line-edition_render" v-if="line">
+      <img :src="'/modes/' + line.mode.toLowerCase() + '.svg'" alt="Mode" class="mode-picto" />
       <LineLogo :line="line" class-name="line-logo" size="5rem" />
     </div>
   </dialog>
@@ -187,7 +191,10 @@ dialog.line-edition {
   color: #333;
   font-family: inherit;
 }
-
+.mode-picto {
+  margin-right: 12px;
+  height: 5rem;
+}
 dialog.line-edition::backdrop {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
