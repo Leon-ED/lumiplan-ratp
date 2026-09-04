@@ -42,7 +42,7 @@ export class Api {
               landmarkName: "",
               lat: stop.stopPoint.lat,
               lon: stop.stopPoint.lon,
-              radius: 80,
+              radius: 120,
               subtitle: "",
               isAccessible: true,
               connectedLines: stop.stopPoint.lines.map((line: any) => ({
