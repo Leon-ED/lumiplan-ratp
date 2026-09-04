@@ -45,6 +45,7 @@ export interface InfoTraffic {
 export enum Mode {
   BUS = "BUS",
   BUS_REMPLACEMENT = "BUS_REMPLACEMENT",
+  BUS_AEROPORT = "BUS_AEROPORT",
   NOCTILIEN = "NOCTILIEN",
   TRAM = "TRAM",
   METRO = "METRO",

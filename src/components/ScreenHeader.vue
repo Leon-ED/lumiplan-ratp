@@ -30,7 +30,7 @@ const props = defineProps<{
   isAtStop: boolean;
 }>();
 const logoSize = computed(() => {
-  if ([Mode.BUS,Mode.NOCTILIEN].includes(props.line.mode)) {
+  if ([Mode.BUS,Mode.NOCTILIEN,Mode.BUS_AEROPORT].includes(props.line.mode)) {
     return "80%";
   }
   return "100%";

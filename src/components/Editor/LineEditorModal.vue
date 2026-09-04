@@ -29,7 +29,7 @@ const compatibleLines = computed(() => {
 
   return props.allLines.filter(
     (otherLine) =>
-      ![Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS, Mode.TER].includes(
+      ![Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS, Mode.TER, Mode.BUS_AEROPORT].includes(
         otherLine.mode,
       ) && otherLine.id !== props.line?.id,
   );
@@ -86,9 +86,9 @@ const handleLinkedLineChange = () => {
           <option :value="Mode.BUS">Bus</option>
           <option :value="Mode.NOCTILIEN">Noctilien</option>
           <option :value="Mode.BUS_REMPLACEMENT">Bus de remplacement</option>
+          <option :value="Mode.BUS_AEROPORT">Bus aéroportuaire</option>
         </select>
       </div>
-
       <div class="field-group" v-if="line.mode === Mode.BUS_REMPLACEMENT">
         <label for="line-linked-line"> Remplace la ligne </label>
 

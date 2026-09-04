@@ -76,6 +76,8 @@ const linesByMode = computed(() => {
     Mode.TER,
     Mode.BUS,
     Mode.NOCTILIEN,
+    Mode.BUS_REMPLACEMENT,
+    Mode.BUS_AEROPORT,
   ];
 
   props.connections.forEach((line) => {
@@ -83,6 +85,9 @@ const linesByMode = computed(() => {
       return;
     }
 
+    if ([Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS_AEROPORT].includes(line.mode)) {
+      line.mode = Mode.BUS;
+    }
     if (!grouped[line.mode]) {
       grouped[line.mode] = [];
     }
