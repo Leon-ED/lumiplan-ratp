@@ -5,6 +5,7 @@ import { AudioManager } from "../audio";
 
 export function usePassengerMessages() {
   const queue = ref<PassengerMessage[]>([]);
+  const MAX_QUEUE_SIZE = 3;
   const currentMessage = ref<PassengerMessage | null>(null);
   let messageTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -35,7 +36,10 @@ export function usePassengerMessages() {
   const triggerMessage = (index: number) => {
     const msg = PASSENGER_MESSAGES[index];
     if (!msg) return;
-
+    if (queue.value.length >= MAX_QUEUE_SIZE) {
+      console.warn("Passenger message queue is full. Message ignored:", msg);
+      return;
+    }
     queue.value.push(msg);
 
     if (!currentMessage.value) {

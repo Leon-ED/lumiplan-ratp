@@ -1,13 +1,20 @@
 <template>
   <Teleport to="body">
     <LoadSaveModal ref="loadSaveModalRef" @load="handleSaveLoaded" />
-    <SettingsModal
-      ref="settingsModalRef"
-      :full-screen="fullScreen"
-      v-model="isAutoPassStops"
-      @toggle-full-screen="emitEvent('toggle-full-screen')"
-    />
+    <SettingsModal ref="settingsModalRef" />
   </Teleport>
+  <div v-if="isGpsMode && isGpsDebugEnabled" class="debug-gps-panel">
+    <h4>Distances GPS</h4>
+    <div v-if="userLocation">
+      <ul>
+        <li v-for="(stop, index) in stopsDistances" :key="index">
+          <span class="stop-name">{{ stop.name }}</span>
+          <span class="stop-dist">{{ stop.distance }}</span>
+        </li>
+      </ul>
+    </div>
+    <div v-else class="waiting-gps">En attente du signal GPS...</div>
+  </div>
 
   <button
     class="config-btn"
@@ -45,7 +52,7 @@
       :is-limited-service="desserte.isLimitedService"
       :line="line!"
       :is-at-stop="state === 'AT_STOP'"
-      @click="emitEvent('toggle-full-screen')"
+      @click="toggleFullScreen"
     />
 
     <main
@@ -199,6 +206,8 @@ import { useJourneyData } from "../composables/useJourneyData";
 import { useScreenState } from "../composables/useScreenState";
 import { useSlates } from "../composables/useSlates";
 import { usePassengerMessages } from "../composables/usePassengerMessages";
+import { useSettings } from "../composables/useSettings";
+import { useDevicePosition } from "../composables/useDevicePosition";
 import { SaveFile } from "../types";
 import { getSecondesFromDate } from "../utils";
 import PassengerMessage from "./SidePanel/PassengerMessage.vue";
@@ -206,19 +215,41 @@ import { AudioManager } from "../audio.ts";
 import DepartureTime from "./SidePanel/DepartureTime.vue";
 import NoData from "./SidePanel/NoData.vue";
 
-defineProps<{
-  fullScreen: boolean;
-}>();
-const emitEvent = defineEmits<{
-  (e: "toggle-full-screen"): void;
-}>();
-
 const route = useRoute();
 const isToolbarHidden = ref(false);
 
 const toggleToolbar = () => {
   isToolbarHidden.value = !isToolbarHidden.value;
 };
+
+const {
+  isFullScreen: fullScreen,
+  toggleFullScreen,
+  progressionMode,
+  isGpsMode,
+  isGpsDebugEnabled,
+} = useSettings();
+const { position: userLocation } = useDevicePosition();
+
+const getDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+) => {
+  const R = 6371e3;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+};
+
 const {
   desserte,
   line,
@@ -233,6 +264,23 @@ const {
   fetchJourneyData,
   fetchInfosTrafficMessages,
 } = useJourneyData(route.query.line as string, route.query.trip as string);
+
+const stopsDistances = computed(() => {
+  if (!userLocation.value || !desserte.value?.stops) return [];
+  return desserte.value.stops.map((s) => {
+    const lat = s.stop.lat;
+    const lon = s.stop.lon;
+    if (!lat || !lon) return { name: s.stop.name, distance: "N/A" };
+
+    const dist = getDistance(
+      userLocation.value!.lat,
+      userLocation.value!.lon,
+      lat,
+      lon,
+    );
+    return { name: s.stop.name, distance: `${dist}m` };
+  });
+});
 
 const {
   state,
@@ -276,7 +324,7 @@ const openSettingsModal = () => settingsModalRef.value?.open();
 
 const handleSaveLoaded = (saveData: SaveFile) => {
   loadFromSave(saveData);
-  isAutoPassStops.value = false;
+  progressionMode.value = "MANUAL";
   forcedState.value = null;
   computeState();
   scheduleNextRotation();
@@ -288,10 +336,10 @@ const updateState = () => {
   if (
     isAutoPassStops.value &&
     currentStop.value &&
-    ((currentStop.value.isTerminus &&
-      getSecondesFromDate(currentStop.value.timeOfArrival, true) < -30) ||
-      (!currentStop.value.isTerminus &&
-        getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -3))
+    ((!currentStop.value.isTerminus &&
+      getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -3) ||
+      (currentStop.value.isTerminus &&
+        getSecondesFromDate(currentStop.value.timeOfDeparture, true) < -45))
   ) {
     desserte.value.stops.shift();
   }
@@ -301,7 +349,7 @@ watch(
   () => [route.query.trip, route.query.line],
   async () => {
     isUsingLocalSave.value = false;
-    isAutoPassStops.value = true;
+    progressionMode.value = "TIME";
 
     await fetchLineData();
     await fetchJourneyData();
@@ -311,8 +359,8 @@ watch(
   },
 );
 
-watch(isAutoPassStops, (newVal) => {
-  if (newVal) {
+watch(progressionMode, (newVal) => {
+  if (newVal === "TIME" || newVal === "GPS") {
     forcedState.value = null;
     computeState();
   }
@@ -329,7 +377,7 @@ onMounted(async () => {
     loadSaveModalRef.value?.loadAutosave();
   }
   if (!isUsingLocalSave.value && route.query.line && route.query.trip) {
-    isAutoPassStops.value = true;
+    progressionMode.value = "TIME";
     await fetchLineData();
     await fetchJourneyData();
   }
@@ -353,6 +401,63 @@ onUnmounted(() => {
 </script>
 
 <style lang="css" scoped>
+.debug-gps-panel {
+  position: absolute;
+  opacity: 0.3;
+  top: 10px;
+  left: 10px;
+  z-index: 10000;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #00ff00;
+  padding: 12px;
+  overflow-y: scroll;
+
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 14px;
+  max-height: 20vh;
+  width: 250px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid #333;
+}
+.debug-gps-panel h4 {
+  margin: 0 0 10px 0;
+  color: white;
+  font-size: 14px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.debug-gps-panel:hover {
+  opacity: 1;
+}
+.debug-gps-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.debug-gps-panel li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 2px;
+}
+.debug-gps-panel .stop-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+.debug-gps-panel .stop-dist {
+  font-weight: bold;
+}
+.waiting-gps {
+  color: #ffaa00;
+  font-style: italic;
+}
+
 .manual-skip-zone {
   position: absolute;
   top: 0;

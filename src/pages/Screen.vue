@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import Lumiplan from '../components/Lumiplan.vue';
 import FitBox from '../components/FitBox.vue';
-import { onDeactivated, onUnmounted, ref } from 'vue';
+import { computed, onDeactivated, onUnmounted } from 'vue';
 import { AudioManager } from '../audio.ts';
-const ratio = ref<number|string>('32/9');
+import { useSettings } from '../composables/useSettings';
+
+const { isFullScreen } = useSettings();
+
+const ratio = computed<number | string>(() => (isFullScreen.value ? 0 : '32/9'));
 onDeactivated(() => {
   AudioManager.stopAll();
 });
@@ -15,7 +19,7 @@ onUnmounted(() => {
 <template>
   <div class="content">
     <FitBox :ratio="ratio">
-      <Lumiplan :full-screen="ratio === 0 ? true : false" @toggle-full-screen="ratio = ratio === 0 ? '32/9' : 0" />
+      <Lumiplan />
     </FitBox>
   </div>
 </template>

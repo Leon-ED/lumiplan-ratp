@@ -17,7 +17,7 @@ import ApiImportJourneyModal from "../components/Editor/ApiImportJourneyModal.vu
 import EditorStopList from "../components/Editor/EditorStopList.vue";
 import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue";
 import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
-import { sortedLines } from "../utils";
+import { cleanId, sortedLines } from "../utils";
 import { Api } from "../api.ts";
 import NewsModal from "../components/NewsModal.vue";
 import { DEFAULT_BG_COLORS } from "../colors.ts";
@@ -161,15 +161,13 @@ const addTimeToDate = (
   isoString: string,
   additionalSeconds: number,
 ): string => {
-  console.log("Adding time:", additionalSeconds, "seconds to", isoString);
   const date = new Date(isoString);
   date.setSeconds(date.getSeconds() + additionalSeconds);
-  console.log("New date after adding time:", date.toISOString());
   return date.toISOString();
 };
 
 const handleSelectBaseLine = (lineId: string) => {
-  const selectedBaseLine = lines.value.find((l) => l.id === lineId);
+  const selectedBaseLine = lines.value.find((l) => cleanId(l.id) === cleanId(lineId));
   if (selectedBaseLine) {
     desserteWithLine.value.line = selectedBaseLine;
   }
@@ -200,7 +198,6 @@ const loadData = (parsedData: SaveFile, fallbackName: string) => {
 
 const handleApiImport = (journey: Desserte) => {
   const uniqueLines = new Map<string, Line>();
-
   journey.stops.forEach((s) => {
     s.stop.connectedLines.forEach((l) => {
       if (!uniqueLines.has(l.id)) {
@@ -218,7 +215,7 @@ const handleApiImport = (journey: Desserte) => {
   _lines.value = Array.from(uniqueLines.values());
 
   const existingBase = _lines.value.find(
-    (l) => l.id === desserteWithLine.value.line.id,
+    (l) => cleanId(l.id) === cleanId(desserteWithLine.value.line.id),
   );
   if (existingBase) {
     desserteWithLine.value.line = existingBase;
@@ -363,7 +360,7 @@ onMounted(async () => {
   if (lineId && tripId) {
     isLoading.value = true;
     try {
-      const response = await Api.getJourney(tripId);
+      const response = await Api.getJourney(tripId,false);
       if (!response) {
         return;
       }

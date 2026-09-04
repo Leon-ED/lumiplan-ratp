@@ -42,8 +42,8 @@ onUnmounted(() => {
 
 const stopNameClass = computed(() => {
   return {
-    "stop-name-long": props.stop.stop.name.length >= 21,
-    "stop-name-very-long": props.stop.stop.name.length >= 29,
+    "stop-name-long": cleanText(props.stop.stop.name).length >= 21,
+    "stop-name-very-long": cleanText(props.stop.stop.name).length >= 29,
   };
 });
 
@@ -68,7 +68,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
       'is-out-of-view': !isVisible && realIndex > 1,
       blinkable: index === 0 && !stop.isStopSkipped,
       'is-last-stop': stop.isTerminus,
-      'is-current': isStopCurrent(stop, index),
+      'is-current': isStopCurrent(stop, index) && !stop.isTerminus,
       'is-skipped': stop.isStopSkipped,
     }"
     :data-time="getSecondesFromDate(stop.timeOfArrival, true)"

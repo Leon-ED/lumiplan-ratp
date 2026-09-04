@@ -12,6 +12,7 @@ export class AudioManager {
   static isSoundEnabled = isSoundEnabledRef;
 
   private static activeAudios = new Set<HTMLAudioElement>();
+  private static currentAudio: HTMLAudioElement | null = null;
 
   static toggleSounds = (enabled: boolean) => {
     isSoundEnabledRef.value = enabled;
@@ -33,6 +34,9 @@ export class AudioManager {
     if (!this.areSoundsEnabled()) {
       return;
     }
+    if (this.currentAudio) {
+      return;
+    }
 
     if (!path.startsWith(this.SOUND_DIR)) {
       path = this.SOUND_DIR + "/" + path;
@@ -40,12 +44,18 @@ export class AudioManager {
 
     const audio = new Audio(path);
 
+    this.currentAudio = audio;
     this.activeAudios.add(audio);
 
     let callbackCalled = false;
 
     const cleanup = () => {
       this.activeAudios.delete(audio);
+
+      if (this.currentAudio === audio) {
+        this.currentAudio = null;
+      }
+
       audio.removeEventListener("ended", handleEnd);
       audio.removeEventListener("error", handleEnd);
     };
@@ -78,6 +88,7 @@ export class AudioManager {
     }
 
     this.activeAudios.clear();
+    this.currentAudio = null;
   };
 
   static playStopName = (

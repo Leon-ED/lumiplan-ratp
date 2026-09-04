@@ -7,6 +7,9 @@ export interface Stop {
   isAccessible: boolean;
   hasGapWhenSteppingOff: boolean;
   connectedLines: Line[];
+  lat?: number;
+  lon?: number;
+  radius?: number;
 }
 
 export interface StopWithTime {
@@ -18,6 +21,7 @@ export interface StopWithTime {
   isStopSkipped: boolean;
   travelTime?: number;
 }
+export type ProgressionMode = "TIME" | "MANUAL" | "GPS";
 export interface DesserteWithLine {
   line: Line;
   desserte: Desserte;
@@ -26,6 +30,7 @@ export interface Desserte {
   id: string;
   direction: string;
   isLimitedService: boolean;
+  geometry?: any;
   stops: StopWithTime[];
 }
 export interface InfoTraffic {
@@ -116,5 +121,6 @@ export interface StopTime {
 export enum Status {
   FirstStop = "first_stop",
   LastStop = "last_stop",
+  SkippedStop = "skipped_stop",
   NormalStop = "normal_stop",
 }
