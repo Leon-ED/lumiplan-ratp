@@ -206,7 +206,6 @@ const status = computed(() => {
   );
 });
 </script>
-
 <style scoped>
 .desserte-overview {
   box-sizing: border-box;
@@ -217,15 +216,15 @@ const status = computed(() => {
   grid-template-columns: 1fr auto;
   gap: 1.5rem;
   background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dcdde1;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .desserte-overview:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
 }
 
@@ -265,20 +264,20 @@ const status = computed(() => {
 .direction {
   font-weight: 700;
   font-size: 1.15em;
-  color: #1a1a1a;
+  color: #111111;
 }
 
 .provenance {
-  color: #8395a7;
+  color: #576574;
   font-size: 0.85em;
-  font-weight: 500;
+  font-weight: 600;
   font-style: italic;
 }
 
 .status {
-  color: #636e72;
+  color: #2d3436;
   font-size: 0.9em;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .details-wrapper {
@@ -288,7 +287,7 @@ const status = computed(() => {
 .desserte summary {
   cursor: pointer;
   font-weight: 600;
-  color: #005fad;
+  color: #004b8a;
   user-select: none;
   font-size: 0.95em;
   padding: 4px 0;
@@ -337,10 +336,12 @@ const status = computed(() => {
   height: 4px;
   flex-grow: 0;
 }
+
 .bottom-line {
   flex-grow: 1;
   min-height: 20px;
 }
+
 .top-line.hidden,
 .bottom-line.hidden {
   visibility: hidden;
@@ -354,34 +355,35 @@ const status = computed(() => {
 }
 
 .stop-name {
-  font-weight: 600;
-  color: #2d3436;
+  font-weight: 700;
+  color: #1e272e;
 }
 
 .stop-time {
   font-size: 0.85em;
-  color: #636e72;
+  color: #485460;
   margin-top: 2px;
+  font-weight: 500;
 }
 
 .passed-stop .stop-name {
-  color: #b2bec3;
-  font-weight: 500;
+  color: #7f8fa6;
+  font-weight: 600;
   font-size: 0.9em;
 }
 
 .passed-stop .stop-time {
-  color: #b2bec3;
+  color: #7f8fa6;
   font-size: 0.8em;
 }
 
 .passed-stop .dot {
-  border-color: #dfe6e9 !important;
-  background-color: #f5f6fa;
+  border-color: #bdc3c7 !important;
+  background-color: #f1f2f6;
 }
 
 .passed-stop .line {
-  background-color: #dfe6e9 !important;
+  background-color: #bdc3c7 !important;
 }
 
 .actions-sidebar {
@@ -389,7 +391,7 @@ const status = computed(() => {
   flex-direction: column;
   gap: 10px;
   padding-left: 10px;
-  border-left: 1px dashed #e0e0e0;
+  border-left: 1px dashed #c8d6e5;
 }
 
 .action-btn {

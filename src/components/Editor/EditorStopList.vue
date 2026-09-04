@@ -188,9 +188,9 @@ const calculateTravelTimes = async () => {
             class="btn btn-outline" 
             @click="calculateTravelTimes"
             :disabled="isCalculating"
-            :title="'Calcule le temps de parcours entre chaque arrêt via OSRM'"
+            :title="'Calcule le temps de parcours entre chaque arrêt avec OpenStreetMap'"
           >
-            {{ isCalculating ? 'Calcul en cours...' : 'Calculer les temps (OSRM)' }}
+            {{ isCalculating ? 'Calcul en cours...' : 'Calculer les temps' }}
           </button>
           <button class="btn btn-outline" @click="exportToPDF">PDF</button>
           <button class="btn btn-secondary" @click="emit('add-stop')">

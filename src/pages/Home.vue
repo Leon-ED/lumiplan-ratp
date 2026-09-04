@@ -388,27 +388,26 @@ main {
   display: flex;
   gap: 0.8em;
 }
-
 .news-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  background-color: #fff0f5;
-  color: #c2185b;
-  border: 1px solid #f8bbd0;
+  background-color: #c2185b; 
+  color: white;
+  border: 1px solid #c2185b;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   font-size: 0.9em;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .news-btn:hover {
-  background-color: #c2185b;
-  color: white;
-  box-shadow: 0 4px 8px rgba(194, 24, 91, 0.2);
+  background-color: #ad1457; 
+  border-color: #ad1457;
+  box-shadow: 0 4px 8px rgba(194, 24, 91, 0.3);
   transform: translateY(-2px);
 }
 
@@ -416,22 +415,22 @@ main {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  background-color: #e8f6f1;
-  color: #2ca27b;
-  border: 1px solid #b5e3d2;
+  background-color: #2ca27b; 
+  color: white; 
+  border: 1px solid #2ca27b;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   font-size: 0.9em;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .editor-btn:hover {
-  background-color: #2ca27b;
-  color: white;
-  box-shadow: 0 4px 8px rgba(44, 162, 123, 0.2);
+  background-color: #238263; 
+  border-color: #238263;
+  box-shadow: 0 4px 8px rgba(44, 162, 123, 0.3);
   transform: translateY(-2px);
 }
 
