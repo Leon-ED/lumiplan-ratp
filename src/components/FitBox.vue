@@ -100,8 +100,6 @@ onUnmounted(() => {
 .fit-content {
   display: flex;
   flex-direction: column;
-  margin-top: auto;
-  margin-bottom: min(25%, 100px);
   transition:
     width 0.15s ease,
     height 0.15s ease;
