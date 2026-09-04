@@ -143,7 +143,7 @@ const badgesList = computed(() => {
 
   if (
     props.desserte.headsign &&
-    props.desserte.headsign.length <= 6 &&
+    props.desserte.headsign.length <= 6 && props.desserte.shortName &&
     !props.desserte.shortName.startsWith(props.desserte.headsign)
   ) {
     list.push(props.desserte.headsign);
