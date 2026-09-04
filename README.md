@@ -8,7 +8,7 @@ Dépot Git pour la reproduction de l'écran d'affichage à l'intérieur des bus 
 > Attention : L'écran est encore en développement, toutes les fonctionnalités ne sont pas encore disponibles et certaines peuvent être instables.
 
 ## A faire
- - [ ] Ajouter un mode pour créer ses propres courses et les afficher sur l'écran
+ - [x] Ajouter un mode pour créer ses propres courses et les afficher sur l'écran
  - [ ] Amélioration des animations & transitions
  - [ ] Implémenter le temps réel
 ## Démo de l'écran
