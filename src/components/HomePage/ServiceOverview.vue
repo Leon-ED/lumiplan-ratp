@@ -6,7 +6,7 @@
           <div
             v-if="badgesList.length > 0"
             class="mission-badge"
-            :style="{ backgroundColor: line.color }"
+            :style="{ backgroundColor: line.color, color: line.textColor }"
           >
             <span v-for="badge in badgesList">
               {{ badge }}
