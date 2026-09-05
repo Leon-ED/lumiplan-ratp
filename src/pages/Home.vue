@@ -247,7 +247,7 @@ const QUICK_MODES = [
   {
     name: "Bus de remplacement",
     callback: () => {
-      _search.value = "BUS_REMPLACEMENT ";
+      _search.value = "REMPLACEMENT ";
     },
   },
 ];

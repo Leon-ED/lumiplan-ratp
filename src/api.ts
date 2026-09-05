@@ -11,7 +11,6 @@ import { cleanId, sortVehicleJourneys } from "./utils";
 export class Api {
   static apiBaseUrl = "https://ecrans-api.gwadz.fr/";
   static apiBaseUrlV2 = "https://ecrans-api.gwadz.fr/v2/api/idfm/";
-  // static apiBaseUrlV2 = "https://localhost:8000/api/idfm/";
 
   static async getJourney(
     journeyId: string,
@@ -51,7 +50,7 @@ export class Api {
                 color: line.color,
                 textColor: line.textColor,
                 mode: Converter.convertLineMode(line.type, line.name),
-              }))
+              })),
             },
             timeOfArrival: stop.arrivalTime,
             timeOfDeparture: stop.departureTime,
@@ -133,7 +132,7 @@ export class Api {
   }
 
   static async getLine(lineId: string): Promise<Line> {
-    const endpoint = `${this.apiBaseUrl}lines/lines:${lineId}`;
+    const endpoint = `${this.apiBaseUrlV2}lines?ids=${encodeURIComponent(lineId)}`;
     const response = await fetch(endpoint);
     if (!response.ok) {
       throw new Error(
@@ -142,13 +141,13 @@ export class Api {
     }
     try {
       const linesData: any = await response.json();
-      const line = linesData.lines[0];
+      const line = linesData[0];
       const realLine: Line = {
         id: line.ref,
         name: line.shortName,
-        color: line.backgroundColor,
+        color: line.color,
         textColor: line.textColor,
-        mode: Converter.convertLineMode(line.mode, line.shortName),
+        mode: Converter.convertLineMode(line.type, line.shortName),
       };
       console.log("Fetched line data:", realLine);
       return realLine;
@@ -216,9 +215,7 @@ export class Api {
   }
 
   static async searchLines(query: string): Promise<Line[]> {
-    const endpoint = `${this.apiBaseUrl}lines/search/${encodeURIComponent(
-      query,
-    )}`;
+    const endpoint = `${this.apiBaseUrlV2}search/lines?q=${encodeURIComponent(query)}`;
     const response = await fetch(endpoint);
     if (!response.ok && response.status !== 404) {
       throw new Error(
@@ -227,12 +224,12 @@ export class Api {
     }
     try {
       const linesData: any = await response.json();
-      const lines: Line[] = linesData.lines.map((line: any) => ({
+      const lines: Line[] = linesData.map((line: any) => ({
         id: line.ref,
         name: line.shortName,
-        color: line.backgroundColor,
+        color: line.color,
         textColor: line.textColor,
-        mode: Converter.convertLineMode(line.mode, line.shortName),
+        mode: Converter.convertLineMode(line.type, line.shortName),
       }));
       return lines;
     } catch (error) {
