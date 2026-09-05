@@ -37,10 +37,12 @@ const processConnections = (lines: Line[]) => {
     m === Mode.BUS_REMPLACEMENT ||
     m === Mode.BUS_AEROPORT;
 
-  const groupedConnections = Array.from(groups.entries()).map(([mode, modeLines]) => ({
-    mode,
-    lines: sortedLines(modeLines),
-  }));
+  const groupedConnections = Array.from(groups.entries()).map(
+    ([mode, modeLines]) => ({
+      mode,
+      lines: sortedLines(modeLines),
+    }),
+  );
 
   groupedConnections.sort((a, b) => {
     const aIsBus = isBusMode(a.mode);
@@ -66,7 +68,7 @@ const processedConnections = computed(() =>
       'is-terminus': stop.isTerminus,
     }"
   >
-    <div class="move-buttons no-print">
+    <div class="move-buttons">
       <button
         class="action-btn move-btn"
         @click.stop="emit('move-up', stop)"
@@ -168,7 +170,7 @@ const processedConnections = computed(() =>
             v-if="
               stop.isStopSkipped || (isAfterPartialTerminus && !stop.isTerminus)
             "
-            class="badge terminus no-print"
+            class="badge terminus"
             ><i>Arrêt non desservi </i></span
           >
           <span
@@ -186,7 +188,7 @@ const processedConnections = computed(() =>
           >
         </span>
         <button
-          class="action-btn edit-btn no-print"
+          class="action-btn edit-btn"
           @click.stop="emit('edit-stop', stop)"
           title="Éditer cet arrêt"
           aria-label="Éditer cet arrêt"
@@ -211,7 +213,7 @@ const processedConnections = computed(() =>
           </svg>
         </button>
         <button
-          class="action-btn delete-btn no-print"
+          class="action-btn delete-btn"
           @click.stop="emit('delete-stop', stop)"
           title="Supprimer cet arrêt"
           aria-label="Supprimer cet arrêt"
@@ -242,9 +244,9 @@ const processedConnections = computed(() =>
       </div>
 
       <div class="stop-connections" v-if="processedConnections.length > 0">
-        <div 
-          v-for="group in processedConnections" 
-          :key="group.mode" 
+        <div
+          v-for="group in processedConnections"
+          :key="group.mode"
           class="connection-group"
         >
           <img
@@ -253,7 +255,7 @@ const processedConnections = computed(() =>
             :title="group.mode"
             class="mode-logo"
           />
-          
+
           <div class="lines-wrapper">
             <LineLogo
               v-for="cLine in group.lines"
@@ -423,30 +425,29 @@ button:disabled {
 .stop-connections {
   display: flex;
   flex-direction: column;
-  gap: 10px; 
+  gap: 10px;
   margin-top: 8px;
 }
 
 .connection-group {
   display: flex;
   align-items: flex-start;
-  gap: 10px; 
+  gap: 10px;
 }
 
 .mode-logo {
   height: 1.5rem;
   width: auto;
-  flex-shrink: 0; 
+  flex-shrink: 0;
   margin-top: 1px;
 }
 
 .lines-wrapper {
   display: flex;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px; 
+  gap: 6px;
 }
-
 
 .is-skipped .stop-node {
   border-color: #dee2e6;

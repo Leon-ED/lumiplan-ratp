@@ -36,10 +36,6 @@ const onBaseLineChange = (event: Event) => {
   emit("select-base-line", select.value);
 };
 
-const exportToPDF = () => {
-  window.print();
-};
-
 const isCalculating = ref(false);
 
 const calculateTravelTimes = async () => {
@@ -94,34 +90,14 @@ const calculateTravelTimes = async () => {
 <template>
   <main class="main-content">
     <section
-      class="card main-service-card printable-area"
+      class="card main-service-card"
       :style="{ '--route-color': desserteWithLine.line.color }"
     >
-      <div class="print-header" style="display: none">
-        <div class="print-direction">
-          <LineLogo
-            :line="desserteWithLine.line"
-            :blink="desserteWithLine.desserte.isLimitedService"
-            class-name="line-logo"
-            size="4rem"
-          />
-          <span class="origin">
-            {{
-              desserteWithLine.desserte.stops.length > 2
-                ? desserteWithLine.desserte.stops[0].stop.name
-                : ""
-            }}
-          </span>
-          <span class="print-arrow">➔</span>
-          {{ desserteWithLine.desserte.direction || "Direction non définie" }}
-        </div>
-      </div>
-
-      <div class="card-header no-print">
+      <div class="card-header">
         <h2>Mon service</h2>
       </div>
 
-      <div class="service-config no-print">
+      <div class="service-config">
         <div class="field-group">
           <label for="base-line-select">Ligne principale</label>
           <div class="operated-line-selector">
@@ -185,11 +161,11 @@ const calculateTravelTimes = async () => {
         </div>
       </div>
 
-      <hr class="divider no-print" />
+      <hr class="divider" />
 
       <div class="card-header">
         <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
-        <div class="action-buttons no-print">
+        <div class="action-buttons">
           <button
             class="btn btn-outline"
             @click="calculateTravelTimes"
@@ -198,13 +174,12 @@ const calculateTravelTimes = async () => {
           >
             {{ isCalculating ? "Calcul en cours..." : "Calculer les temps" }}
           </button>
-          <button class="btn btn-outline" @click="exportToPDF">PDF</button>
           <button class="btn btn-secondary" @click="emit('add-stop')">
             + Ajouter un arrêt
           </button>
         </div>
       </div>
-      <div v-if="hasTooManyTerminuses" class="warning-alert no-print">
+      <div v-if="hasTooManyTerminuses" class="warning-alert">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -435,62 +410,6 @@ input[type="text"]:focus {
 </style>
 
 <style lang="css">
-@media print {
-  * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  .printable-area,
-  .printable-area * {
-    visibility: visible;
-  }
-
-  .printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 20px;
-    box-shadow: none !important;
-    border: none !important;
-    background: white !important;
-  }
-
-  .printable-area .no-print {
-    display: none !important;
-  }
-
-  .printable-area .print-header {
-    display: block !important;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #000;
-  }
-
-  .print-direction {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #000;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .print-arrow {
-    font-size: 3rem;
-  }
-
-  .thermometer-list {
-    page-break-inside: auto;
-  }
-}
-/* Styles pour l'alerte des terminus */
 .warning-alert {
   background-color: #fcf1f1;
   color: #dc3545;

@@ -36,7 +36,7 @@ const removeMessage = (index: number) => {
 </script>
 
 <template>
-  <section class="card traffic-card no-print">
+  <section class="card traffic-card">
     <div class="card-header">
       <h2>Informations trafic</h2>
       <span
