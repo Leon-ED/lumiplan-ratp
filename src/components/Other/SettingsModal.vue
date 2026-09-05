@@ -16,6 +16,8 @@ const {
   simulatedTime,
   toggleShowAllLines,
   showAllLinesEnabled,
+  showMissionEnabled, 
+  toggleShowMission,  
 } = useSettings();
 
 const open = () => {
@@ -70,8 +72,17 @@ defineExpose({ open, close });
           :checked="showAllLinesEnabled"
           @change="toggleShowAllLines()"
         />
-        <span>Afficher toutes les correspondances</span>
+        <span>Afficher toutes les correspondances (y compris bus)</span>
       </label>
+      <label class="setting-item">
+        <input
+          type="checkbox"
+          :checked="showMissionEnabled"
+          @change="toggleShowMission()"
+        />
+        <span>Afficher la mission (si disponible)</span>
+      </label>
+
       <label class="setting-item">
         <input
           type="checkbox"
@@ -85,7 +96,6 @@ defineExpose({ open, close });
       </label>
       <label class="time-setting">
         <span>Heure simulée</span>
-
         <input
           type="time"
           v-model="simulatedTime"
@@ -157,7 +167,6 @@ dialog.custom-modal::backdrop {
   cursor: pointer;
 }
 
-/* Styles du sélecteur Mode GPS/Temps/Manuel */
 .mode-selector {
   flex-direction: column;
   align-items: flex-start;

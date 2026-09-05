@@ -50,6 +50,7 @@
     <ScreenHeader
       :direction="state === 'FIRST_STOP' ? '' : desserte.direction"
       :is-limited-service="desserte.isLimitedService"
+      :vehicle-number="desserte.vehicleNumber"
       :line="line!"
       :is-at-stop="state === 'AT_STOP'"
       @click="toggleFullScreen"

@@ -29,6 +29,7 @@ export interface DesserteWithLine {
 export interface Desserte {
   id: string;
   direction: string;
+  vehicleNumber?: string;
   isLimitedService: boolean;
   geometry?: any;
   stops: StopWithTime[];

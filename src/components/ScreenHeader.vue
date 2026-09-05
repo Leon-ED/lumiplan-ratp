@@ -5,8 +5,20 @@
       :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
       class="mode-picto"
     />
-    <LineLogo v-if="line" :line="line" class-name="picto" class="line-logo" :size="logoSize" :blink="isLimitedService" />
-
+    <LineLogo
+      v-if="line"
+      :line="line"
+      class-name="picto"
+      class="line-logo"
+      :size="logoSize"
+      :blink="isLimitedService"
+    />
+    <div
+      v-if="vehicleNumber && line && showMissionEnabled"
+      class="vehicle-number"
+    >
+      {{ vehicleNumber }}
+    </div>
     <TransitionGroup name="slide" tag="div" class="direction">
       <span v-if="isAtStop" class="direction-label" key="label">Direction</span>
       <span v-if="direction" class="direction-name" key="name">
@@ -22,33 +34,48 @@ import { Line, Mode } from "../types";
 import LineLogo from "./Other/LineLogo.vue";
 import Clock from "./Other/Clock.vue";
 import { computed } from "vue";
+import { useSettings } from "../composables/useSettings.ts";
 
 const props = defineProps<{
   direction: string;
   line: Line;
   isLimitedService: boolean;
   isAtStop: boolean;
+  vehicleNumber?: string;
 }>();
+const { showMissionEnabled } = useSettings();
 const logoSize = computed(() => {
-  if ([Mode.BUS,Mode.NOCTILIEN,Mode.BUS_AEROPORT].includes(props.line.mode)) {
+  if ([Mode.BUS, Mode.NOCTILIEN, Mode.BUS_AEROPORT].includes(props.line.mode)) {
     return "80%";
   }
   return "100%";
- 
 });
-
 </script>
 
 <style lang="scss" scoped>
-.header:hover{
+.header:hover {
   cursor: pointer;
-
 }
+
 .line-logo {
-  margin-top:auto;
-  margin-bottom:auto;
-
+  margin-top: auto;
+  margin-bottom: auto;
 }
+.vehicle-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3cqw 0.5cqw;
+  border-radius: 0.2cqw;
+  font-size: 1.3cqw;
+  height: fit-content;
+  white-space: nowrap;
+  font-family: "ParisineBold", sans-serif;
+  margin-left: 0.5cqw;
+  background-color: #625e57;
+  color: white;
+}
+
 .no-data-available header,
 .no-data-available header * {
   background-color: rgb(36, 36, 36);
@@ -57,7 +84,8 @@ const logoSize = computed(() => {
 }
 
 .no-data-available header .picto,
-.no-data-available header .mode-picto {
+.no-data-available header .mode-picto,
+.no-data-available header .vehicle-number {
   display: none !important;
 }
 
@@ -108,7 +136,7 @@ header {
 }
 .slide-up {
   display: inline-block;
-  animation: slide-up .7s ease-in-out;
+  animation: slide-up 0.7s ease-in-out;
 }
 @keyframes slide-up {
   0% {
@@ -139,7 +167,6 @@ header {
 .direction-label.slide-enter-active,
 .direction-label.slide-leave-active {
   transition: all 1s ease-in-out;
-
 }
 .slide-enter-from,
 .slide-leave-to {
@@ -153,6 +180,6 @@ header {
 }
 .direction-name.slide-enter-active,
 .direction-name.slide-leave-active {
-  transition: none; 
+  transition: none;
 }
 </style>

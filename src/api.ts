@@ -30,6 +30,13 @@ export class Api {
       const desserte: Desserte = {
         id: journeyData.id,
         isLimitedService: false,
+        vehicleNumber:
+          journeyData.shortName &&
+          /^[a-zA-Z]{4}\d{2}$/.test(journeyData.shortName)
+            ? journeyData.shortName
+            : journeyData.headsign && /^[a-zA-Z]{4}$/.test(journeyData.headsign)
+              ? journeyData.headsign
+              : undefined,
         geometry: journeyData.shape,
         direction: journeyData.destinationStop.stopName || journeyData.headsign,
         stops: journeyData.stopTimes

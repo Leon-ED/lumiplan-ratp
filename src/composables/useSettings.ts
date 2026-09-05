@@ -8,6 +8,7 @@ const isFullScreen = ref(false);
 const progressionMode = ref<ProgressionMode>("TIME");
 const showAllLines = ref(false);
 const isGpsDebugEnabled = ref(false);
+const showMission = ref(false);
 let isInitialized = false;
 
 export function useSettings() {
@@ -37,7 +38,7 @@ export function useSettings() {
   };
   const toggleShowAllLines = () => {
     showAllLines.value = !showAllLines.value;
-  }
+  };
   const showAllLinesEnabled = computed(() => showAllLines.value);
 
   const setProgressionMode = (mode: ProgressionMode) => {
@@ -51,7 +52,10 @@ export function useSettings() {
   const setSoundsEnabled = (enabled: boolean) => {
     AudioManager.toggleSounds(enabled);
   };
-
+  const toggleShowMission = () => {
+    showMission.value = !showMission.value;
+  };
+  const showMissionEnabled = computed(() => showMission.value);
   if (!isInitialized) {
     watch(
       progressionMode,
@@ -91,5 +95,7 @@ export function useSettings() {
     simulatedTime,
     showAllLinesEnabled,
     toggleShowAllLines,
+    showMissionEnabled, 
+    toggleShowMission,
   };
 }
