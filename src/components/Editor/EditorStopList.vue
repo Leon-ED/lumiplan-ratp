@@ -10,6 +10,10 @@ const props = defineProps<{
   allLines: Line[];
 }>();
 
+const areAllStopsWithCoordinates = computed(() => {
+  return props.sortedStops.every((stop) => stop.stop.lat && stop.stop.lon);
+});
+
 const emit = defineEmits<{
   (e: "edit-operated-line", line: Line): void;
   (e: "add-stop"): void;
@@ -167,6 +171,7 @@ const calculateTravelTimes = async () => {
         <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
         <div class="action-buttons">
           <button
+            v-if="areAllStopsWithCoordinates"
             class="btn btn-outline"
             @click="calculateTravelTimes"
             :disabled="isCalculating"
