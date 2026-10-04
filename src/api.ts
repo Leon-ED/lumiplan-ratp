@@ -30,6 +30,8 @@ export class Api {
       const desserte: Desserte = {
         id: journeyData.id,
         isLimitedService: false,
+        hasWheelchairAccess: journeyData.isWheelchairAccessible,
+        servesAirport: journeyData.areBikesAllowed || journeyData.stopTimes.some((stop: any) => stop.stopPoint.stopName.toLowerCase().includes("aéroport")),
         vehicleNumber:
           journeyData.shortName &&
           /^[a-zA-Z]{4}\d{2}$/.test(journeyData.shortName)

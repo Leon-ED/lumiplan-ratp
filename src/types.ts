@@ -30,6 +30,8 @@ export interface Desserte {
   id: string;
   direction: string;
   vehicleNumber?: string;
+  hasWheelchairAccess: boolean;
+  servesAirport: boolean;
   isLimitedService: boolean;
   geometry?: any;
   stops: StopWithTime[];

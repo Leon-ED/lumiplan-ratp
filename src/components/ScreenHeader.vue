@@ -24,6 +24,18 @@
       <span v-if="direction" class="direction-name" key="name">
         <span class="slide-up">{{ direction }}</span>
       </span>
+      <img
+        v-if="direction && servesAirport"
+        src="../assets/img/airplane.svg"
+        class="airplane-picto slide-up"
+        key="airplane"
+      />
+      <img
+        v-if="direction && isWheelChairAccessible"
+        src="../assets/img/wheelchairjourney.svg"
+        class="wheelchair-picto slide-up"
+        key="wheelchair"
+      />
     </TransitionGroup>
     <div class="clock"><Clock /></div>
   </header>
@@ -40,7 +52,9 @@ const props = defineProps<{
   direction: string;
   line: Line;
   isLimitedService: boolean;
+  isWheelChairAccessible: boolean;
   isAtStop: boolean;
+  servesAirport: boolean;
   vehicleNumber?: string;
 }>();
 const { showMissionEnabled } = useSettings();
@@ -56,7 +70,16 @@ const logoSize = computed(() => {
 .header:hover {
   cursor: pointer;
 }
-
+.wheelchair-picto {
+  height: 2.5cqw;
+  width: auto;
+  margin-left: 1cqw;
+}
+.airplane-picto {
+  height: 2.5cqw;
+  width: auto;
+  margin-left: 1.5cqw;
+}
 .line-logo {
   margin-top: auto;
   margin-bottom: auto;

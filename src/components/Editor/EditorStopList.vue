@@ -137,6 +137,33 @@ const calculateTravelTimes = async () => {
               </option>
             </select>
           </div>
+          <label class="checkbox-label" for="is-limited-service">
+            <input
+              id="is-limited-service"
+              type="checkbox"
+              v-model="desserteWithLine.desserte.isLimitedService"
+            />
+            Service Partiel
+          </label>
+          <label class="checkbox-label" for="serves-airport">
+            <input
+              id="serves-airport"
+              type="checkbox"
+              v-model="desserteWithLine.desserte.servesAirport"
+            />
+            Dessert un aéroport
+          </label>
+          <label class="checkbox-label" for="has-wheelchair-access">
+            <input
+              id="has-wheelchair-access"
+              type="checkbox"
+              v-model="desserteWithLine.desserte.hasWheelchairAccess"
+            />
+            <span>
+              Accessible aux
+              <abbr title="Usagers en fauteuil roulant">UFR</abbr>
+            </span>
+          </label>
         </div>
 
         <div class="field-group direction">
@@ -154,14 +181,6 @@ const calculateTravelTimes = async () => {
             v-model="desserteWithLine.desserte.vehicleNumber"
             placeholder="ex : LEON93, ARNO77"
           />
-          <label class="checkbox-label" for="is-limited-service">
-            <input
-              id="is-limited-service"
-              type="checkbox"
-              v-model="desserteWithLine.desserte.isLimitedService"
-            />
-            Service Partiel
-          </label>
         </div>
       </div>
 
@@ -349,6 +368,7 @@ input[type="text"]:focus {
   cursor: pointer;
   text-transform: none !important;
   letter-spacing: normal !important;
+  width: fit-content;
 }
 .checkbox-label input[type="checkbox"] {
   width: 16px;

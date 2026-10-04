@@ -59,6 +59,8 @@ const defaultDesserte: DesserteWithLine = {
     id: "editor-made-journey",
     direction: "Ma direction",
     stops: [],
+    servesAirport: false,
+    hasWheelchairAccess: false,
     isLimitedService: false,
   },
 };

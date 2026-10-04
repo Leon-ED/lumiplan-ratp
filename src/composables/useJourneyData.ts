@@ -12,6 +12,8 @@ export function useJourneyData(
     id: "",
     stops: [],
     isLimitedService: false,
+    hasWheelchairAccess: false,
+    servesAirport: false,
   };
   const desserte = ref<Desserte>(fakeDesserte);
   const line = ref<Line | null>(null);
