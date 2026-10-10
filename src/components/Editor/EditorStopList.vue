@@ -227,7 +227,7 @@ const calculateTravelTimes = async () => {
         {{
           desserteWithLine.desserte.stops
             .filter((stop) => stop.isTerminus)
-            .map((stop) => stop.stop.name)
+            .map((stop) => stop.stop.name || 'Arrêt non paramétré n°' + (desserteWithLine.desserte.stops.indexOf(stop) + 1))
             .join(", ")
         }}.
       </div>
