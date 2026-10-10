@@ -6,6 +6,7 @@ import { sortedLines } from "../../utils";
 
 const props = defineProps<{
   stop: StopWithTime;
+  isSelected: boolean;
   isFirstStop: boolean;
   isLastStop: boolean;
   isAfterPartialTerminus: boolean;
@@ -18,6 +19,7 @@ const emit = defineEmits<{
   (e: "delete-stop", stop: StopWithTime): void;
   (e: "move-up", stop: StopWithTime): void;
   (e: "move-down", stop: StopWithTime): void;
+  (e: "toggle-select", stop: StopWithTime): void;
 }>();
 
 const processConnections = (lines: Line[]) => {
@@ -91,6 +93,7 @@ const processedConnections = computed(() =>
           <polyline points="18 15 12 9 6 15"></polyline>
         </svg>
       </button>
+      <input type="checkbox" :checked="isSelected" @change="$emit('toggle-select', stop)" />
       <button
         class="action-btn move-btn"
         @click.stop="emit('move-down', stop)"

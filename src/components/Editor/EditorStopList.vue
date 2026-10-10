@@ -9,6 +9,7 @@ const props = defineProps<{
   sortedStops: StopWithTime[];
   allLines: Line[];
 }>();
+const selectedStops = ref(new Set<string>());
 
 const areAllStopsWithCoordinates = computed(() => {
   return props.sortedStops.every((stop) => stop.stop.lat && stop.stop.lon);
@@ -87,6 +88,101 @@ const calculateTravelTimes = async () => {
     alert("Erreur réseau ou impossibilité de joindre l'API OSRM.");
   } finally {
     isCalculating.value = false;
+  }
+};
+const handleToggleSelect = (stop: StopWithTime) => {
+  if (selectedStops.value.has(stop.stop.id)) {
+    selectedStops.value.delete(stop.stop.id);
+  } else {
+    selectedStops.value.add(stop.stop.id);
+  }
+};
+
+const multiLinesModalRef = ref<HTMLDialogElement | null>(null);
+const selectedMultiLines = ref<Line[]>([]);
+
+const handleQuickAction = (event: Event) => {
+  const select = event.target as HTMLSelectElement;
+  const action = select.value;
+  if (!action) return;
+
+  const stopsToEdit = props.desserteWithLine.desserte.stops.filter((s) =>
+    selectedStops.value.has(s.stop.id),
+  );
+
+  switch (action) {
+    case "make_accessible":
+      stopsToEdit.forEach((s) => (s.stop.isAccessible = true));
+      break;
+    case "make_inaccessible":
+      stopsToEdit.forEach((s) => (s.stop.isAccessible = false));
+      break;
+    case "add_gap":
+      stopsToEdit.forEach((s) => (s.stop.hasGapWhenSteppingOff = true));
+      break;
+    case "remove_gap":
+      stopsToEdit.forEach((s) => (s.stop.hasGapWhenSteppingOff = false));
+      break;
+    case "set_skipped":
+      stopsToEdit.forEach((s) => (s.isStopSkipped = true));
+      break;
+    case "unset_skipped":
+      stopsToEdit.forEach((s) => (s.isStopSkipped = false));
+      break;
+    case "change_radius": {
+      const radiusStr = prompt("Nouveau rayon de déclenchement (en mètres) :");
+      if (radiusStr !== null) {
+        const radius = parseInt(radiusStr);
+        if (!isNaN(radius) && radius > 0) {
+          stopsToEdit.forEach((s) => (s.stop.radius = radius));
+        }
+      }
+      break;
+    }
+    case "delete":
+      if (
+        confirm(`Voulez-vous vraiment supprimer ${stopsToEdit.length} arrêts ?`)
+      ) {
+        props.desserteWithLine.desserte.stops =
+          props.desserteWithLine.desserte.stops.filter(
+            (s) => !selectedStops.value.has(s.stop.id),
+          );
+        selectedStops.value.clear();
+      }
+      break;
+    case "change_connections":
+      selectedMultiLines.value = [];
+      multiLinesModalRef.value?.showModal();
+      break;
+  }
+
+  select.value = "";
+};
+
+const applyMultiConnections = () => {
+  const stopsToEdit = props.desserteWithLine.desserte.stops.filter((s) =>
+    selectedStops.value.has(s.stop.id),
+  );
+  stopsToEdit.forEach((s) => {
+    s.stop.connectedLines = [...selectedMultiLines.value];
+  });
+  closeMultiLinesModal();
+};
+
+const closeMultiLinesModal = () => {
+  multiLinesModalRef.value?.close();
+};
+const areAllSelected = computed(() => {
+  return (
+    props.sortedStops.length > 0 &&
+    selectedStops.value.size === props.sortedStops.length
+  );
+});
+const toggleSelectAll = () => {
+  if (areAllSelected.value) {
+    selectedStops.value.clear();
+  } else {
+    props.sortedStops.forEach((stop) => selectedStops.value.add(stop.stop.id));
   }
 };
 </script>
@@ -187,7 +283,46 @@ const calculateTravelTimes = async () => {
       <hr class="divider" />
 
       <div class="card-header">
-        <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
+          "
+        >
+          <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
+          <small v-if="selectedStops.size > 0"
+            >{{ selectedStops.size }} sélectionné(s)</small
+          >
+
+          <select
+            v-if="selectedStops.size > 0"
+            class="btn btn-outline"
+            @change="handleQuickAction"
+            style="padding: 4px 8px"
+          >
+            <option value="">Actions rapides...</option>
+            <option value="make_accessible">Rendre Accessible UFR</option>
+            <option value="make_inaccessible">Rendre Inaccessible UFR</option>
+            <option value="add_gap">Ajouter Écart quai/véhicule</option>
+            <option value="remove_gap">Enlever Écart quai/véhicule</option>
+            <option value="set_skipped">
+              Mettre les arrêts en arrêts non desservis
+            </option>
+            <option value="unset_skipped">
+              Mettre les arrêts en arrêts desservis
+            </option>
+            <option value="change_radius">
+              Changer le rayon de déclenchement
+            </option>
+            <option value="change_connections">
+              Modifier les correspondances
+            </option>
+            <option value="delete" style="color: red">Supprimer</option>
+          </select>
+        </div>
+
         <div class="action-buttons">
           <button
             v-if="areAllStopsWithCoordinates"
@@ -227,15 +362,30 @@ const calculateTravelTimes = async () => {
         {{
           desserteWithLine.desserte.stops
             .filter((stop) => stop.isTerminus)
-            .map((stop) => stop.stop.name || 'Arrêt non paramétré n°' + (desserteWithLine.desserte.stops.indexOf(stop) + 1))
+            .map(
+              (stop) =>
+                stop.stop.name ||
+                "Arrêt non paramétré n°" +
+                  (desserteWithLine.desserte.stops.indexOf(stop) + 1),
+            )
             .join(", ")
         }}.
       </div>
+      <label v-if="sortedStops.length > 0">
+        <input
+          type="checkbox"
+          :checked="areAllSelected"
+          @change="toggleSelectAll"
+        />
+        Tout sélectionner
+      </label>
+
       <div class="thermometer-list">
         <EditorStopItem
           v-for="(stop, index) in sortedStops"
           :key="stop.stop.id"
           :is-first-stop="index === 0"
+          :is-selected="selectedStops.has(stop.stop.id)"
           :is-last-stop="index === sortedStops.length - 1"
           :is-after-partial-terminus="
             firstTerminusIndex !== -1 && index > firstTerminusIndex
@@ -247,9 +397,57 @@ const calculateTravelTimes = async () => {
           @delete-stop="emit('delete-stop', stop)"
           @move-up="emit('move-up', stop)"
           @move-down="emit('move-down', stop)"
+          @toggle-select="handleToggleSelect(stop)"
         />
       </div>
     </section>
+
+    <dialog ref="multiLinesModalRef" class="line-edition">
+      <div class="modal-header">
+        <h3>Modifier les correspondances ({{ selectedStops.size }} arrêts)</h3>
+        <button class="close-btn" @click="closeMultiLinesModal" title="Fermer">
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Sélectionnez les lignes qui seront communes à tous les arrêts
+          sélectionnés :
+        </p>
+        <div class="line-selection-grid">
+          <label
+            v-for="line in allLines"
+            :key="line.id"
+            class="line-checkbox-item"
+            :class="{
+              'is-active': selectedMultiLines.some((l) => l.id === line.id),
+            }"
+          >
+            <input type="checkbox" :value="line" v-model="selectedMultiLines" />
+            <LineLogo :line="line" class-name="line-logo-small" size="1.5rem" />
+            <span class="line-name-label">{{ line.mode }} {{ line.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div
+        class="modal-footer"
+        style="
+          margin-top: 20px;
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+        "
+      >
+        <button class="btn btn-secondary" @click="closeMultiLinesModal">
+          Annuler
+        </button>
+        <button class="btn btn-primary" @click="applyMultiConnections">
+          Appliquer
+        </button>
+      </div>
+    </dialog>
   </main>
 </template>
 
@@ -302,6 +500,13 @@ const calculateTravelTimes = async () => {
   background-color: #f0f0f0;
   color: #333;
 }
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
 .btn-secondary:hover:not(:disabled) {
   background-color: #e0e0e0;
 }
@@ -316,7 +521,7 @@ const calculateTravelTimes = async () => {
 }
 .service-config {
   display: flex;
-  align-items: flex-start; /* Changé de center à flex-start pour aligner en haut avec la checkbox */
+  align-items: flex-start;
   gap: 10px;
 }
 @media (max-width: 600px) {
@@ -356,7 +561,6 @@ input[type="text"]:focus {
   background-color: #fff;
 }
 
-/* Nouveaux styles pour la checkbox */
 .checkbox-label {
   display: flex;
   align-items: center;
@@ -432,9 +636,6 @@ input[type="text"]:focus {
   margin-left: auto;
   min-width: 250px;
 }
-</style>
-
-<style lang="css">
 .warning-alert {
   background-color: #fcf1f1;
   color: #dc3545;
@@ -453,5 +654,83 @@ input[type="text"]:focus {
 .warning-alert svg {
   flex-shrink: 0;
   color: #dc3545;
+}
+dialog.line-edition {
+  border: none;
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  color: #333;
+  font-family: inherit;
+  margin: auto;
+}
+dialog.line-edition::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1a1a1a;
+}
+.close-btn {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+.close-btn:hover {
+  background: #e0e0e0;
+  color: #000;
+}
+.line-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.line-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #fafafa;
+}
+.line-checkbox-item:hover {
+  border-color: #007bff;
+}
+.line-checkbox-item.is-active {
+  border-color: #007bff;
+  background: #f0f7ff;
+}
+.line-checkbox-item input {
+  display: none;
+}
+.line-name-label {
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 </style>
