@@ -64,6 +64,7 @@ export interface Line {
   textColor: string;
   mode: Mode;
   linkedLine?: Line;
+  exludeInSaveFile?: boolean;
 }
 
 export interface SaveFileHeader {

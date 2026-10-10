@@ -19,6 +19,26 @@ import AutosaveRestoreModal from "../components/Editor/AutosaveRestoreModal.vue"
 import EditorTrafficInfo from "../components/Editor/EditorTrafficInfo.vue";
 import { cleanId, sortedLines } from "../utils";
 import { Api } from "../api.ts";
+import { RER_LINES, TRANSILIEN_LINES, METRO_LINES, TRAM_LINES, CABLE_LINES, BUS_LINES } from "../lines";
+
+const PRESET_LINES = [
+  ...RER_LINES,
+  ...TRANSILIEN_LINES,
+  ...METRO_LINES,
+  ...TRAM_LINES,
+  ...CABLE_LINES,
+  ...BUS_LINES,
+];
+
+const injectPresetLines = (currentLines: Line[]) => {
+  const lineIds = new Set(currentLines.map((l) => l.id));
+  for (const preset of PRESET_LINES) {
+    if (!lineIds.has(preset.id)) {
+      currentLines.push(JSON.parse(JSON.stringify(preset)));
+      lineIds.add(preset.id);
+    }
+  }
+};
 import NewsModal from "../components/NewsModal.vue";
 import { DEFAULT_BG_COLORS } from "../colors.ts";
 
@@ -66,6 +86,7 @@ const defaultDesserte: DesserteWithLine = {
 };
 
 const _lines = ref<Line[]>([defaultDesserte.line]);
+injectPresetLines(_lines.value);
 const lines = computed(() => sortedLines(_lines.value));
 const desserteWithLine = ref<DesserteWithLine>(defaultDesserte);
 const saveFileName = ref<string>("Ma Desserte");
@@ -177,6 +198,7 @@ const handleSelectBaseLine = (lineId: string) => {
 };
 const loadData = (parsedData: SaveFile, fallbackName: string) => {
   _lines.value = parsedData.lines;
+  injectPresetLines(_lines.value);
   desserteWithLine.value = parsedData.journey;
   messages.value = parsedData.messages || [];
 
@@ -216,6 +238,7 @@ const handleApiImport = (journey: Desserte) => {
 
   desserteWithLine.value.desserte = journey;
   _lines.value = Array.from(uniqueLines.values());
+  injectPresetLines(_lines.value);
 
   const existingBase = _lines.value.find(
     (l) => cleanId(l.id) === cleanId(desserteWithLine.value.line.id),
@@ -254,15 +277,36 @@ const applyImportedData = (jsonString: string) => {
   }
 };
 
-const getExportData = (): string =>
-  JSON.stringify(
+const getExportData = (): string => {
+  const usedLineIds = new Set<string>();
+  
+  const collectUsedIds = (line: Line) => {
+    usedLineIds.add(line.id);
+    if (line.linkedLine) {
+      collectUsedIds(line.linkedLine);
+    }
+  };
+
+  collectUsedIds(desserteWithLine.value.line);
+  sortedStops.value.forEach(stop => {
+    stop.stop.connectedLines.forEach(collectUsedIds);
+  });
+
+  const linesToSave = lines.value.filter(line => {
+    if (line.exludeInSaveFile) {
+      return usedLineIds.has(line.id);
+    }
+    return true;
+  });
+
+  return JSON.stringify(
     {
       header: {
         dateTime: new Date().toISOString(),
         version: "1.0.0",
         name: saveFileName.value || "Sauvegarde",
       },
-      lines: lines.value,
+      lines: linesToSave,
       messages: messages.value,
       journey: {
         ...desserteWithLine.value,
@@ -275,6 +319,7 @@ const getExportData = (): string =>
     null,
     2,
   );
+};
 
 const copyToClipboard = async () => {
   try {

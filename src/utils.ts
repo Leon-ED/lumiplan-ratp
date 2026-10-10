@@ -63,6 +63,12 @@ export const sortedLines = (lines: Line[]): Line[] => {
   ];
 
   return lines.sort((a, b) => {
+    const aIsCustom = a.id.startsWith("editor-made-line");
+    const bIsCustom = b.id.startsWith("editor-made-line");
+    
+    if (aIsCustom && !bIsCustom) return -1;
+    if (!aIsCustom && bIsCustom) return 1;
+
     const aIndex = modeOrder.indexOf(a.mode);
     const bIndex = modeOrder.indexOf(b.mode);
     if (aIndex === bIndex) {

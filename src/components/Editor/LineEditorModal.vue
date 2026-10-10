@@ -61,6 +61,20 @@ const handleModeChange = () => {
 const handleLinkedLineChange = () => {
   updateColorsFromLinkedLine(props.line?.linkedLine);
 };
+
+import { watch } from "vue";
+watch(
+  () => props.line,
+  (newVal) => {
+    if (newVal && !newVal.id.startsWith("editor-made-line")) {
+      newVal.id = `editor-made-line-${Math.random().toString(36).substr(2, 9)}`;
+      if (newVal.exludeInSaveFile) {
+        delete newVal.exludeInSaveFile;
+      }
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <template>

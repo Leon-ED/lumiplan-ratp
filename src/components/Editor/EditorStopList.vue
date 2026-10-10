@@ -206,6 +206,13 @@ const toggleSelectAll = () => {
               @click="emit('edit-operated-line', desserteWithLine.line)"
               title="Modifier les couleurs/nom de cette desserte spécifiquement"
             >
+              <img
+                :src="
+                  '/modes/' + desserteWithLine.line.mode.toLowerCase() + '.svg'
+                "
+                alt="Mode"
+                class="mode-picto"
+              />
               <LineLogo
                 :line="desserteWithLine.line"
                 :blink="desserteWithLine.desserte.isLimitedService"
@@ -606,9 +613,9 @@ input[type="text"]:focus {
 }
 .operated-line-preview {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 8px;
@@ -617,6 +624,10 @@ input[type="text"]:focus {
   transition:
     border-color 0.2s,
     background 0.2s;
+}
+.operated-line-preview .mode-picto {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .operated-line-preview:hover {
   background: #f1f3f5;
