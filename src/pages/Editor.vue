@@ -149,6 +149,7 @@ const addStop = () => {
     ...defaultStop,
     stop: {
       ...defaultStop.stop,
+      isAccessible: desserteWithLine.value.desserte.hasWheelchairAccess,
       id: `editor-made-stop-${crypto.randomUUID()}`,
     },
     travelTime: 60,
