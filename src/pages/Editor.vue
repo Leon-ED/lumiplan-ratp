@@ -49,9 +49,9 @@ const route = useRoute();
 const isLoading = ref(false);
 
 const defaultLine: Line = {
-  id: crypto.randomUUID(),
+  id: 'editor-made-line-' + crypto.randomUUID(),
   mode: Mode.BUS,
-  name: "Ligne N°1",
+  name: "Ligne n°1",
   color:
     DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)].hex,
   textColor: "#FFFFFF",
@@ -145,7 +145,7 @@ const openStopEditorModal = (stop: StopWithTime) => {
 const addLine = () => {
   const newLine: Line = {
     ...defaultLine,
-    name: `Ligne n°${_lines.value.length + 1}`,
+    name: `Ligne n°${_lines.value.filter((l) => l.id.startsWith("editor-made-line")).length + 1}`,
     color:
       DEFAULT_BG_COLORS[Math.floor(Math.random() * DEFAULT_BG_COLORS.length)]
         .hex,

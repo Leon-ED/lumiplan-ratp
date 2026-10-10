@@ -29,8 +29,17 @@ const availableModes = Object.values(Mode);
 
 const filteredLines = computed(() => {
   const filtered = props.lines.filter((line) => {
-    if(selectedMode.value === 'UNCONFIGURED' && line.name == 'TODO !' && line.mode === Mode.BUS){
+    if (
+      selectedMode.value === "UNCONFIGURED" &&
+      line.name.toLocaleLowerCase().startsWith("ligne n°") &&
+      line.mode === Mode.BUS
+    ) {
       return true;
+    }
+    if (selectedMode.value === "EDITOR_MADE_LINES") {
+      return props.lines
+        .filter((l) => l.id.startsWith("editor-made-line"))
+        .includes(line);
     }
     // 1. Filtre par nom
     const matchesSearch = line.name
@@ -40,7 +49,6 @@ const filteredLines = computed(() => {
     // 2. Filtre  mode
     const matchesMode =
       selectedMode.value === "ALL" || line.mode === selectedMode.value;
-
 
     // La ligne sélectionnée tjs en 1ère
     if (props.selectedLine && line.id === props.selectedLine.id) {
@@ -53,7 +61,7 @@ const filteredLines = computed(() => {
   return filtered.sort((a, b) => {
     if (props.selectedLine && a.id === props.selectedLine.id) return -1;
     if (props.selectedLine && b.id === props.selectedLine.id) return 1;
-    return 0; 
+    return 0;
   });
 });
 
@@ -112,11 +120,16 @@ const onDrop = (event: DragEvent) => {
 
       <div class="filters-container" v-if="lines.length > 0">
         <select v-model="selectedMode" class="mode-select">
-          <option value="ALL">Tous les modes</option>
-          <option value="UNCONFIGURED">Lignes non configurées</option>
-          <option v-for="mode in availableModes" :key="mode" :value="mode">
-            {{ mode }}
-          </option>
+          <optgroup label="Filtres">
+            <option value="ALL">Toutes les lignes</option>
+            <option value="EDITOR_MADE_LINES">Mes lignes</option>
+            <option value="UNCONFIGURED">Lignes non configurées</option>
+          </optgroup>
+          <optgroup label="Modes de transport">
+            <option v-for="mode in availableModes" :key="mode" :value="mode">
+              {{ mode }}
+            </option>
+          </optgroup>
         </select>
         <input
           type="text"
