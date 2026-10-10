@@ -170,6 +170,7 @@ dialog.custom-modal::backdrop {
 }
 .dialog-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -220,6 +221,7 @@ dialog.custom-modal::backdrop {
 }
 .preview-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   border-bottom: 1px solid #dee2e6;
@@ -344,6 +346,7 @@ dialog.custom-modal::backdrop {
 
 .modal-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;

@@ -640,12 +640,13 @@ const deleteLine = (line: Line) => {
 
 .editor-grid {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 32px;
   align-items: start;
 }
 .header-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   align-items: center;
 }
@@ -692,9 +693,9 @@ const deleteLine = (line: Line) => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
-/* Spinner and loading states */
 .loading-state {
   display: flex;
   flex-direction: column;

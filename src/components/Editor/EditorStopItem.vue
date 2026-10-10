@@ -359,6 +359,7 @@ button:disabled {
   color: #495057;
   text-align: right;
   margin-right: 14px;
+  flex-shrink: 0;
 }
 .stop-node {
   position: relative;
@@ -376,11 +377,13 @@ button:disabled {
   margin-left: 20px;
   padding-bottom: 24px;
   flex: 1;
+  min-width: 0;
   transition: transform 0.2s ease;
   padding-top: 8px;
 }
 .stop-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -389,11 +392,13 @@ button:disabled {
   font-size: 1.15rem;
   color: #212529;
   cursor: pointer;
+  word-break: break-word;
 }
 .stop-subtitle {
   font-weight: 500;
   font-size: 0.9rem;
   color: #495057;
+  word-break: break-word;
 }
 .stop-landmark {
   font-weight: 600;
@@ -450,6 +455,8 @@ button:disabled {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .is-skipped .stop-node {

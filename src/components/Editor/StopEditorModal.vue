@@ -263,6 +263,7 @@ dialog.line-edition::backdrop {
 
 .dialog-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -302,6 +303,7 @@ dialog.line-edition::backdrop {
 
 .row-fields {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
 }
 
@@ -346,7 +348,7 @@ input[type="number"]:focus {
 
 .checkbox-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 12px;
   background: #f8f9fa;
   padding: 12px;

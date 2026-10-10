@@ -108,6 +108,8 @@ const removeMessage = (index: number) => {
 }
 .card-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -165,7 +167,9 @@ const removeMessage = (index: number) => {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  height: 32px;
+  height: auto;
+  min-height: 32px;
+  flex-wrap: wrap;
 }
 .effect-label {
   font-size: 0.95rem;

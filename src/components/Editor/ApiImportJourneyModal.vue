@@ -162,6 +162,7 @@ dialog.custom-modal::backdrop {
 }
 .dialog-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -201,10 +202,12 @@ dialog.custom-modal::backdrop {
 }
 .api-search-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 .api-search-bar input {
   flex: 1;
+  min-width: 150px;
   padding: 12px 14px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -243,6 +246,7 @@ dialog.custom-modal::backdrop {
 }
 .modal-footer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;

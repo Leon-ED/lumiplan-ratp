@@ -194,12 +194,12 @@ const toggleSelectAll = () => {
       :style="{ '--route-color': desserteWithLine.line.color }"
     >
       <div class="card-header">
-        <h2>Mon service</h2>
+        <h2>Service</h2>
       </div>
 
       <div class="service-config">
         <div class="field-group">
-          <label for="base-line-select">Ligne principale</label>
+          <label for="base-line-select">Ligne</label>
           <div class="operated-line-selector">
             <div
               class="operated-line-preview"
@@ -270,14 +270,14 @@ const toggleSelectAll = () => {
         </div>
 
         <div class="field-group direction">
-          <label for="direction-input">Nom de la direction</label>
+          <label for="direction-input">Direction</label>
           <input
             id="direction-input"
             type="text"
             v-model="desserteWithLine.desserte.direction"
             placeholder="Ex: Gare de Lyon"
           />
-          <label for="direction-input">Nom de la mission</label>
+          <label for="direction-input">Mission</label>
           <input
             id="direction-input"
             type="text"
@@ -292,10 +292,7 @@ const toggleSelectAll = () => {
       <div class="card-header">
         <div
           style="
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            align-items: center;
+            display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-items: center;
           "
         >
           <h3>{{ desserteWithLine.desserte.stops.length }} arrêts</h3>
@@ -465,9 +462,12 @@ const toggleSelectAll = () => {
   padding: 24px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   border: 1px solid #eaeaea;
+  min-width: 0;
 }
 .card-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -483,6 +483,7 @@ const toggleSelectAll = () => {
 }
 .action-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 .divider {
@@ -528,6 +529,7 @@ const toggleSelectAll = () => {
 }
 .service-config {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 10px;
 }
@@ -544,6 +546,7 @@ const toggleSelectAll = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 .field-group label:not(.checkbox-label) {
   font-size: 0.9rem;
@@ -591,11 +594,13 @@ input[type="text"]:focus {
 
 .operated-line-selector {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
 }
 .line-select {
   flex: 1;
+  min-width: 120px;
   padding: 10px 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -642,10 +647,12 @@ input[type="text"]:focus {
   display: flex;
   flex-direction: column;
   padding-top: 10px;
+  min-width: 0;
 }
 .direction {
   margin-left: auto;
   min-width: 250px;
+  flex-grow: 1;
 }
 .warning-alert {
   background-color: #fcf1f1;

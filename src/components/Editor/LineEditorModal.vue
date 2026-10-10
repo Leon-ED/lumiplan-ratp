@@ -216,6 +216,7 @@ dialog.line-edition::backdrop {
 
 .dialog-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -287,6 +288,7 @@ select:focus {
 
 .color-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
 }
 
