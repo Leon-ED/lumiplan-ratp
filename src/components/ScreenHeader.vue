@@ -27,13 +27,13 @@
       <img
         v-if="direction && servesAirport"
         src="../assets/img/airplane.svg"
-        class="airplane-picto slide-up"
+        class="airplane-picto slide-up header-picto"
         key="airplane"
       />
       <img
         v-if="direction && isWheelChairAccessible"
         src="../assets/img/wheelchairjourney.svg"
-        class="wheelchair-picto slide-up"
+        class="wheelchair-picto slide-up header-picto"
         key="wheelchair"
       />
     </TransitionGroup>
@@ -108,6 +108,7 @@ const logoSize = computed(() => {
 
 .no-data-available header .picto,
 .no-data-available header .mode-picto,
+.no-data-available header .header-picto,
 .no-data-available header .vehicle-number {
   display: none !important;
 }
