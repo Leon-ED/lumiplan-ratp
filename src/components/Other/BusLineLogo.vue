@@ -69,7 +69,6 @@ const classes = computed(() => ({
   chars_3: props.lineName.length <= 3,
   chars_4: props.lineName.length === 4,
   more4chars: props.lineName.length > 4,
-  blink: props.blink,
 }));
 
 const getFontSize = (length: number): number => {
