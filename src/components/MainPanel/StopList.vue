@@ -135,9 +135,10 @@ const getIndexForStop = (i: number) => {
 .next-stop-container {
   position: relative;
   margin-top: 0.5cqw;
-  transition: opacity 0.5s ease;
+  transition: opacity 1s ease;
   display: flex;
   align-items: center;
+  z-index: 2;
 }
 
 .next-stop-arrow-indicator {
