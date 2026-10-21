@@ -667,4 +667,9 @@ button.toolbar-toggle-large {
 .slide-over-leave-to {
   transform: translateY(-100%);
 }
+
+.main-panel-wrapper:has(.current-stop-panel, .direction, .is-current)
+  :deep(.next-stop-container) {
+  opacity: 0;
+}
 </style>
