@@ -582,6 +582,7 @@ main.split-view {
   border-left: 2px solid var(--ratp-beige-dark);
   z-index: 2;
   box-shadow: 0px 0 2px 0 black;
+  transition: background-color 1s ease;
 }
 .side-panel:has(.side-foreground),
 .side-panel:not(:has(*)) {
