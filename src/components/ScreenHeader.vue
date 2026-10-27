@@ -156,7 +156,7 @@ header {
 
 .direction-name {
   color: var(--ratp-blue);
-  font-size: 3.5cqw;
+  font-size: 3cqw;
 }
 .slide-up {
   display: inline-block;
