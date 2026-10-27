@@ -83,6 +83,9 @@ export function useSlates(
     if (isPostStopLocked.value) {
       return [];
     }
+    if (state.value === "FIRST_STOP") return [];
+    if (state.value === "NO_DATA") return [];
+    if (state.value === "NO_TRIP_DATA_AVAILABLE") return [];
 
     const hasTrafficMessages = displayedInfosTraffic.value.length > 0;
 
