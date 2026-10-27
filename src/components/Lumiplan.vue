@@ -58,14 +58,7 @@
       @click="toggleFullScreen"
     />
 
-    <main
-      :class="{
-        'split-view':
-          shouldShowSidePanel ||
-          isDisplayingPassengerMessage ||
-          ['FIRST_STOP', 'NO_TRIP_DATA_AVAILABLE', 'NO_DATA'].includes(state),
-      }"
-    >
+    <main :class="{ 'split-view': isSplitView }">
       <div class="main-panel-wrapper">
         <StopList
           v-show="['FIRST_STOP', 'AT_STOP', 'NOT_AT_STOP'].includes(state)"
@@ -110,20 +103,24 @@
       </div>
 
       <div class="side-panel">
+        <Transition name="slide-over">
+          <NoData
+            v-if="['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(state)"
+            class="side-foreground"
+            :key="state"
+          />
+          <DepartureTime
+            v-else-if="state === 'FIRST_STOP'"
+            class="side-foreground"
+            :departure-date="currentStop?.timeOfDeparture!"
+            key="departure-time"
+          />
+        </Transition>
         <Transition name="slide" mode="out-in">
           <PassengerMessage
             v-if="isDisplayingPassengerMessage && currentPassengerMessage"
             :message="currentPassengerMessage"
             :key="'passenger-msg-' + currentPassengerMessage.message"
-          />
-          <NoData
-            v-else-if="['NO_DATA', 'NO_TRIP_DATA_AVAILABLE'].includes(state)"
-            :key="state"
-          />
-          <DepartureTime
-            v-else-if="state === 'FIRST_STOP'"
-            :departure-date="currentStop?.timeOfDeparture!"
-            key="departure-time"
           />
           <ArrivingToIn
             v-else-if="currentSlate?.type === 'TRAVEL_TIME'"
@@ -319,6 +316,36 @@ const {
   isDisplayingPassengerMessage,
   triggerMessage,
 } = usePassengerMessages();
+
+const isFirstStopPanelReady = ref(true);
+const isLeavingFirstStop = ref(false);
+let firstStopTimer: ReturnType<typeof setTimeout> | undefined;
+let leavingTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(state, (newState, oldState) => {
+  if (
+    oldState === "FIRST_STOP" &&
+    newState !== "FIRST_STOP" &&
+    isFirstStopPanelReady.value
+  ) {
+    isLeavingFirstStop.value = true;
+    clearTimeout(leavingTimer);
+    leavingTimer = setTimeout(() => {
+      isLeavingFirstStop.value = false;
+    }, 850);
+  }
+});
+
+const isSplitView = computed(
+  () =>
+    isLeavingFirstStop.value ||
+    (state.value !== "FIRST_STOP" && shouldShowSidePanel.value) ||
+    isDisplayingPassengerMessage.value ||
+    ["NO_TRIP_DATA_AVAILABLE", "NO_DATA"].includes(state.value) ||
+    (state.value === "FIRST_STOP" && isFirstStopPanelReady.value),
+);
+
+
 const loadSaveModalRef = ref<InstanceType<typeof LoadSaveModal> | null>(null);
 const settingsModalRef = ref<InstanceType<typeof SettingsModal> | null>(null);
 
@@ -400,6 +427,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", handleKeydown);
+  clearTimeout(firstStopTimer);
+  clearTimeout(leavingTimer);
 });
 </script>
 
@@ -545,14 +574,30 @@ main {
 main.split-view {
   grid-template-columns: 65% 35%;
 }
-
 .side-panel {
   height: 100%;
   width: 100%;
   position: relative;
   background-color: #f4eeea;
   border-left: 2px solid var(--ratp-beige-dark);
+  z-index: 2;
+  box-shadow: 0px 0 2px 0 black;
 }
+.side-panel:has(.side-foreground),
+.side-panel:not(:has(*)) {
+  background: none;
+  box-shadow: none;
+}
+
+.side-foreground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
 .message-triggers {
   position: fixed;
   display: flex;
