@@ -191,7 +191,7 @@ const lineLogoSize = (line: Line) => {
 
 .header {
   color: #212121;
-  font-size: 1.6cqw;
+  font-size: 2cqw;
   margin-bottom: 1cqw;
 }
 
