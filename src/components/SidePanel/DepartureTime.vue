@@ -87,14 +87,14 @@ const departureInTranslation = useRotatedText(DEPARTURE_IN_TEXTS);
 <style lang="css" scoped>
 aside {
   padding: 1cqw;
-  font-size: 2.5cqw;
-  box-shadow: -5px 0 5px -5px black;
+  font-size: 2cqw;
   background-color: rgb(36, 36, 36);
   display: grid;
   grid-template-rows: 10% 1fr;
   grid-template-columns: 100%;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
 }
 .time-information {
   display: flex;

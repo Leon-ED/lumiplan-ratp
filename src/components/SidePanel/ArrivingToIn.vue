@@ -58,7 +58,6 @@ defineProps<Props>();
   flex-direction: column;
   width: 100%;
   background-color: #f4efea;
-  font-family: "ParisineBold";
 }
 
 table {
@@ -68,15 +67,28 @@ table {
 }
 
 thead {
-  padding: .5cqw 2.4cqw 0 2cqw;
-  font-size: 1.3cqw;
+  padding: .5cqw 2.4cqw 2cqw 2cqw;
+  font-size: 2cqw;
   font-family: "ParisineRegular";
+  font-weight: normal !important;
   color: #212121;
+}
+
+thead th {
+  padding-bottom: 2cqw;
 }
 
 th,
 td {
-  padding: 0.8cqw 2cqw;
+  padding: 0.8cqw 1.25cqw;
+}
+
+th {
+  font-weight: normal !important;
+}
+
+tbody {
+  font-family: "ParisineBold";
 }
 
 .destination-header,
@@ -86,17 +98,18 @@ td {
 
 .minutes-header,
 .minutes-before-arrival {
-  text-align: center;
   width: 15%;
+  text-align: right;
 }
 
 .minutes-before-arrival {
   color: black;
   font-size: 3cqw;
+  text-align: right;
 }
 
 .destination {
-  font-size: 1.5cqw;
+  font-size: 1.75cqw;
   color: var(--ratp-blue);
 }
 
@@ -107,4 +120,5 @@ tbody tr {
 tbody tr:nth-child(odd) {
   background-color: #dedad6;
 }
+
 </style>

@@ -84,7 +84,7 @@ const getIndexForStop = (i: number) => {
   flex-direction: column;
   justify-content: flex-start;
 
-  --gutter-width: 6cqw;
+  --gutter-width: 6.25cqw;
   --line-width: 2.2cqw;
 }
 
@@ -135,9 +135,10 @@ const getIndexForStop = (i: number) => {
 .next-stop-container {
   position: relative;
   margin-top: 0.5cqw;
-  transition: opacity 0.5s ease;
+  transition: opacity 1s ease;
   display: flex;
   align-items: center;
+  z-index: 2;
 }
 
 .next-stop-arrow-indicator {
@@ -164,5 +165,10 @@ const getIndexForStop = (i: number) => {
 .stops-list-container:has(.stops-list .stop-transition-leave-active)
   .next-stop-container {
   opacity: 0;
+}
+.stops-list-container:has(
+  .stops-list > .stops-transition-wrapper > .stop:first-child.is-skipped)
+  .next-stop-container {
+  transition: opacity 0.2s ease;
 }
 </style>

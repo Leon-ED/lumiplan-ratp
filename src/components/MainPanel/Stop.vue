@@ -191,10 +191,14 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
     .stop-transition-enter-active,
     .stop-transition-enter-from,
     .stop-transition-leave-to,
-    .stop-transition-move
+    .stop-transition-move,
+    .is-current
   )
   .stop-indicator {
   animation: blink 1.2s infinite steps(1);
+}
+.blinkable.is-current .stop-indicator {
+  background-color: var(--ratp-yellow);
 }
 
 .stop.is-last-stop .stop-name .text-bg {
@@ -225,7 +229,7 @@ const isStopCurrent = (stop: StopWithTime, index: number) => {
   background-color: #ff1400;
   width: 4.5cqw;
   height: 0.7cqw;
-  left: 3cqw;
+  left: 3.125cqw;
   top: 50%;
   border-radius: 1px;
   z-index: 15;

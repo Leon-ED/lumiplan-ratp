@@ -4,7 +4,7 @@ export const PASSENGER_MESSAGES: PassengerMessage[] = [
   {
     bgColor: "#6AB2E4",
     message:
-      "Bienvenue sur les lignes<br/> Ile-de-France Mobilité<br/>exploitées par la RATP.",
+      "Bienvenue sur les lignes<br/> Ile-de-France Mobilités<br/>exploitées par la RATP.",
     audio: "generic/welcome.mp3",
     duration: 13,
   },

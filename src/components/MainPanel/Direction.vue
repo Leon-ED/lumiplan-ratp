@@ -36,7 +36,7 @@ const translation = useRotatedText(DIRECTION_TEXTS);
   display: grid;
   grid-template-rows: 10% 90%;
   padding: 1cqw;
-  font-size: 2.5cqw;
+  font-size: 2cqw;
   font-family: "ParisineRegular";
 }
 .direction-name {
