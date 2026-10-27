@@ -51,7 +51,7 @@ const removeMessage = (index: number) => {
       <div v-for="(msg, index) in messages" :key="index" class="traffic-item">
         <div class="traffic-item-header">
           <button
-            v-if="index > 0"
+            v-if="index >= 0"
             class="btn-delete"
             @click="removeMessage(index)"
             title="Supprimer ce message additionnel"
