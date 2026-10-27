@@ -27,6 +27,9 @@ defineProps<{
   padding: 1cqw;
   box-sizing: border-box;
   text-align: left;
+  z-index: 4;
+  position: relative;
+  box-shadow: 0px 0 2px 0 black;
 }
 
 .message-content {
