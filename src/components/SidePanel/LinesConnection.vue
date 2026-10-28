@@ -85,14 +85,13 @@ const linesByMode = computed(() => {
       return;
     }
 
-    if ([Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS_AEROPORT].includes(line.mode)) {
-      line.mode = Mode.BUS;
+    const targetMode = [Mode.BUS_REMPLACEMENT, Mode.BUS_AEROPORT, Mode.NOCTILIEN].includes(line.mode)
+      ? Mode.BUS
+      : line.mode;
+    if (!grouped[targetMode]) {
+      grouped[targetMode] = [];
     }
-    if (!grouped[line.mode]) {
-      grouped[line.mode] = [];
-    }
-
-    grouped[line.mode].push(line);
+    grouped[targetMode].push(line);
   });
 
   if (!showAllLinesEnabled.value) {
@@ -107,6 +106,9 @@ const linesByMode = computed(() => {
 
   if (grouped[Mode.TER]) {
     grouped[Mode.TER] = [];
+  }
+  if (grouped[Mode.NOCTILIEN]) {
+    delete grouped[Mode.NOCTILIEN];
   }
 
   const sortedGrouped: { [mode: string]: Line[] } = {};
