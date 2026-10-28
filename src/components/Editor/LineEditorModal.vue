@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Line, Mode } from "../../types";
 import LineLogo from "../Other/LineLogo.vue";
 import { DEFAULT_BG_COLORS, DEFAULT_TEXT_COLORS } from "../../colors.ts";
@@ -11,7 +11,29 @@ const props = defineProps<{
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
+let currentLineRef: Line | null = null;
+let originalSnapshot: string | null = null;
+
+const getLineSnapshot = (line: Line | null) => {
+  if (!line) return null;
+  return JSON.stringify({
+    name: line.name?.trim(),
+    mode: line.mode,
+    color: line.color?.toLowerCase(),
+    textColor: line.textColor?.toLowerCase(),
+    linkedLineId: line.linkedLine?.id,
+  });
+};
+
+const recordSnapshot = (line: Line | null) => {
+  currentLineRef = line;
+  originalSnapshot = getLineSnapshot(line);
+};
+
 const open = () => {
+  if (props.line) {
+    recordSnapshot(props.line);
+  }
   dialogRef.value?.showModal();
 };
 
@@ -62,14 +84,34 @@ const handleLinkedLineChange = () => {
   updateColorsFromLinkedLine(props.line?.linkedLine);
 };
 
-import { watch } from "vue";
 watch(
   () => props.line,
   (newVal) => {
-    if (newVal && !newVal.id.startsWith("editor-made-line")) {
-      newVal.id = `editor-made-line-${Math.random().toString(36).substr(2, 9)}`;
-      if (newVal.exludeInSaveFile) {
-        delete newVal.exludeInSaveFile;
+    if (!newVal) {
+      currentLineRef = null;
+      originalSnapshot = null;
+      return;
+    }
+
+    // Si on ouvre une nouvelle ligne ou qu'on change de ligne
+    if (newVal !== currentLineRef) {
+      recordSnapshot(newVal);
+      return;
+    }
+
+    // Même instance de ligne : on vérifie si un champ a réellement été modifié par rapport à l'état initial
+    if (originalSnapshot && getLineSnapshot(newVal) !== originalSnapshot) {
+      if (!newVal.id.startsWith("editor-made-line")) {
+        const newId =
+          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+            ? `editor-made-line-${crypto.randomUUID()}`
+            : `editor-made-line-${Math.random().toString(36).substring(2, 9)}`;
+
+        newVal.id = newId;
+
+        if (newVal.exludeInSaveFile) {
+          delete newVal.exludeInSaveFile;
+        }
       }
     }
   },
