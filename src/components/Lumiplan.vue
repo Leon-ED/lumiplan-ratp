@@ -159,12 +159,12 @@
       {{ isToolbarHidden ? "Afficher" : "Masquer" }}
     </button>
     <button
-      v-for="n in 10"
-      :key="n"
-      @click="triggerMessage(n - 1)"
-      :title="`Lancer l'annonce ${n}`"
+      v-for="(announcement, index) in PASSENGER_MESSAGES"
+      :key="index"
+      @click="triggerMessage(index)"
+      :title="`Lancer l'annonce: ${announcement.title}`"
     >
-      {{ n === 10 ? 0 : n }}
+      {{ index + 1 === 10 ? 0 : index + 1 }}
     </button>
     <button
       class="toolbar-toggle-large"
@@ -187,7 +187,6 @@
 import { ref, onMounted, onUnmounted, watch, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useIntervalFn } from "@vueuse/core";
-
 import ScreenHeader from "./ScreenHeader.vue";
 import StopList from "./MainPanel/StopList.vue";
 import DataUnavailable from "./MainPanel/DataUnavailable.vue";
@@ -214,6 +213,7 @@ import PassengerMessage from "./SidePanel/PassengerMessage.vue";
 import { AudioManager } from "../audio.ts";
 import DepartureTime from "./SidePanel/DepartureTime.vue";
 import NoData from "./SidePanel/NoData.vue";
+import { PASSENGER_MESSAGES } from "../messages.ts";
 
 const route = useRoute();
 const isToolbarHidden = ref(false);
@@ -344,7 +344,6 @@ const isSplitView = computed(
     ["NO_TRIP_DATA_AVAILABLE", "NO_DATA"].includes(state.value) ||
     (state.value === "FIRST_STOP" && isFirstStopPanelReady.value),
 );
-
 
 const loadSaveModalRef = ref<InstanceType<typeof LoadSaveModal> | null>(null);
 const settingsModalRef = ref<InstanceType<typeof SettingsModal> | null>(null);

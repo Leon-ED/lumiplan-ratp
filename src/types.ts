@@ -83,6 +83,7 @@ export interface SaveFile {
   messages: SaveInfoTrafic[];
 }
 export interface PassengerMessage {
+  title: string;
   bgColor: string;
   message: string;
   subText?: string;
