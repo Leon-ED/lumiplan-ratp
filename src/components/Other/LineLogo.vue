@@ -29,6 +29,9 @@ const style = computed(() => {
   };
 });
 const isLineSpecial = computed(() => {
+  if (props.transparent) {
+    return false;
+  }
   const specialNames = [
     "AUDONIE",
     "TUVIM",
@@ -67,6 +70,8 @@ const isLineSpecial = computed(() => {
     "C02529",
     "C02344",
     "C02732",
+    "C01333", // Ney-Fla  // La Traverse Ney - Flandre
+    "C01757", // Traverse // La Traverse Brancion-Commerce
     "C01742",
     "C01743",
     "C00563",
@@ -160,10 +165,10 @@ const lineLogoComponent = computed(() => {
     />
   </div>
   <img
+    v-else-if="isLineSpecial"
     :data-line-mode-and-name="
       props.line.mode.toString().toUpperCase() + ' : ' + props.line.name
     "
-    v-else-if="isLineSpecial"
     :src="computeNormalImgLink"
     :data-line-id="cleanId(props.line.id)"
     :onerror="'this.onerror=null;this.src=\'' + computeBackupImgLink + '\''"
