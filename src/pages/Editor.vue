@@ -74,7 +74,7 @@ const defaultStop: StopWithTime = {
   isStopSkipped: false,
 };
 const defaultDesserte: DesserteWithLine = {
-  line: defaultLine,
+  line: PRESET_LINES[Math.floor(Math.random() * PRESET_LINES.length)],
   desserte: {
     id: "editor-made-journey",
     direction: "Ma direction",

@@ -73,7 +73,7 @@ watch(
       }
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 
@@ -81,7 +81,6 @@ watch(
   <dialog class="line-edition" ref="dialogRef">
     <header class="dialog-header">
       <h3>Modifier la ligne</h3>
-
       <button class="close-btn" @click="close" title="Fermer">✕</button>
     </header>
 
@@ -187,7 +186,11 @@ watch(
     </div>
 
     <div class="line-edition_render" v-if="line">
-      <img :src="'/modes/' + line.mode.toLowerCase() + '.svg'" alt="Mode" class="mode-picto" />
+      <img
+        :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
+        alt="Mode"
+        class="mode-picto"
+      />
       <LineLogo :line="line" class-name="line-logo" size="5rem" />
     </div>
   </dialog>

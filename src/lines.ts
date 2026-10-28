@@ -537,15 +537,15 @@ export const BUS_LINES: Line[] = [
   },
   {
     id: "IDFM:autobus_suresnois",
-    name: "AS",
+    name: "AS : Autobus Suresnois",
     color: "#82C8E6",
     textColor: "#FFFFFF",
     mode: Mode.BUS,
     exludeInSaveFile: true,
   },
   {
-    id: "IDFM:LBLEUE",
-    name: "LBLEUE",
+    id: "IDFM:LIGNE_BLEUE",
+    name: "LBLEUE : Ligne Bleue",
     color: "#0055A4",
     textColor: "#FFFFFF",
     mode: Mode.BUS,
@@ -569,7 +569,7 @@ export const BUS_LINES: Line[] = [
   },
   {
     id: "IDFM:C01330",
-    name: "Bievres",
+    name: "Bievres : La Traverse Bièvres–Montsouris",
     color: "#BBA5D4",
     textColor: "#000000",
     mode: Mode.BUS,
@@ -577,7 +577,7 @@ export const BUS_LINES: Line[] = [
   },
   {
     id: "IDFM:C01757",
-    name: "Traverse",
+    name: "Traverse : La Traverse Brancion-Commerce",
     color: "#CBE859",
     textColor: "#FFFFFF",
     mode: Mode.BUS,
@@ -585,7 +585,7 @@ export const BUS_LINES: Line[] = [
   },
   {
     id: "IDFM:C01332",
-    name: "Batigno",
+    name: "Batigno : La Traverse Batignolles-Bichat",
     color: "#4B2795",
     textColor: "#FFFFFF",
     mode: Mode.BUS,
@@ -593,7 +593,7 @@ export const BUS_LINES: Line[] = [
   },
   {
     id: "IDFM:C01333",
-    name: "Ney-Fla",
+    name: "Ney-Fla : La Traverse Ney–Flandre",
     color: "#C9A2CD",
     textColor: "#000000",
     mode: Mode.BUS,

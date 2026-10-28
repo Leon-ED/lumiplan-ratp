@@ -43,18 +43,26 @@ const isLineSpecial = computed(() => {
     "TVM",
     "ROISSYBUS",
     "CHARONNE",
-    "AMIBUS",
+    // "AMIBUS",
     "MONTBUS",
     "RIVER",
     "PORT",
     "EOLIEN",
     "AS",
-    "LBLEUE",
     "THIAIS",
     "CHOISYBUS",
     "BIEVRES",
   ];
   const specialIds = [
+    "C01366", // Amibus
+    "C01330", // Bievres : La Traverse Bièvres–Montsouris
+    "AUTOBUS_SURESNOIS", // AS : Autobus Suresnois
+    "C01757", // Traverse : La Traverse Brancion-Commerce
+    "C01332", // Batigno : La Traverse Batignolles-Bichat
+    "C01333", // Ney-Fla : La Traverse Ney–Flandre
+    "C01333", // Ney-Fla  // La Traverse Ney - Flandre
+    "C01757", // Traverse // La Traverse Brancion-Commerce
+    "LIGNE_BLEUE", // LBLEUE : Ligne Bleue
     "C01389",
     "C01390",
     "C01391",
@@ -70,8 +78,6 @@ const isLineSpecial = computed(() => {
     "C02529",
     "C02344",
     "C02732",
-    "C01333", // Ney-Fla  // La Traverse Ney - Flandre
-    "C01757", // Traverse // La Traverse Brancion-Commerce
     "C01742",
     "C01743",
     "C00563",
@@ -124,7 +130,6 @@ const isLineSpecial = computed(() => {
     "C01853",
     "C02404",
   ];
-
   return (
     specialNames.includes(
       props.line.name.toLocaleUpperCase().replace(/\s/g, ""),
@@ -176,8 +181,10 @@ const lineLogoComponent = computed(() => {
     :style="style"
   />
   <div
-    v-else-if="[Mode.BUS,Mode.BUS_AEROPORT].includes(props.line.mode) ||
-      (props.line.mode === Mode.BUS_REMPLACEMENT && !props.line.linkedLine)"
+    v-else-if="
+      [Mode.BUS, Mode.BUS_AEROPORT].includes(props.line.mode) ||
+      (props.line.mode === Mode.BUS_REMPLACEMENT && !props.line.linkedLine)
+    "
     :class="props.className"
   >
     <BusLineLogo
