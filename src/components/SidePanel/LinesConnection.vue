@@ -85,23 +85,24 @@ const linesByMode = computed(() => {
       return;
     }
 
-    if ([Mode.NOCTILIEN, Mode.BUS_REMPLACEMENT, Mode.BUS_AEROPORT].includes(line.mode)) {
-      line.mode = Mode.BUS;
-    }
-    if (!grouped[line.mode]) {
-      grouped[line.mode] = [];
+    const groupKey = [
+      Mode.NOCTILIEN,
+      Mode.BUS_REMPLACEMENT,
+      Mode.BUS_AEROPORT,
+    ].includes(line.mode)
+      ? Mode.BUS
+      : line.mode;
+
+    if (!grouped[groupKey]) {
+      grouped[groupKey] = [];
     }
 
-    grouped[line.mode].push(line);
+    grouped[groupKey].push(line);
   });
 
   if (!showAllLinesEnabled.value) {
     if (grouped[Mode.BUS]) {
       grouped[Mode.BUS] = [];
-    }
-
-    if (grouped[Mode.NOCTILIEN]) {
-      delete grouped[Mode.NOCTILIEN];
     }
   }
 
