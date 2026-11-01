@@ -55,9 +55,6 @@ export class Converter {
       return Mode.BUS;
     }
     switch (normalizedMode) {
-      case "tram":
-        return Mode.TRAM;
-
       case "subway":
         return Mode.METRO;
 
@@ -66,8 +63,8 @@ export class Converter {
 
       case "cable_car":
       case "aerial_lift":
-      case "telepherique":
         return Mode.CABLE;
+
       case "funicular":
         return Mode.METRO;
 
@@ -76,6 +73,7 @@ export class Converter {
 
       case "monorail":
         return Mode.TRAM;
+
       default:
         return Mode.BUS;
     }

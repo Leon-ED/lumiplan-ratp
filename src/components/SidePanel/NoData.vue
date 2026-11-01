@@ -1,7 +1,7 @@
 <template>
   <aside class="aside">
     Informations<br />sur le parcours <br />du bus<br />indisponibles
-    <img src="../../assets/img/screw-driver.svg" class="tool-icon" />
+    <!-- <img src="../../assets/img/screw-driver.svg" class="tool-icon" /> -->
   </aside>
 </template>
 <style lang="css" scoped>
