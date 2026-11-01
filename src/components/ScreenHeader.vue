@@ -2,7 +2,7 @@
   <header class="header">
     <img
       v-if="line"
-      :src="'/modes/' + line.mode.toLowerCase() + '.svg'"
+      :src="logoUrl"
       class="mode-picto"
     />
     <LineLogo
@@ -59,10 +59,20 @@ const props = defineProps<{
 }>();
 const { showMissionEnabled } = useSettings();
 const logoSize = computed(() => {
+  if ([Mode.TRAM, Mode.FLUVIAL, Mode.VELO].includes(props.line.mode)) {
+    return "120%";
+  }
   if ([Mode.BUS, Mode.NOCTILIEN, Mode.BUS_AEROPORT].includes(props.line.mode)) {
     return "80%";
   }
   return "100%";
+});
+const logoUrl = computed(() => {
+  let mode = props.line.mode.toLowerCase();
+  if (props.line.mode === Mode.NOCTILIEN) {
+    mode = "bus";
+  }
+  return `/modes/${mode}.svg`;
 });
 </script>
 
