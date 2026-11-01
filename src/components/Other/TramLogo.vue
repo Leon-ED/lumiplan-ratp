@@ -23,10 +23,26 @@
       text-anchor="middle"
       dominant-baseline="central"
       :fill="transparent ? textColor : '#25303b'"
-      :font-size="getFontSize(lineName.length)"
+      :font-size="fontSize"
       font-family="ParisineBold"
     >
-      {{ lineName }}
+      <!-- Cas 1 : Lettre(s) + Chiffre(s) + 1 Lettre (en exposant et taille 50%) -->
+      <template v-if="parsedLine.type === 'with-suffix'">
+        <tspan letter-spacing="1.7">{{ parsedLine.prefix }}</tspan>
+        <tspan>{{ parsedLine.digits }}</tspan>
+        <tspan :font-size="fontSize * 0.75" dy="-0.1em">{{ parsedLine.suffix }}</tspan>
+      </template>
+
+      <!-- Cas 2 : Lettre(s) + Chiffre(s) -->
+      <template v-else-if="parsedLine.type === 'prefix-digits'">
+        <tspan letter-spacing="1.7">{{ parsedLine.prefix }}</tspan>
+        <tspan>{{ parsedLine.digits }}</tspan>
+      </template>
+
+      <!-- Cas 3 : Basique -->
+      <template v-else>
+        {{ lineName }}
+      </template>
     </text>
   </svg>
 </template>
@@ -53,10 +69,33 @@ const style = computed(() => ({
   "--height": props.height,
 }));
 
-const getFontSize = (length: number): number => {
-  const base = 20;
-  return base - (length - 1) * 3.5;
-};
+const fontSize = computed(() => {
+  const base = 16.5;
+  return base - Math.min(0, props.lineName.length - 1) * 3.5;
+});
+
+const parsedLine = computed(() => {
+  const val = props.lineName.trim();
+  const suffixMatch = val.match(/^([A-Za-zÀ-ÿ]+)(\d+)([A-Za-zÀ-ÿ])$/);
+  if (suffixMatch) {
+    return {
+      type: "with-suffix" as const,
+      prefix: suffixMatch[1],
+      digits: suffixMatch[2],
+      suffix: suffixMatch[3],
+    };
+  }
+  const digitsMatch = val.match(/^([A-Za-zÀ-ÿ]+)(\d+)$/);
+  if (digitsMatch) {
+    return {
+      type: "prefix-digits" as const,
+      prefix: digitsMatch[1],
+      digits: digitsMatch[2],
+    };
+  }
+
+  return { type: "plain" as const };
+});
 </script>
 
 <style scoped>
@@ -64,7 +103,7 @@ svg {
   display: block;
   font-family: "ParisineBold", sans-serif;
   height: var(--height);
-  width: var(--height); /* Assure que le SVG reste carré */
+  width: var(--height);
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;

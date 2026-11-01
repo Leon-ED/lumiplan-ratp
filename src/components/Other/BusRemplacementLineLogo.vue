@@ -40,50 +40,24 @@
         >
           SNCF
         </text>
-        <MetroModeLogo
-          v-else-if="replacedLine.mode === Mode.METRO"
-          :color="textColor"
-          stroke-width="18"
-          height="16"
-        />
-
-        <!-- RER -->
-        <RerModeLogo
-          v-else-if="replacedLine.mode === Mode.RER"
-          :color="textColor"
-          stroke-width="18"
-          height="16"
-        />
-
-        <TransilienModeLogo
-          v-else-if="replacedLine.mode === Mode.TRANSILIEN"
-          :color="textColor"
-          stroke-width="18"
-          height="16"
-        />
-
-        <TramModeLogo
-          v-else-if="replacedLine.mode === Mode.TRAM"
-          :color="textColor"
-          stroke-width="18"
-          height="16"
-        />
-        <CableModeLogo
-          v-else-if="replacedLine.mode === Mode.CABLE"
-          :color="textColor"
-          stroke-width="18"
-          height="16"
-        />
         <g
           v-if="replacedLine.mode === Mode.TER"
           transform="translate(22, 0)"
         >
-          <TerModeLogo
+          <ModeLogo
+            :mode="Mode.TER"
             :color="textColor"
             stroke-width="18"
             height="16"
           />
         </g>
+        <ModeLogo
+          v-else
+          :mode="replacedLine.mode"
+          :color="textColor"
+          stroke-width="18"
+          height="16"
+        />
       </g>
       <foreignObject
         v-if="replaceLineOverride.mode !== Mode.TER"
@@ -107,12 +81,7 @@
 import { computed } from "vue";
 import { Line, Mode } from "../../types";
 
-import MetroModeLogo from "./Modes/MetroModeLogo.vue";
-import RerModeLogo from "./Modes/RerModeLogo.vue";
-import TransilienModeLogo from "./Modes/TransilienModeLogo.vue";
-import TramModeLogo from "./Modes/TramModeLogo.vue";
-import CableModeLogo from "./Modes/CableModeLogo.vue";
-import TerModeLogo from "./Modes/TerModeLogo.vue";
+import ModeLogo from "./Modes/ModeLogo.vue";
 import LineLogo from "./LineLogo.vue";
 
 interface Props {

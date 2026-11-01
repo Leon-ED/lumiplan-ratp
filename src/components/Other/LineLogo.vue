@@ -8,7 +8,68 @@ import TrainLogo from "./TrainLogo.vue";
 import MetroLogo from "./MetroLogo.vue";
 import TramLogo from "./TramLogo.vue";
 import BusRemplacementLineLogo from "./BusRemplacementLineLogo.vue";
-
+const SPECIAL_NAMES = new Set([
+    "AUDONIE",
+    "TUVIM",
+    "TILLBUS",
+    "TUC",
+    "ORLYBUS",
+    "FUN",
+    "ORLYVAL",
+    "TVM",
+    "ROISSYBUS",
+    "CHARONNE",
+    // "AMIBUS",
+    "MONTBUS",
+    "RIVER",
+    "PORT",
+    "EOLIEN",
+    "AS",
+    "THIAIS",
+    "CHOISYBUS",
+    "BIEVRES",
+  ]);
+const SPECIAL_IDS = new Set([
+    "LUMIPLAN",
+    "WAGON",
+    "C01366", // Amibus
+    "C01342", // TUB
+    "C01330", // Bievres : La Traverse Bièvres–Montsouris
+    "AUTOBUS_SURESNOIS", // AS : Autobus Suresnois
+    "IDFM", // IDFM : Île-de-France Mobilités
+    "C01757", // Traverse : La Traverse Brancion-Commerce
+    "C01332", // Batigno : La Traverse Batignolles-Bichat
+    "C01333", // Ney-Fla : La Traverse Ney–Flandre
+    "C01333", // Ney-Fla  // La Traverse Ney - Flandre
+    "C01757", // Traverse // La Traverse Brancion-Commerce
+    "LIGNE_BLEUE", // LBLEUE : Ligne Bleue
+    "C00563", // CDG VAL
+    // "C01386", // Métro 3b
+    // "C01387", // Métro 7b
+    "C01840", // Remplacmeent Transilien U
+    "C01841", // Remplacement Transilien P
+    "C01842", // Remplacement Transilien H
+    "C01844", // Remplacement Transilien K
+    "C02534", // Remplacement Métro 13
+    "C01357", // ClamiBus
+    "C02268", // Remplacement Métro 6
+    "C02442", // Remplacement RER A
+    "C02471", // Remplacement Métro 12
+    "C01683", // Remplacement Tram T4
+    "C02406", // Remplacement Tram T3a
+    "C02590", // Remplacement Métro 7B
+    "C02469", // Remplacement Tram T13
+    "C01845", // Remplacement Transilien N
+    "C01846", // Remplacement Transilien J
+    "C01847", // Remplacement Transilien L
+    "C01848", // Remplacement Transilien R
+    "C01849", // Remplacement RER A
+    "C01850", // Remplacement RER B
+    "C01851", // Remplacement RER C
+    "C01852", // Remplacement RER D
+    "C01853",// Remplacement RER E
+    "C02404",
+  ]);
 interface Props {
   line: Line;
   className: string;
@@ -32,115 +93,18 @@ const isLineSpecial = computed(() => {
   if (props.transparent) {
     return false;
   }
-  const specialNames = [
-    "AUDONIE",
-    "TUVIM",
-    "TILLBUS",
-    "TUC",
-    "ORLYBUS",
-    "FUN",
-    "ORLYVAL",
-    "TVM",
-    "ROISSYBUS",
-    "CHARONNE",
-    // "AMIBUS",
-    "MONTBUS",
-    "RIVER",
-    "PORT",
-    "EOLIEN",
-    "AS",
-    "THIAIS",
-    "CHOISYBUS",
-    "BIEVRES",
-  ];
-  const specialIds = [
-    "C01366", // Amibus
-    "C01330", // Bievres : La Traverse Bièvres–Montsouris
-    "AUTOBUS_SURESNOIS", // AS : Autobus Suresnois
-    "C01757", // Traverse : La Traverse Brancion-Commerce
-    "C01332", // Batigno : La Traverse Batignolles-Bichat
-    "C01333", // Ney-Fla : La Traverse Ney–Flandre
-    "C01333", // Ney-Fla  // La Traverse Ney - Flandre
-    "C01757", // Traverse // La Traverse Brancion-Commerce
-    "LIGNE_BLEUE", // LBLEUE : Ligne Bleue
-    "C01389",
-    "C01390",
-    "C01391",
-    "C01679",
-    "C01843",
-    "C01684",
-    "C01794",
-    "C01774",
-    "C01795",
-    "C02317",
-    "C02528",
-    "C01999",
-    "C02529",
-    "C02344",
-    "C02732",
-    "C01742",
-    "C01743",
-    "C00563",
-    "C01386",
-    "C01387",
-    "C01384",
-    "C01383",
-    "C01840",
-    "C01841",
-    "C02310",
-    "C01842",
-    "C02512",
-    "C01844",
-    "C02405",
-    "C02483",
-    "C02534",
-    "C01357",
-    "C02494",
-    "C02527",
-    "C02492",
-    "C02268",
-    "C02475",
-    "C02533",
-    "C02442",
-    "C02385",
-    "C02019",
-    "C02514",
-    "C02532",
-    "C02531",
-    "C02471",
-    "C01683",
-    "C02406",
-    "C02590",
-    "C02407",
-    "C02408",
-    "C02409",
-    "C02410",
-    "C02411",
-    "C02573",
-    "C02469",
-    "C02180",
-    "C01845",
-    "C01846",
-    "C01847",
-    "C01848",
-    "C01849",
-    "C01850",
-    "C01851",
-    "C01852",
-    "C01853",
-    "C02404",
-  ];
+  
   return (
-    specialNames.includes(
+    SPECIAL_NAMES.has(
       props.line.name.toLocaleUpperCase().replace(/\s/g, ""),
-    ) || specialIds.includes(cleanId(props.line.id))
+    ) || SPECIAL_IDS.has(cleanId(props.line.id))
   );
 });
 const computeBackupImgLink = computed(() => {
   return "/lines/" + props.line.name.toLowerCase().replace(/\s/g, "_") + ".svg";
 });
 const computeNormalImgLink = computed(() => {
-  return "/lines/" + cleanId(cleanId(props.line.id)) + ".svg";
+  return "/lines/" + cleanId(props.line.id) + ".svg";
 });
 const lineLogoComponent = computed(() => {
   if (isLineSpecial.value) {
