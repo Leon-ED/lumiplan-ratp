@@ -59,7 +59,7 @@ const props = defineProps<{
 }>();
 const { showMissionEnabled } = useSettings();
 const logoSize = computed(() => {
-  if ([Mode.TRAM, Mode.FLUVIAL, Mode.VELO].includes(props.line.mode)) {
+  if ([Mode.TRAM].includes(props.line.mode)) {
     return "120%";
   }
   if ([Mode.BUS, Mode.NOCTILIEN, Mode.BUS_AEROPORT].includes(props.line.mode)) {
