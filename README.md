@@ -42,6 +42,9 @@ Lancer l'environnement de dev
 ```sh
 npm run dev
 ```
+Renommer le fichier `.env.exemple` en `.env` et renseigner les variables d'environnement.
+
+
 Par défaut le projet sera disponible dans le navigateur avec l'url
 
 > http://localhost:5173/
