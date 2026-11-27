@@ -22,21 +22,41 @@
       y="50%"
       text-anchor="middle"
       dominant-baseline="central"
+      alignment-baseline="central"
       :fill="transparent ? textColor : '#25303b'"
       :font-size="fontSize"
       font-family="ParisineBold"
     >
       <!-- Cas 1 : Lettre(s) + Chiffre(s) + 1 Lettre (en exposant et taille 50%) -->
       <template v-if="parsedLine.type === 'with-suffix'">
-        <tspan letter-spacing="1.7">{{ parsedLine.prefix }}</tspan>
-        <tspan>{{ parsedLine.digits }}</tspan>
-        <tspan :font-size="fontSize * 0.75" dy="-0.1em">{{ parsedLine.suffix }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+          letter-spacing="1.7"
+        >{{ parsedLine.prefix }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+        >{{ parsedLine.digits }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+          :font-size="fontSize * 0.75"
+          dy="-0.1em"
+        >{{ parsedLine.suffix }}</tspan>
       </template>
 
       <!-- Cas 2 : Lettre(s) + Chiffre(s) -->
       <template v-else-if="parsedLine.type === 'prefix-digits'">
-        <tspan letter-spacing="1.7">{{ parsedLine.prefix }}</tspan>
-        <tspan>{{ parsedLine.digits }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+          letter-spacing="1.7"
+        >{{ parsedLine.prefix }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+        >{{ parsedLine.digits }}</tspan>
       </template>
 
       <!-- Cas 3 : Basique -->
@@ -108,5 +128,11 @@ svg {
   word-break: break-word;
   overflow-wrap: break-word;
   text-overflow: ellipsis;
+}
+
+text,
+tspan {
+  dominant-baseline: central;
+  alignment-baseline: central;
 }
 </style>

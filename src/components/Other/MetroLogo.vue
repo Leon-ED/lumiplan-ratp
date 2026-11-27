@@ -11,6 +11,7 @@
       y="50%"
       text-anchor="middle"
       dominant-baseline="central"
+      alignment-baseline="central"
       :letter-spacing="letterSpacing"
       :fill="textColor"
       :font-size="fontSize"
@@ -18,8 +19,18 @@
     >
       <!-- Cas : Chiffre(s) + Lettre(s) -->
       <template v-if="parsedLine.type === 'digits-letters'">
-        <tspan>{{ parsedLine.digits }}</tspan>
-        <tspan :font-size="fontSize * 0.35" letter-spacing=".4" dx="1.5" dy="-0.1em">{{ parsedLine.letters }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+        >{{ parsedLine.digits }}</tspan>
+        <tspan
+          dominant-baseline="central"
+          alignment-baseline="central"
+          :font-size="fontSize * 0.35"
+          letter-spacing=".4"
+          dx="1.5"
+          dy="-0.1em"
+        >{{ parsedLine.letters }}</tspan>
       </template>
 
       <!-- Cas standard -->
@@ -118,5 +129,11 @@ svg {
   display: block;
   font-family: "ParisineBold";
   height: var(--height);
+}
+
+text,
+tspan {
+  dominant-baseline: central;
+  alignment-baseline: central;
 }
 </style>
